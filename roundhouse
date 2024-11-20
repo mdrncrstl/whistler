@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fullscreen Stream</title>
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: black;
+    }
+    video {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
+    }
+  </style>
+</head>
+<body>
+  <video id="video" autoplay muted loop playsinline></video>
+  <script>
+    const video = document.getElementById('video');
+    const streamURL = 'https://streamer3.brownrice.com/whistlerroundhouse/whistlerroundhouse.stream/playlist.m3u8';
+
+    if (Hls.isSupported()) {
+      const hls = new Hls();
+      hls.loadSource(streamURL);
+      hls.attachMedia(video);
+    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+      video.src = streamURL;
+    } else {
+      alert('Your browser does not support HLS streaming.');
+    }
+  </script>
+</body>
+</html>
