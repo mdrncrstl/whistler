@@ -3,30 +3,47 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Fullscreen Stream</title>
+  <title>Roundhouse Stream with Timestamp</title>
   <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
   <style>
     body {
       margin: 0;
       overflow: hidden;
       background: black;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
     }
     video {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      background: black;
+    }
+    #timestamp {
       position: absolute;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      object-fit: cover;
+      bottom: 10px;
+      right: 10px;
+      color: white;
+      background: rgba(0, 0, 0, 0.6);
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-family: Arial, sans-serif;
+      font-size: 14px;
+      z-index: 10;
     }
   </style>
 </head>
 <body>
   <video id="video" autoplay muted loop playsinline></video>
+  <div id="timestamp">Loading time...</div>
   <script>
     const video = document.getElementById('video');
+    const timestamp = document.getElementById('timestamp');
     const streamURL = 'https://streamer3.brownrice.com/whistlerroundhouse/whistlerroundhouse.stream/playlist.m3u8';
 
+    // Load the HLS stream
     if (Hls.isSupported()) {
       const hls = new Hls();
       hls.loadSource(streamURL);
@@ -36,6 +53,15 @@
     } else {
       alert('Your browser does not support HLS streaming.');
     }
+
+    // Update timestamp every second
+    function updateTimestamp() {
+      const options = { timeZone: 'America/Vancouver', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
+      const whistlerTime = new Intl.DateTimeFormat('en-US', options).format(new Date());
+      timestamp.textContent = `Time: ${whistlerTime}`;
+    }
+
+    setInterval(updateTimestamp, 1000);
   </script>
 </body>
 </html>
