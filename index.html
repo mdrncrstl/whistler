@@ -13,12 +13,14 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
+      height: 100vh; /* Match the viewport height */
+      width: 100vw; /* Match the viewport width */
     }
     video {
-      max-width: 100%;
-      max-height: 100%;
-      object-fit: contain; /* Keeps aspect ratio without stretching */
+      width: auto;
+      height: auto;
+      max-width: 100vw; /* Limit the video width to the viewport */
+      max-height: 100vh; /* Limit the video height to the viewport */
     }
   </style>
 </head>
