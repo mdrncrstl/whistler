@@ -13,11 +13,13 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
+      height: 100vh; /* Full viewport height */
+      width: 100vw; /* Full viewport width */
     }
     video {
-      width: 100%;
-      height: 100%;
+      width: 2496px; /* Match the width of the Surface Laptop */
+      height: auto; /* Maintain aspect ratio */
+      max-height: 100vh; /* Prevent overflow beyond screen height */
       object-fit: contain;
       background: black;
     }
@@ -26,7 +28,7 @@
       bottom: 10px;
       right: 10px;
       color: white;
-      background: rgba(0, 0, 0, 0.6);
+      background: rgba(0, 0, 0, 0.4); /* Black box with 40% transparency */
       padding: 5px 10px;
       border-radius: 5px;
       font-family: Arial, sans-serif;
@@ -37,7 +39,7 @@
 </head>
 <body>
   <video id="video" autoplay muted loop playsinline></video>
-  <div id="timestamp">Loading time...</div>
+  <div id="timestamp">Loading...</div>
   <script>
     const video = document.getElementById('video');
     const timestamp = document.getElementById('timestamp');
@@ -56,9 +58,19 @@
 
     // Update timestamp every second
     function updateTimestamp() {
-      const options = { timeZone: 'America/Vancouver', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
-      const whistlerTime = new Intl.DateTimeFormat('en-US', options).format(new Date());
-      timestamp.textContent = `Time: ${whistlerTime}`;
+      const options = {
+        timeZone: 'America/Vancouver', // Whistler time
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+      };
+      const now = new Date();
+      const whistlerTime = new Intl.DateTimeFormat('en-CA', options).format(now);
+      timestamp.textContent = `Date & Time: ${whistlerTime}`;
     }
 
     setInterval(updateTimestamp, 1000);
