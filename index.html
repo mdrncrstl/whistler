@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Fit Without Cropping</title>
+  <title>Fit to Surface 3</title>
   <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
   <style>
     body {
@@ -13,14 +13,14 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh; /* Full viewport height */
-      width: 100vw; /* Full viewport width */
+      height: 100vh;
+      width: 100vw;
     }
     video {
-      width: 100%; /* Scale video width to container */
-      height: auto; /* Adjust height to maintain aspect ratio */
-      aspect-ratio: 16/9; /* Ensure proper aspect ratio (modify if needed) */
-      background: black; /* Add black bars if required to fit */
+      width: 2496px; /* Exact width of your screen */
+      height: 1664px; /* Exact height of your screen */
+      object-fit: contain; /* Ensures full video fits without cropping */
+      background: black;
     }
   </style>
 </head>
