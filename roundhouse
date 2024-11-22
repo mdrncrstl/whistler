@@ -18,7 +18,7 @@
     #video-container {
       position: relative;
       width: 2256px; /* Match the video width to your screen resolution */
-      height: 1504px; /* Match the video height to your screen resolution */
+      height: 1267.5px; /* Match the video height to your screen resolution */
       background: black;
     }
     video {
