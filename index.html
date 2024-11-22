@@ -2,85 +2,35 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Whistler Stream with Timestamp</title>
-  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Whistler Streams</title>
   <style>
     body {
-      margin: 0;
-      overflow: hidden;
-      background: black;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      width: 100vw;
-    }
-    #video-container {
-      position: relative;
-      width: 2256px; /* Match the video width to your screen resolution */
-      height: 1504px; /* Match the video height to your screen resolution */
-      background: black;
-    }
-    video {
-      width: 100%;
-      height: 100%;
-      object-fit: contain; /* Ensures the full video fits without cropping */
-    }
-    #timestamp {
-      position: absolute;
-      top: 10px; /* Place in the top-left corner of the video */
-      left: 10px;
-      color: white;
-      background: rgba(0, 0, 0, 0.6); /* Black box with 60% transparency */
-      padding: 5px 10px;
-      border-radius: 5px;
       font-family: Arial, sans-serif;
-      font-size: 14px;
-      z-index: 10;
       text-align: center;
+      background: black;
+      color: white;
+      margin: 0;
+      padding: 20px;
+    }
+    a {
+      color: #4CAF50;
+      text-decoration: none;
+      font-size: 18px;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+    .links {
+      margin-top: 20px;
     }
   </style>
 </head>
 <body>
-  <div id="video-container">
-    <video id="video" autoplay muted loop playsinline></video>
-    <div id="timestamp">Loading...</div>
+  <h1>Whistler Blackcomb Live Streams</h1>
+  <p>Welcome to the live streams of Whistler Blackcomb. Select a stream below:</p>
+  <div class="links">
+    <a href="roundhouse">Roundhouse Lodge Stream</a>
   </div>
-  <script>
-    const video = document.getElementById('video');
-    const timestamp = document.getElementById('timestamp');
-    const streamURL = 'https://streamer3.brownrice.com/whistlerroundhouse/whistlerroundhouse.stream/playlist.m3u8';
-
-    // Load the HLS stream
-    if (Hls.isSupported()) {
-      const hls = new Hls();
-      hls.loadSource(streamURL);
-      hls.attachMedia(video);
-    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-      video.src = streamURL;
-    } else {
-      alert('Your browser does not support HLS streaming.');
-    }
-
-    // Update timestamp every second
-    function updateTimestamp() {
-      const options = {
-        timeZone: 'America/Vancouver', // Whistler time
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: true, // Enable 12-hour format with AM/PM
-      };
-      const now = new Date();
-      const whistlerTime = new Intl.DateTimeFormat('en-CA', options).format(now);
-      timestamp.textContent = `Date & Time: ${whistlerTime}`;
-    }
-
-    updateTimestamp(); // Initial call
-    setInterval(updateTimestamp, 1000);
-  </script>
 </body>
 </html>
