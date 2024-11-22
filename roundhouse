@@ -13,14 +13,12 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh; /* Full viewport height */
-      width: 100vw; /* Full viewport width */
+      height: 100vh;
     }
     video {
-      width: 2496px; /* Match the width of the Surface Laptop */
-      height: auto; /* Maintain aspect ratio */
-      max-height: 100vh; /* Prevent overflow beyond screen height */
-      object-fit: contain;
+      width: 2496px; /* Match your Surface Laptop width */
+      height: 1664px; /* Match your Surface Laptop height */
+      object-fit: fill; /* Prevents any cropping or empty space */
       background: black;
     }
     #timestamp {
@@ -34,6 +32,7 @@
       font-family: Arial, sans-serif;
       font-size: 14px;
       z-index: 10;
+      text-align: center;
     }
   </style>
 </head>
