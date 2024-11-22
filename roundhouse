@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Roundhouse Stream with Timestamp</title>
+  <title>Fit to Surface 3</title>
   <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
   <style>
     body {
@@ -14,37 +14,22 @@
       justify-content: center;
       align-items: center;
       height: 100vh;
+      width: 100vw;
     }
     video {
-      width: 2496px; /* Match your Surface Laptop width */
-      height: 1664px; /* Match your Surface Laptop height */
-      object-fit: fill; /* Prevents any cropping or empty space */
+      width: 2496px; /* Exact width of your screen */
+      height: 1664px; /* Exact height of your screen */
+      object-fit: contain; /* Ensures full video fits without cropping */
       background: black;
-    }
-    #timestamp {
-      position: absolute;
-      bottom: 10px;
-      right: 10px;
-      color: white;
-      background: rgba(0, 0, 0, 0.4); /* Black box with 40% transparency */
-      padding: 5px 10px;
-      border-radius: 5px;
-      font-family: Arial, sans-serif;
-      font-size: 14px;
-      z-index: 10;
-      text-align: center;
     }
   </style>
 </head>
 <body>
   <video id="video" autoplay muted loop playsinline></video>
-  <div id="timestamp">Loading...</div>
   <script>
     const video = document.getElementById('video');
-    const timestamp = document.getElementById('timestamp');
     const streamURL = 'https://streamer3.brownrice.com/whistlerroundhouse/whistlerroundhouse.stream/playlist.m3u8';
 
-    // Load the HLS stream
     if (Hls.isSupported()) {
       const hls = new Hls();
       hls.loadSource(streamURL);
@@ -54,25 +39,6 @@
     } else {
       alert('Your browser does not support HLS streaming.');
     }
-
-    // Update timestamp every second
-    function updateTimestamp() {
-      const options = {
-        timeZone: 'America/Vancouver', // Whistler time
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: false
-      };
-      const now = new Date();
-      const whistlerTime = new Intl.DateTimeFormat('en-CA', options).format(now);
-      timestamp.textContent = `Date & Time: ${whistlerTime}`;
-    }
-
-    setInterval(updateTimestamp, 1000);
   </script>
 </body>
 </html>
