@@ -1,0 +1,15 @@
+import '@testing-library/jest-dom/vitest'
+
+class ResizeObserverMock {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+}
+
+Object.defineProperty(globalThis, 'ResizeObserver', { value: ResizeObserverMock, writable: true })
+Object.defineProperty(window, 'matchMedia', {
+  writable: true,
+  value: (query: string) => ({ matches: false, media: query, onchange: null, addListener: () => undefined, removeListener: () => undefined, addEventListener: () => undefined, removeEventListener: () => undefined, dispatchEvent: () => false }),
+})
+Object.defineProperty(URL, 'createObjectURL', { value: () => 'blob:masterdeck-test', writable: true })
+Object.defineProperty(URL, 'revokeObjectURL', { value: () => undefined, writable: true })

@@ -1,0 +1,12 @@
+Portfolio holdings
+Symbol,Security Name,Quantity,Average Cost,Current Price,Market Value,Currency,Exchange
+VGS,Vanguard MSCI Index ETF,12,110.50,145.20,1742.40,AUD,ASX
+
+Cash balances
+Currency,Balance,Account Name
+AUD,245.30,Superhero
+
+Transactions
+Transaction Date,Transaction Type,Symbol,Quantity,Price,Amount,Brokerage,Currency,Reference
+01/08/2026,BUY,CBA,5,160,-800,5,AUD,fixture-1
+02/08/2026,DIVIDEND,VGS,0,0,12.50,0,AUD,fixture-2
