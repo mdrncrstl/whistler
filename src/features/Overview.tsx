@@ -25,8 +25,8 @@ export function Overview() {
   return (
     <>
       <PageHeader
-        title="Portfolio overview"
-        description="Your combined Interactive Brokers and Superhero position in AUD."
+        title="Portfolio"
+        description="Your complete position across every connected account, reported in AUD."
         actions={<Button icon={RefreshCw} busy={action === 'refresh-quotes'} onClick={() => refreshQuotes()}>Refresh market data</Button>}
       />
       <div className="metric-grid four">

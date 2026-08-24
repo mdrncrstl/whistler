@@ -1,4 +1,5 @@
-import { Eye, EyeOff, LogOut, Save, ShieldCheck, SlidersHorizontal, UserRound } from 'lucide-react'
+import { CreditCard, Eye, EyeOff, LogOut, Save, ShieldCheck, SlidersHorizontal, UserRound } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import { useState } from 'react'
 import { usePortfolio } from '../context/PortfolioContext'
 import { authClient } from '../lib/supabase'
@@ -59,6 +60,11 @@ function SettingsForm({ profile, demo, action, updateProfile, onExitDemo }: {
           </ul>
           <div className="session-row"><span><strong>Current session</strong><small>{demo ? 'Local demo only' : 'Google identity via Supabase'}</small></span><Badge tone={demo ? 'warning' : 'success'}>{demo ? 'Demo' : 'Authenticated'}</Badge></div>
           <Button variant="danger" icon={LogOut} onClick={signOut}>{demo ? 'Exit demo' : 'Sign out on this device'}</Button>
+        </Card>
+        <Card className="settings-card billing-settings-card">
+          <div className="settings-title"><CreditCard /><div><h2>Plan & billing</h2><p>Compare plans, subscribe securely or manage an existing subscription.</p></div></div>
+          <div className="session-row"><span><strong>Current plan</strong><small>{demo ? 'Illustrative demo workspace' : 'Free workspace'}</small></span><Badge>{demo ? 'Demo' : 'Free'}</Badge></div>
+          <Link className="button button-primary" to="/app/billing"><CreditCard size={16}/><span>View plans & billing</span></Link>
         </Card>
       </div>
     </>

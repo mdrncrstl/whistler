@@ -15,6 +15,9 @@ const Income = lazy(() => import('./features/Income').then((module) => ({ defaul
 const TaxCentre = lazy(() => import('./features/TaxCentre').then((module) => ({ default: module.TaxCentre })))
 const Connections = lazy(() => import('./features/Connections').then((module) => ({ default: module.Connections })))
 const Settings = lazy(() => import('./features/Settings').then((module) => ({ default: module.Settings })))
+const Reports = lazy(() => import('./features/Reports').then((module) => ({ default: module.Reports })))
+const Tools = lazy(() => import('./features/Tools').then((module) => ({ default: module.Tools })))
+const Billing = lazy(() => import('./features/Billing').then((module) => ({ default: module.Billing })))
 
 function PortfolioRoutes({ onExitDemo }: { onExitDemo: () => void }) {
   return (
@@ -25,9 +28,12 @@ function PortfolioRoutes({ onExitDemo }: { onExitDemo: () => void }) {
           <Route path="holdings" element={<Holdings />} />
           <Route path="transactions" element={<Transactions />} />
           <Route path="income" element={<Income />} />
+          <Route path="reports/:report?" element={<Reports />} />
           <Route path="tax" element={<TaxCentre />} />
+          <Route path="tools/:tool?" element={<Tools />} />
           <Route path="connections" element={<Connections />} />
           <Route path="settings" element={<Settings onExitDemo={onExitDemo} />} />
+          <Route path="billing" element={<Billing />} />
           <Route path="*" element={<Navigate to="/app" replace />} />
         </Routes>
       </Suspense>

@@ -1,5 +1,5 @@
-import { AlertTriangle, CheckCircle2, CloudUpload, FileSpreadsheet, KeyRound, Mail, RefreshCw, ShieldCheck, Trash2, Unplug, WalletCards } from 'lucide-react'
-import { useRef, useState } from 'react'
+import { AlertTriangle, Building2, CheckCircle2, CloudUpload, Coins, FileSpreadsheet, KeyRound, Mail, RefreshCw, Search, ShieldCheck, Trash2, Unplug, WalletCards } from 'lucide-react'
+import { useMemo, useRef, useState } from 'react'
 import { useGoogleLogin } from '@react-oauth/google'
 import { usePortfolio } from '../context/PortfolioContext'
 import { parseSuperheroFile } from '../lib/superhero'
@@ -22,10 +22,22 @@ export function Connections() {
   const [report, setReport] = useState<SuperheroReport | null>(null)
   const [fileName, setFileName] = useState('')
   const [disconnecting, setDisconnecting] = useState<BrokerConnection | null>(null)
+  const [catalogQuery, setCatalogQuery] = useState('')
   const fileInput = useRef<HTMLInputElement>(null)
   const ibkr = bundle.connections.find((item) => item.provider === 'ibkr')
   const superhero = bundle.connections.find((item) => item.provider === 'superhero')
   const gmail = bundle.connections.find((item) => item.provider === 'google_gmail')
+  const catalog = useMemo(() => [
+    { name: 'Stake', region: 'Australia / US', method: 'Statement import', icon: Building2, status: 'available' },
+    { name: 'CommSec', region: 'Australia', method: 'CSV statement', icon: Building2, status: 'available' },
+    { name: 'CMC Invest', region: 'Australia', method: 'CSV statement', icon: Building2, status: 'available' },
+    { name: 'Pearler', region: 'Australia', method: 'CSV statement', icon: Building2, status: 'available' },
+    { name: 'SelfWealth', region: 'Australia', method: 'CSV statement', icon: Building2, status: 'available' },
+    { name: 'nabtrade', region: 'Australia', method: 'CSV statement', icon: Building2, status: 'available' },
+    { name: 'Coinbase', region: 'Crypto', method: 'Transaction CSV', icon: Coins, status: 'available' },
+    { name: 'Kraken', region: 'Crypto', method: 'Ledger CSV', icon: Coins, status: 'available' },
+    { name: 'Standard portfolio CSV', region: 'Any broker', method: 'Universal importer', icon: FileSpreadsheet, status: 'available' },
+  ].filter((item) => `${item.name} ${item.region} ${item.method}`.toLowerCase().includes(catalogQuery.toLowerCase())), [catalogQuery])
 
   const gmailLogin = useGoogleLogin({
     scope: 'openid email profile https://www.googleapis.com/auth/gmail.readonly',
@@ -75,13 +87,16 @@ export function Connections() {
 
   return (
     <>
-      <PageHeader title="Connections" description="Read-only broker data and optional Superhero document automation." />
+      <PageHeader title="Connections" description="Bring every broker, exchange and portfolio into one read-only workspace." />
       {demo && <div className="demo-banner"><ShieldCheck size={18} /><span>The demo shows connection states but never accepts or sends private broker credentials. Sign in to connect real accounts.</span></div>}
       <div className="connections-grid">
         {connectionCard(ibkr, 'ibkr', 'Automatic Activity Flex sync for positions, cash and complete account activity.', <>{ibkr ? <Button icon={RefreshCw} busy={action === `sync-${ibkr.id}`} disabled={demo} onClick={() => syncIbkr(ibkr.id)}>Sync IBKR now</Button> : <Button variant="primary" icon={KeyRound} disabled={demo} onClick={() => setIbkrOpen(true)}>Connect IBKR</Button>}<span className="read-only-label"><ShieldCheck size={14} /> Flex Web Service v3 · read only</span></>)}
         {connectionCard(superhero, 'superhero', 'Upload a Full Portfolio Report, Transaction Statement, Valuation CSV or contract-note PDF.', <Button variant={superhero ? 'secondary' : 'primary'} icon={CloudUpload} onClick={() => fileInput.current?.click()}>{superhero ? 'Import another report' : 'Choose Superhero report'}</Button>)}
         {connectionCard(gmail, 'google_gmail', 'Optional separate Gmail read-only authorisation for narrow Superhero contract-note searches.', <>{gmail ? <Button icon={RefreshCw} busy={action === `sync-${gmail.id}`} disabled={demo} onClick={() => syncGmail(gmail.id)}>Scan Gmail now</Button> : <Button icon={Mail} disabled={demo} onClick={() => gmailLogin()}>Connect Gmail read-only</Button>}<span className="read-only-label"><ShieldCheck size={14} /> Requested scope: gmail.readonly</span></>)}
       </div>
+
+      <div className="catalog-heading"><div><span className="section-label">MORE SOURCES</span><h2>Broker & exchange catalogue</h2><p>Import official statements without sharing a trading password.</p></div><label className="catalog-search"><Search size={15}/><input value={catalogQuery} onChange={(event)=>setCatalogQuery(event.target.value)} placeholder="Find a broker…"/></label></div>
+      <div className="integration-catalog">{catalog.map(({name,region,method,icon:Icon})=><Card className="catalog-card" key={name}><span className="catalog-icon"><Icon/></span><div><h3>{name}</h3><p>{region} · {method}</p></div><Button variant="ghost" icon={CloudUpload} onClick={()=>fileInput.current?.click()}>Import</Button></Card>)}</div>
 
       <input ref={fileInput} className="visually-hidden" type="file" accept=".csv,text/csv,.pdf,application/pdf" onChange={(event) => selectFile(event.target.files?.[0])} />
       {(fileName || report) && <Card className="import-review"><div className="import-file"><FileSpreadsheet size={22} /><span><strong>{fileName}</strong><small>Parsed locally in your browser; the raw file is not retained.</small></span></div>{report && <><div className="import-counts"><span><strong>{report.holdings.length}</strong> holdings</span><span><strong>{report.transactions.length}</strong> transactions</span><span><strong>{report.cash.length}</strong> cash rows</span></div>{report.warnings.length > 0 && <div className="import-warnings"><AlertTriangle size={16} /><span>{report.warnings.slice(0, 3).join(' ')}</span></div>}<div className="connection-actions"><Button variant="primary" icon={CloudUpload} busy={action === 'import-superhero'} disabled={demo || (!report.holdings.length && !report.transactions.length && !report.cash.length)} onClick={submitReport}>{demo ? 'Sign in to import' : 'Import parsed rows'}</Button><Button variant="ghost" onClick={() => { setReport(null); setFileName(''); if (fileInput.current) fileInput.current.value = '' }}>Cancel</Button></div></>}</Card>}

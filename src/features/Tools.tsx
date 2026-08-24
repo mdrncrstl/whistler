@@ -1,0 +1,18 @@
+import { Bot, Copy, Mail, Plus, Send, Sparkles, Tags } from 'lucide-react'
+import { useState } from 'react'
+import { Badge, Button, Card, EmptyState, PageHeader } from '../components/ui'
+import { usePortfolio } from '../context/PortfolioContext'
+import { allocationBy, summarisePortfolio } from '../lib/portfolio'
+
+export function Tools() {
+  const { tool = 'assistant' } = useParamsSafe()
+  const { bundle, setNotice } = usePortfolio()
+  const summary = summarisePortfolio(bundle)
+  const [prompt,setPrompt]=useState('')
+  const [groups,setGroups]=useState<string[]>(['Core holdings','Income assets'])
+  if(tool==='inbox') return <><PageHeader title="Document inbox" description="Forward broker confirmations and statements into your private import queue."/><Card className="inbox-address"><Mail/><div><span className="section-label">YOUR PRIVATE ADDRESS</span><strong>imports+{bundle.profile?.id?.slice(0,8)||'demo'}@inbox.masterdeck.app</strong><p>Supported: contract notes, dividend statements, CSV reports and PDFs.</p></div><Button icon={Copy} onClick={()=>{navigator.clipboard?.writeText(`imports+${bundle.profile?.id?.slice(0,8)||'demo'}@inbox.masterdeck.app`);setNotice({tone:'success',message:'Inbox address copied.'})}}>Copy</Button></Card><Card><EmptyState icon={Mail} title="Inbox is clear" description="Forwarded documents will be parsed and held for review before any portfolio data changes."/></Card></>
+  if(tool==='groups') return <><PageHeader title="Custom groups" description="Create reusable slices for reports, filters and comparisons." actions={<Button icon={Plus} variant="primary" onClick={()=>setGroups(v=>[...v,`New group ${v.length+1}`])}>New group</Button>}/><div className="group-grid">{groups.map((g,i)=><Card key={g} className="group-card"><Tags/><Badge>{i===0?'5 holdings':'3 holdings'}</Badge><h2>{g}</h2><p>{i===0?'Long-term positions across all accounts.':'Assets currently contributing cash income.'}</p><Button variant="ghost">Open group</Button></Card>)}</div></>
+  const top=allocationBy(bundle.holdings,'sector')[0]
+  return <><PageHeader title="Deck AI" description="Ask questions grounded only in your portfolio data and calculated reports."/><div className="ai-layout"><Card className="ai-chat"><div className="ai-welcome"><span><Bot/></span><h2>What would you like to understand?</h2><p>Try a portfolio question. Deck AI uses your holdings, transactions and reports—not the open web.</p><div className="prompt-chips">{['What is driving my return?','Where am I concentrated?','Summarise my tax position'].map(x=><button key={x} onClick={()=>setPrompt(x)}>{x}</button>)}</div></div><form className="ai-compose" onSubmit={e=>{e.preventDefault();setNotice({tone:'info',message:prompt?`Analysis queued: ${prompt}`:'Write a question first.'})}}><Sparkles/><input value={prompt} onChange={e=>setPrompt(e.target.value)} placeholder="Ask about your portfolio…"/><button aria-label="Send"><Send/></button></form></Card><Card className="ai-context"><span className="section-label">LIVE CONTEXT</span><h2>What Deck AI can see</h2><dl><div><dt>Portfolio value</dt><dd>{summary.total.toLocaleString('en-AU',{style:'currency',currency:'AUD',maximumFractionDigits:0})}</dd></div><div><dt>Holdings</dt><dd>{summary.holdingCount}</dd></div><div><dt>Largest sector</dt><dd>{top?.name||'—'}</dd></div><div><dt>Transactions</dt><dd>{bundle.transactions.length}</dd></div></dl><p>Financial values stay inside your authenticated MASTERDECK workspace.</p></Card></div></>
+}
+function useParamsSafe(){const path=window.location.pathname.split('/').filter(Boolean);return {tool:path.at(-1)}}
