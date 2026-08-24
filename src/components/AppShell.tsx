@@ -19,7 +19,7 @@ const navigation = [
     { to: '/app/reports/income-calendar', label: 'Income calendar', icon: FileText },
   ]},
   { group: 'Tax reporting', items: [
-    { to: '/app/tax', label: 'Tax overview', icon: Landmark },
+    { to: '/app/tax', label: 'Tax reporting', icon: Landmark },
     { to: '/app/reports/mytax', label: 'ATO myTax', icon: FileText },
     { to: '/app/reports/unrealised', label: 'Unrealised gains', icon: FileText },
     { to: '/app/reports/valuation', label: 'Portfolio valuation', icon: FileText },

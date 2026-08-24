@@ -1,61 +1,64 @@
-# MASTERDECK design QA
+# MASTERDECK portfolio parity QA
 
 ## Comparison target
 
-- Source visual truth: `qa/navexa-reference-portfolio.jpg` (logged-in Navexa portfolio) and normalized focused source `qa/navexa-reference-1280-normalized.jpg`.
-- Implementation: `qa/masterdeck-portfolio-postfix.jpg` and normalized `qa/masterdeck-portfolio-postfix-normalized.jpg`.
-- Route/state: logged-in portfolio shell in light theme; source uses the available Navexa portfolio state, implementation uses realistic MASTERDECK demo data so information density can be reviewed.
-- Viewport: 1280 x 800 CSS px for the normalized focused comparison. The Brave extension returned the source at 1265 x 791 physical pixels and MASTERDECK at 2560 x 1600 physical pixels (2x density); both were normalized to 1280 x 800 before the final judgment.
-- Additional evidence: `qa/masterdeck-portfolio-pass1.jpg` records the first full-view build capture.
+- Source visual truth: `qa/navexa-live-portfolio-2560.png` (authenticated Navexa portfolio captured live on 2026-08-24).
+- Implementation: `qa/masterdeck-local-parity.png` (MASTERDECK demo data used only to give the screen equivalent visual density).
+- Combined comparison input: `qa/navexa-masterdeck-comparison.png`.
+- Route/state: portfolio route, light theme, desktop, populated holdings state.
+- Comparison viewport: both inputs were cropped without scaling to the same 1440 x 900 px region. Source screenshot is 2545 x 1214 px at DPR 1. Implementation browser capture is 2880 x 1800 px; the comparison uses its unscaled top-left 1440 x 900 region because browser screenshot clipping was returned at the host browser density.
+- Production evidence: `qa/masterdeck-production-parity-empty.png` confirms the deployed authenticated route uses the same shell and empty-state geometry.
 
 ## Full-view comparison evidence
 
-The final source/build pair was opened together in the same Browser comparison input. MASTERDECK now retains the source's compact left rail, search-led top bar, dense metric row, primary performance visualization, secondary allocation region, and tabular portfolio content. It intentionally uses MASTERDECK's green/slate typography and tokens rather than Navexa branding or assets.
-
-The build is wider and more information-dense than the first pass, with all major content regions consuming the available workspace instead of being constrained to a narrow centered column.
+The combined image was opened as one side-by-side comparison input. The main spatial anchors now align: 239 px navigation rail, 48 px header, filter row at the top of the content area, five metrics in a single horizontal strip, amount/percent and line/bar controls, a full-width blue performance chart, then the holdings title and grouped table. MASTERDECK keeps its own name and mark and does not reuse Navexa trademarks or hotlinked assets.
 
 ## Focused region evidence
 
-- Sidebar: grouped Portfolio, Reports, Tax Reporting and Tools sections are all visible at 1280 px without clipping; active state, portfolio switcher, safety notice and identity remain distinguishable.
-- Header and metrics: search, refresh, alerts, theme control, four summary metrics and their secondary labels remain readable and aligned.
-- Chart and allocation: primary/benchmark lines, range controls, allocation bar, legend and percentages are legible at the same time.
-- Ledger: asset, account, value and return columns retain compact row rhythm and clear positive/negative states.
-- Image/asset fidelity: neither product depends on photographic imagery in this screen. MASTERDECK uses the existing Lucide icon library and existing brand mark; no placeholder image blocks, emoji, CSS illustrations or copied Navexa assets were introduced.
+- Typography: both screens use real Inter font files at 300-700 weights. MASTERDECK no longer resolves to Aptos.
+- Sidebar: group labels, 32 px rows, muted inactive states, neutral active fill, and collapsed report/tax groups follow the reference rhythm.
+- Header/filter controls: centered 400 px global search and 400 px holdings filter match the measured source widths; controls are 28-34 px high with 6 px radii.
+- Metrics/chart: labels, large tabular numbers, active total-return tile, blue line/fill, right-side axis and section heights match the source hierarchy.
+- Holdings: exchange group rows, 45 px position rows, sticky symbol column, numeric alignment, subtotals and grand total match the source table composition.
+- Assets: MASTERDECK retains its own brand mark and Lucide icons. No Navexa logo, holding logo, copied SVG, photographic asset, placeholder image, or hotlink was introduced.
 
 ## Required fidelity surfaces
 
-- Fonts and typography: passed. Aptos/SF Pro Text/Inter fallback stack has clearer optical weight than the prior tiny dark UI; headings, tabular numbers and microcopy remain distinct without copying Navexa's font treatment.
-- Spacing and layout rhythm: passed after the full-width fix. Compact 31 px navigation rows, 60 px top bar, 10 px radii and 12-14 px card gaps preserve a financial-product density.
-- Colors and tokens: passed. Light mode is the default; semantic green/red, muted slate, borders and surfaces meet the independent MASTERDECK treatment. Dark mode was toggled on and back to light successfully.
-- Image quality and asset fidelity: passed. No source imagery was required or substituted. Existing vector icon-library assets remain sharp at both densities.
-- Copy and content: passed. Labels are portfolio-specific, Australian tax terminology is explicit, and security copy consistently describes read-only behavior.
-- Responsiveness: passed. The 390 x 844 Browser viewport exposed the mobile menu and mobile navigation and retained portfolio and billing content; all three prices remained present.
-- Accessibility and interactions: passed for the tested core flow. Navigation uses links, controls have accessible names, focus styles and reduced-motion handling exist, and light/dark toggles expose state-specific labels.
+- Fonts and typography: passed. Local Inter font files load in five weights; sizes, weights, line heights, uppercase micro-labels and tabular hierarchy are materially aligned.
+- Spacing and layout rhythm: passed. The major x/y anchors differ by less than one normal control gap in the normalized comparison; no P1/P2 density or wrapping drift remains.
+- Colors and visual tokens: passed. Light slate surfaces, blue performance accent, green/red financial states and neutral borders align while remaining MASTERDECK-owned tokens.
+- Image quality and asset fidelity: passed. No source imagery was required; icon-library vectors remain sharp.
+- Copy and content: passed. Portfolio, filter, performance, return and grouped holding labels match the product task without copying Navexa branding.
+- Responsiveness: passed for MASTERDECK at compact width; the reference itself preserves a desktop-width canvas at the attempted mobile viewport, so MASTERDECK intentionally keeps the dense portfolio table horizontally scrollable while retaining its mobile shell.
+- Accessibility and interactions: passed for the tested core flow. Search is labelled, controls are semantic buttons, the performance period changes rendered state, export is wired, and the console is clean.
 
 ## Comparison history
 
 ### Pass 1
 
-- [P1] Workspace remained visually narrow on large screens.
-  - Evidence: `qa/masterdeck-portfolio-pass1.jpg` showed a centered maximum-width canvas with substantial unused width, repeating the user's main complaint.
-  - Fix: changed `.app-content` from a 1580 px maximum-width container to a true full-width workspace while keeping responsive page padding.
+- [P1] Wrong typography and unrelated dashboard composition.
+  - Evidence: `qa/masterdeck-before-parity.png` used Aptos, stacked metric cards, allocation/mover cards and a mobile-like overview instead of the reference hierarchy.
+  - Fix: bundled Inter, rebuilt the portfolio route around the measured filter/metric/chart/table geometry, and collapsed navigation groups on the portfolio view.
 
 ### Pass 2
 
-- Post-fix evidence: `qa/masterdeck-portfolio-postfix.jpg` and its normalized copy show the metrics, chart, allocation and tables spanning the available desktop canvas.
+- Post-fix evidence: `qa/masterdeck-local-parity.png` and `qa/navexa-masterdeck-comparison.png`.
 - No actionable P0, P1 or P2 visual findings remain.
 
 ## Functional evidence
 
-- All 13 new/expanded routes rendered without lazy-loading residue: performance, benchmark, diversification, income calendar, ATO myTax, unrealised gains, valuation, Deck AI, document inbox, custom groups, connections, billing and settings.
-- Default light mode, switch to dark, and restoration to light all passed in Brave.
-- Mobile menu, mobile navigation and portfolio content were present at 390 x 844.
-- MASTERDECK Browser console check returned zero warnings/errors after route and theme testing. Two retained log errors were from the Navexa source tab and not the implementation.
+- `npm.cmd run typecheck`: passed.
+- `npm.cmd run lint`: passed.
+- `npm.cmd test`: 5 files / 13 tests passed.
+- `npm.cmd run build`: passed.
+- Production Vercel build: passed and aliased to `https://masterdeck-eosin.vercel.app`.
+- Browser page identity, meaningful DOM, framework-overlay absence, console health and populated-demo interaction checks: passed.
+- Production browser console warnings/errors: zero.
 
 ## Findings
 
 - No actionable P0/P1/P2 findings remain.
-- [P3] A future polish pass could replace initial-based holding tiles with licensed exchange/company marks when a reliable logo data source is selected.
+- [P3] Holding avatars remain independent initial markers until a licensed security-logo source is chosen.
 
 ## Final result
 
