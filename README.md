@@ -5,7 +5,7 @@ MASTERDECK is a private, read-only portfolio workspace for Interactive Brokers a
 ## Stack
 
 - React 19 + Vite + TypeScript
-- Supabase Auth (shared identity project) and isolated MASTERDECK portfolio data
+- One isolated MASTERDECK Supabase project for Auth, portfolio data and Edge Functions
 - Supabase Edge Functions for broker credentials, imports and quote refreshes
 - Vercel hosting
 
