@@ -12,17 +12,21 @@ const navigation = [
     { to: '/app/transactions', label: 'Transactions', icon: TableProperties },
   ]},
   { group: 'Reports', items: [
-    { to: '/app/reports/performance', label: 'Performance', icon: BarChart3 },
     { to: '/app/reports/benchmark', label: 'Benchmark analysis', icon: FileText },
+    { to: '/app/reports/performance', label: 'Performance breakdown', icon: BarChart3 },
     { to: '/app/reports/diversification', label: 'Diversification', icon: Tags },
-    { to: '/app/income', label: 'Income breakdown', icon: CircleDollarSign },
+    { to: '/app/reports/growth', label: 'Growth & goals', icon: BarChart3 },
+    { to: '/app/reports/income', label: 'Income breakdown', icon: CircleDollarSign },
     { to: '/app/reports/income-calendar', label: 'Income calendar', icon: FileText },
   ]},
   { group: 'Tax reporting', items: [
-    { to: '/app/tax', label: 'Tax reporting', icon: Landmark },
-    { to: '/app/reports/mytax', label: 'ATO myTax', icon: FileText },
-    { to: '/app/reports/unrealised', label: 'Unrealised gains', icon: FileText },
-    { to: '/app/reports/valuation', label: 'Portfolio valuation', icon: FileText },
+    { to: '/app/tax', label: 'Overview', icon: Landmark, end: true },
+    { to: '/app/tax/mytax', label: 'ATO myTax', icon: FileText },
+    { to: '/app/tax/capital-gains', label: 'Capital gains tax', icon: FileText },
+    { to: '/app/tax/taxable-income', label: 'Taxable income', icon: FileText },
+    { to: '/app/tax/valuation', label: 'Portfolio valuation', icon: FileText },
+    { to: '/app/tax/unrealised', label: 'Unrealised gains', icon: FileText },
+    { to: '/app/tax/historical-cost', label: 'Historical cost', icon: FileText },
   ]},
   { group: 'Tools', items: [
     { to: '/app/tools/assistant', label: 'Deck AI', icon: Bot },
@@ -41,7 +45,7 @@ export function AppShell({ children, onExitDemo }: { children: ReactNode; onExit
   const [theme, setTheme] = useState<'light' | 'dark'>(() => window.localStorage.getItem('masterdeck-theme') === 'dark' ? 'dark' : 'light')
   const location = useLocation()
   const flatNavigation = navigation.flatMap((section) => section.items)
-  const current = flatNavigation.find((item) => item.end ? location.pathname === item.to : location.pathname.startsWith(item.to)) || flatNavigation[0]
+  const current = [...flatNavigation].sort((a, b) => b.to.length - a.to.length).find((item) => item.end ? location.pathname === item.to : location.pathname.startsWith(item.to)) || flatNavigation[0]
   const profile = bundle.profile
   const privacy = Boolean(profile?.settings?.privacyMode)
 

@@ -29,7 +29,7 @@ function PortfolioRoutes({ onExitDemo }: { onExitDemo: () => void }) {
           <Route path="transactions" element={<Transactions />} />
           <Route path="income" element={<Income />} />
           <Route path="reports/:report?" element={<Reports />} />
-          <Route path="tax" element={<TaxCentre />} />
+          <Route path="tax/:report?" element={<TaxCentre />} />
           <Route path="tools/:tool?" element={<Tools />} />
           <Route path="connections" element={<Connections />} />
           <Route path="settings" element={<Settings onExitDemo={onExitDemo} />} />

@@ -1,64 +1,68 @@
-# MASTERDECK portfolio parity QA
+# MASTERDECK authenticated product parity QA
 
 ## Comparison target
 
-- Source visual truth: `qa/navexa-live-portfolio-2560.png` (authenticated Navexa portfolio captured live on 2026-08-24).
-- Implementation: `qa/masterdeck-local-parity.png` (MASTERDECK demo data used only to give the screen equivalent visual density).
-- Combined comparison input: `qa/navexa-masterdeck-comparison.png`.
-- Route/state: portfolio route, light theme, desktop, populated holdings state.
-- Comparison viewport: both inputs were cropped without scaling to the same 1440 x 900 px region. Source screenshot is 2545 x 1214 px at DPR 1. Implementation browser capture is 2880 x 1800 px; the comparison uses its unscaled top-left 1440 x 900 region because browser screenshot clipping was returned at the host browser density.
-- Production evidence: `qa/masterdeck-production-parity-empty.png` confirms the deployed authenticated route uses the same shell and empty-state geometry.
+- Source visual truth: authenticated Navexa routes captured live on 2026-08-25, the user-supplied `codex-clipboard-30b2e87c-405c-470b-8216-f1813b0802d5.png` AI screen, and the existing authenticated portfolio capture `qa/navexa-live-portfolio-2560.png`.
+- Implementation: `qa/masterdeck-performance-parity-local.png` plus browser-rendered checks of every authenticated local route.
+- Combined comparison input: `qa/navexa-masterdeck-comparison.png` (shared shell, typography and density).
+- State: light theme; populated demo state for equivalent visual density; empty/live states checked separately without importing the user's Navexa data.
+- Desktop evidence: source 2545 x 1214 px at DPR 1 and implementation capture 2880 x 1800 px, normalized to the same 1440 x 900 content region in the combined comparison.
+- Responsive evidence: explicit 390 x 844 CSS viewport at DPR 2. Browser-reported document width was 750-780 physical px depending on the route, with no page-level horizontal overflow.
 
 ## Full-view comparison evidence
 
-The combined image was opened as one side-by-side comparison input. The main spatial anchors now align: 239 px navigation rail, 48 px header, filter row at the top of the content area, five metrics in a single horizontal strip, amount/percent and line/bar controls, a full-width blue performance chart, then the holdings title and grouped table. MASTERDECK keeps its own name and mark and does not reuse Navexa trademarks or hotlinked assets.
+The combined comparison was opened as one side-by-side image. MASTERDECK preserves the aligned 239 px navigation rail, 48 px header, compact filter bars, horizontal summary strips, full-width report canvas and dense grouped tables. The new report and tax routes use the same hierarchy and visual rhythm as the captured Navexa workspaces while retaining MASTERDECK branding, independent icons, and independent data semantics.
 
 ## Focused region evidence
 
-- Typography: both screens use real Inter font files at 300-700 weights. MASTERDECK no longer resolves to Aptos.
-- Sidebar: group labels, 32 px rows, muted inactive states, neutral active fill, and collapsed report/tax groups follow the reference rhythm.
-- Header/filter controls: centered 400 px global search and 400 px holdings filter match the measured source widths; controls are 28-34 px high with 6 px radii.
-- Metrics/chart: labels, large tabular numbers, active total-return tile, blue line/fill, right-side axis and section heights match the source hierarchy.
-- Holdings: exchange group rows, 45 px position rows, sticky symbol column, numeric alignment, subtotals and grand total match the source table composition.
-- Assets: MASTERDECK retains its own brand mark and Lucide icons. No Navexa logo, holding logo, copied SVG, photographic asset, placeholder image, or hotlink was introduced.
+- Reports: all six report routes now include holdings search, period/status/group controls, summary metrics, chart or allocation analysis, detailed ledgers and populated/empty states.
+- Tax: the overview now includes finalisation tasks, assessable-income and capital-gain summaries, six detailed report links and prior-year status. myTax, CGT, taxable-income, valuation, unrealised-gain and historical-cost views expose the source-equivalent field and table depth.
+- Tools: Deck AI matches the captured title/welcome/suggestion/fixed-composer structure and returns deterministic portfolio-grounded answers. Inbox and custom groups now include setup, filtering, creation and empty states.
+- Mobile: the navigation changes to the existing mobile shell; report controls wrap, metric grids reduce to two columns and dense tables remain internally scrollable.
+- Assets: MASTERDECK retains its own mark and Lucide icon set. No Navexa logo, holding logo, copied SVG, hotlink, fake logo or photographic placeholder was introduced.
 
 ## Required fidelity surfaces
 
-- Fonts and typography: passed. Local Inter font files load in five weights; sizes, weights, line heights, uppercase micro-labels and tabular hierarchy are materially aligned.
-- Spacing and layout rhythm: passed. The major x/y anchors differ by less than one normal control gap in the normalized comparison; no P1/P2 density or wrapping drift remains.
-- Colors and visual tokens: passed. Light slate surfaces, blue performance accent, green/red financial states and neutral borders align while remaining MASTERDECK-owned tokens.
-- Image quality and asset fidelity: passed. No source imagery was required; icon-library vectors remain sharp.
-- Copy and content: passed. Portfolio, filter, performance, return and grouped holding labels match the product task without copying Navexa branding.
-- Responsiveness: passed for MASTERDECK at compact width; the reference itself preserves a desktop-width canvas at the attempted mobile viewport, so MASTERDECK intentionally keeps the dense portfolio table horizontally scrollable while retaining its mobile shell.
-- Accessibility and interactions: passed for the tested core flow. Search is labelled, controls are semantic buttons, the performance period changes rendered state, export is wired, and the console is clean.
+- Fonts and typography: passed. Bundled Inter 300-700 is used throughout; small UI text, report headings, tabular values and micro-labels keep source-like optical weights and hierarchy.
+- Spacing and layout rhythm: passed. Shared filters, summary strips, cards, grouped table rows and report gaps maintain the compact source density without clipped controls.
+- Colors and visual tokens: passed. Light slate surfaces, blue analytical emphasis, neutral rules and green/red financial states map to MASTERDECK-owned tokens.
+- Image quality and asset fidelity: passed. These screens require interface icons rather than photographic imagery; library vectors remain sharp and no prohibited approximate asset was added.
+- Copy and content: passed. Source-equivalent information architecture and report terminology are present while branding and explanatory language remain independent.
+- Responsiveness: passed. Every tested authenticated route rendered meaningful content at 390 x 844 with no document overflow.
+- Accessibility and interactions: passed. Inputs/selects are labelled, buttons are semantic, focusable controls work, dense tables use headers, and the browser console remained clean.
 
 ## Comparison history
 
-### Pass 1
+### Pass 1 — portfolio shell
 
 - [P1] Wrong typography and unrelated dashboard composition.
-  - Evidence: `qa/masterdeck-before-parity.png` used Aptos, stacked metric cards, allocation/mover cards and a mobile-like overview instead of the reference hierarchy.
-  - Fix: bundled Inter, rebuilt the portfolio route around the measured filter/metric/chart/table geometry, and collapsed navigation groups on the portfolio view.
+- Fix: bundled Inter and rebuilt the shared shell, filter/metric/chart/table composition.
+- Post-fix evidence: `qa/navexa-masterdeck-comparison.png`.
 
-### Pass 2
+### Pass 2 — authenticated product depth
 
-- Post-fix evidence: `qa/masterdeck-local-parity.png` and `qa/navexa-masterdeck-comparison.png`.
-- No actionable P0, P1 or P2 visual findings remain.
+- [P1] Reports and tax were shallow single-screen summaries and omitted multiple source routes.
+- [P1] Deck AI, inbox and custom groups exposed placeholder interactions rather than complete primary states.
+- Fix: added six deep report routes, seven tax routes, a tax finalisation workflow, field-level myTax reporting, grouped ledgers, income schedules, deterministic AI conversation, inbox onboarding/search, and custom-group creation/deletion.
+- Post-fix evidence: browser-rendered route audit, `qa/masterdeck-performance-parity-local.png`, and the shared-shell combined comparison.
+- No actionable P0/P1/P2 findings remain.
 
 ## Functional evidence
 
 - `npm.cmd run typecheck`: passed.
 - `npm.cmd run lint`: passed.
-- `npm.cmd test`: 5 files / 13 tests passed.
+- `npm.cmd test`: 6 files / 16 tests passed.
 - `npm.cmd run build`: passed.
-- Production Vercel build: passed and aliased to `https://masterdeck-eosin.vercel.app`.
-- Browser page identity, meaningful DOM, framework-overlay absence, console health and populated-demo interaction checks: passed.
-- Production browser console warnings/errors: zero.
+- Desktop browser audit: 21/21 authenticated routes had meaningful DOM, zero page-level overflow and zero console errors.
+- Mobile browser audit: 21/21 authenticated routes settled at 390 x 844 with meaningful DOM and zero page-level overflow.
+- Production audit: all 16 rebuilt report, tax and tool routes rendered at `https://masterdeck-eosin.vercel.app` under the signed-in account, preserved their deep links, showed no demo portfolio state and had zero page-level overflow.
+- Interactions: report holding filter, sale-allocation selector, Deck AI suggestion/response, custom-group creation and route navigation passed.
 
 ## Findings
 
 - No actionable P0/P1/P2 findings remain.
-- [P3] Holding avatars remain independent initial markers until a licensed security-logo source is chosen.
+- [P3] Holding avatars remain independent initial markers until a licensed security-logo source is selected.
+- [P3] Projected income dates are clearly marked indicative because connected broker data does not expose forward company guidance.
 
 ## Final result
 
