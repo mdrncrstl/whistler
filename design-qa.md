@@ -119,7 +119,8 @@ The combined comparison was opened as one side-by-side image. MASTERDECK preserv
 - Provenance: the copied rows and two disabled connection records are explicitly labelled as a static reference portfolio; they do not claim live broker access or store broker credentials.
 - Hydration fix: live sessions now begin with an empty private bundle and show the shared loading screen until the authenticated Edge Function response arrives. Demo data is only initialized in explicit demo mode.
 - Connection safety: reference IBKR and Superhero records now offer real connection/import replacement actions instead of a non-functional sync action.
-- Production browser evidence: after a 3.2 second settled reload, `$139,854.61` and AAPL remained visible, first-run onboarding was absent, and the console contained zero warnings or errors.
+- Backend repair: Edge Function v4 no longer rewrites an existing profile on every request. It reads first and only inserts when missing, with a race-safe existence check; the first 9 post-deploy POST requests all returned 200.
+- Production browser evidence: a cold Edge start resolved to `$139,854.61` with AAPL present and no error/onboarding fallback. A second full refresh settled in 1.68 seconds with the same value, and Connections exposed the reference labels and replacement actions without the broken live-sync action.
 - Automated regression coverage: 32 tests passed across 10 files, including an authenticated hydration test that proves no AAPL/reference-data flash occurs before the live bundle resolves; typecheck, lint, build and `git diff --check` passed.
 
 ## Functional evidence
