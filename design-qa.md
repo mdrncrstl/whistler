@@ -143,6 +143,19 @@ The combined comparison was opened as one side-by-side image. MASTERDECK preserv
 - Interaction evidence: Percent hides the incompatible Line/Bar selector, returning to Amount restores it, `$139,854.61` remains present, the browser console reports zero warnings/errors, and no framework overlay is present.
 - Remaining P3: replace generic holding initials with a licensed or provider-backed security-logo source when one is selected.
 
+### Pass 10 — live hover and open-state parity (2026-08-26)
+
+- Source browser audit: authenticated `https://www.navexa.com/n/portfolio`, inspected interactively rather than from a static screenshot. Browser pointer/click settling exposed the source hover help and open states for All time, Filter, All Positions, grouping, Hide Closed, Columns and Export.
+- Source evidence: `qa/navexa-hover-filter.png`, `qa/navexa-hover-closed.png`, `qa/navexa-columns-dialog.png` and `qa/navexa-export-menu.png`.
+- Implementation evidence: `qa/masterdeck-hover-filter.png`, `qa/masterdeck-filter-builder.png`, `qa/masterdeck-hover-positions.png`, `qa/masterdeck-hover-closed.png` and `qa/masterdeck-columns-dialog.png`.
+- Combined visual comparison: `qa/navexa-masterdeck-columns-comparison.png`, unscaled 600 × 720 component crops for modal hierarchy, sizing and control-density judgement.
+- [P1] Masterdeck's matching controls lacked Navexa's explanatory hover layer, and the filter builder was an inline strip instead of an anchored popover.
+- [P1] Column Settings changed the live table immediately and omitted fixed/visible/hidden status, Reset, Cancel and Apply semantics.
+- Fix: added delayed, source-shaped hover help to date range, filter, positions, grouping, closed-position and column controls; converted the filter builder to a responsive floating popover; and rebuilt Column Settings around a pending selection model with fixed symbol modes, visibility badges, drag handles, reset/cancel/apply actions and accessible labels.
+- Responsive evidence: the 610 px filter builder is source-aligned on wide screens and right-aligned below 1500 px so the 1280 px browser viewport no longer clips its controls.
+- Interaction evidence: opening Filter exposes the complete Where/field/operator/value/add-filter builder; closing it leaves the `Filter Holdings` hover state; All Positions and Hide Closed expose the audited explanatory copy; Columns supports pending checkbox changes and only updates the table after Apply Changes.
+- Automated evidence: 10 files / 32 tests passed. The portfolio interaction test now asserts the hover-help contracts and proves a hidden column appears only after the settings dialog's Apply action.
+
 ## Functional evidence
 
 - `npm.cmd run typecheck`: passed.
