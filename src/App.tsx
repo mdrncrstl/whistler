@@ -71,7 +71,7 @@ export default function App() {
   const authenticated = Boolean(session || demo)
   return (
     <Routes>
-      <Route path="/" element={authenticated ? <Navigate to="/app" replace /> : <Landing onDemo={enterDemo} />} />
+      <Route path="/" element={<Landing onDemo={enterDemo} signedIn={authenticated} onOpenApp={() => window.location.assign('/app')} />} />
       <Route path="/auth/callback" element={<AuthCallback />} />
       <Route path="/app/*" element={authenticated ? <PortfolioProvider session={session || null} demo={demo}><PortfolioRoutes onExitDemo={exitDemo} /></PortfolioProvider> : <Navigate to="/" replace />} />
       <Route path="*" element={<Navigate to={authenticated ? '/app' : '/'} replace />} />

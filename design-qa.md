@@ -75,6 +75,20 @@ The combined comparison was opened as one side-by-side image. MASTERDECK preserv
 - Visual fidelity: passed for hierarchy, control density, source-like white/slate/blue palette, table rhythm and collapse states. Masterdeck retains independent branding, demo data and icons.
 - Accessibility: passed. Collapse controls expose `aria-expanded`, group toggles expose state, menus/dialogs have roles and labels, sortable headers expose `aria-sort`, and every new input is labelled.
 
+### Pass 5 — public conversion funnel (2026-08-26)
+
+- Source inspection: live `https://www.navexa.com/au` desktop and mobile funnel, including sticky navigation, mobile drawer, feature dropdown, hero, proof, scope boundary, onboarding steps, product-led feature sections, pricing switch, comparison table, integrations, FAQ accordion, repeated CTAs and footer.
+- Reference captures: `C:\Users\moder\.codex\tmp\navexa-home-audit-2026-08-26\desktop-00-hero.png`, desktop and mobile contact sheets, and interaction-state captures.
+- Implementation capture: `C:\Users\moder\.codex\tmp\navexa-home-audit-2026-08-26\masterdeck-home-local-desktop.png`.
+- Combined visual comparison: `C:\Users\moder\.codex\tmp\navexa-home-audit-2026-08-26\homepage-hero-comparison.png`, normalized to equal 1440 x 900 panels.
+- [P1] The previous root route exposed only a single dark hero and capability strip; it did not provide a full marketing journey or let signed-in users inspect the public site.
+- Fix: rebuilt `/` as a complete Masterdeck-owned funnel with independent copy and assets, accurate supported integrations, real Masterdeck product screenshots, shared billing data, accessible interaction states and direct app/auth conversion paths. Signed-in users now see `Open Masterdeck` while the public homepage remains accessible.
+- Visual fidelity: passed. The implementation follows the source's white/slate/blue palette, centered product-led hero, large browser-framed preview, long-form section rhythm, pricing hierarchy and mobile stacking while retaining Masterdeck typography, mark and product imagery.
+- Interaction evidence: desktop feature dropdown exposes three destinations; mobile navigation toggles `aria-expanded`; annual/monthly pricing changes Essential from $14 to $18; FAQ state changes and reveals the selected answer; demo CTA reaches `/app` with populated demo state.
+- Responsive evidence: 1440 x 900 desktop and 390 x 844 mobile CSS viewports passed with no page-level horizontal overflow. All four product images loaded at natural resolution.
+- Console evidence: zero browser warnings or errors after navigation, interaction and responsive checks.
+- Automated evidence: landing tests cover the full section journey, shared pricing state, FAQ state and mobile menu behavior.
+
 ## Functional evidence
 
 - `npm.cmd run typecheck`: passed.
