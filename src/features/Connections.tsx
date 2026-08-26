@@ -1,6 +1,7 @@
 import { AlertTriangle, Building2, CheckCircle2, CloudUpload, Coins, FileSpreadsheet, KeyRound, Mail, RefreshCw, Search, ShieldCheck, Trash2, Unplug, WalletCards } from 'lucide-react'
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useGoogleLogin } from '@react-oauth/google'
+import { useSearchParams } from 'react-router-dom'
 import { usePortfolio } from '../context/PortfolioContext'
 import { parseSuperheroFile } from '../lib/superhero'
 import type { BrokerConnection, SuperheroReport } from '../types'
@@ -15,7 +16,9 @@ function providerName(provider: BrokerConnection['provider']) {
 
 export function Connections() {
   const { bundle, demo, action, connectIbkr, syncIbkr, importSuperhero, connectGmail, syncGmail, disconnect, setNotice } = usePortfolio()
-  const [ibkrOpen, setIbkrOpen] = useState(false)
+  const [searchParams, setSearchParams] = useSearchParams()
+  const requestedSetup = searchParams.get('setup')
+  const [ibkrOpen, setIbkrOpen] = useState(() => requestedSetup === 'ibkr' && !demo)
   const [label, setLabel] = useState('IBKR Main')
   const [token, setToken] = useState('')
   const [queryId, setQueryId] = useState('')
@@ -38,6 +41,24 @@ export function Connections() {
     { name: 'Kraken', region: 'Crypto', method: 'Ledger CSV', icon: Coins, status: 'available' },
     { name: 'Standard portfolio CSV', region: 'Any broker', method: 'Universal importer', icon: FileSpreadsheet, status: 'available' },
   ].filter((item) => `${item.name} ${item.region} ${item.method}`.toLowerCase().includes(catalogQuery.toLowerCase())), [catalogQuery])
+
+  useEffect(() => {
+    if (requestedSetup === 'import') {
+      window.requestAnimationFrame(() => {
+        const target = document.querySelector<HTMLElement>('[data-setup-provider="superhero"]')
+        if (typeof target?.scrollIntoView === 'function') target.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        target?.querySelector<HTMLButtonElement>('button')?.focus()
+      })
+    }
+  }, [requestedSetup])
+
+  const closeIbkrSetup = () => {
+    setIbkrOpen(false)
+    if (!requestedSetup) return
+    const next = new URLSearchParams(searchParams)
+    next.delete('setup')
+    setSearchParams(next, { replace: true })
+  }
 
   const gmailLogin = useGoogleLogin({
     scope: 'openid email profile https://www.googleapis.com/auth/gmail.readonly',
@@ -65,7 +86,7 @@ export function Connections() {
     event.preventDefault()
     try {
       await connectIbkr({ label, token, queryId })
-      setIbkrOpen(false); setToken(''); setQueryId('')
+      closeIbkrSetup(); setToken(''); setQueryId('')
     } catch { /* surfaced by context */ }
   }
 
@@ -75,6 +96,7 @@ export function Connections() {
   }
 
   const connectionCard = (connection: BrokerConnection | undefined, provider: BrokerConnection['provider'], description: string, actions: React.ReactNode) => (
+    <div className={`connection-slot ${requestedSetup === (provider === 'ibkr' ? 'ibkr' : provider === 'superhero' ? 'import' : '') ? 'requested' : ''}`} data-setup-provider={provider}>
     <Card className="connection-card">
       <div className="connection-icon">{provider === 'ibkr' ? <KeyRound /> : provider === 'google_gmail' ? <Mail /> : <FileSpreadsheet />}</div>
       <div className="connection-body">
@@ -83,11 +105,13 @@ export function Connections() {
         <div className="connection-actions">{actions}{connection && !demo && <Button variant="ghost" icon={Trash2} onClick={() => setDisconnecting(connection)}>Disconnect</Button>}</div>
       </div>
     </Card>
+    </div>
   )
 
   return (
     <>
       <PageHeader title="Connections" description="Bring every broker, exchange and portfolio into one read-only workspace." />
+      {!bundle.holdings.length && <section className="connection-onboarding" aria-label="Portfolio setup progress"><div><strong>Add investments in two steps</strong><p>Choose a source below, then review the holdings Masterdeck finds. Your portfolio fills automatically after a successful sync or import.</p></div><ol><li className="active"><span>1</span>Choose a source</li><li><span>2</span>Review and import</li></ol></section>}
       {demo && <div className="demo-banner"><ShieldCheck size={18} /><span>The demo shows connection states but never accepts or sends private broker credentials. Sign in to connect real accounts.</span></div>}
       <div className="connections-grid">
         {connectionCard(ibkr, 'ibkr', 'Automatic Activity Flex sync for positions, cash and complete account activity.', <>{ibkr ? <Button icon={RefreshCw} busy={action === `sync-${ibkr.id}`} disabled={demo} onClick={() => syncIbkr(ibkr.id)}>Sync IBKR now</Button> : <Button variant="primary" icon={KeyRound} disabled={demo} onClick={() => setIbkrOpen(true)}>Connect IBKR</Button>}<span className="read-only-label"><ShieldCheck size={14} /> Flex Web Service v3 · read only</span></>)}
@@ -103,7 +127,7 @@ export function Connections() {
 
       <Card className="sync-history"><div className="card-title-row"><div><span className="section-label">ACTIVITY</span><h2>Recent sync runs</h2></div></div>{bundle.syncRuns.length ? <div className="sync-list">{bundle.syncRuns.map((run) => <div key={run.id}><span className={`sync-status ${run.status}`}>{run.status === 'success' ? <CheckCircle2 size={16} /> : run.status === 'error' ? <AlertTriangle size={16} /> : <RefreshCw size={16} />}</span><span><strong>{run.message || `${providerName(run.provider)} sync`}</strong><small>{date(run.started_at, { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' })} · {run.imported_count} rows processed</small></span><Badge tone={run.status === 'success' ? 'success' : run.status === 'error' ? 'error' : 'warning'}>{run.status}</Badge></div>)}</div> : <EmptyState icon={WalletCards} title="No sync history yet" description="Completed broker syncs and report imports will appear here." />}</Card>
 
-      <Modal open={ibkrOpen} title="Connect Interactive Brokers" description="Use an Activity Flex Query with read-only reporting access." onClose={() => setIbkrOpen(false)}>
+      <Modal open={ibkrOpen} title="Connect Interactive Brokers" description="Use an Activity Flex Query with read-only reporting access." onClose={closeIbkrSetup}>
         <form className="form-stack" onSubmit={saveIbkr}>
           <label><span>Account label</span><input value={label} onChange={(event) => setLabel(event.target.value)} maxLength={80} required /></label>
           <label><span>Flex Web Service token</span><input value={token} onChange={(event) => setToken(event.target.value)} type="password" autoComplete="off" inputMode="numeric" placeholder="Private Flex token" required /></label>

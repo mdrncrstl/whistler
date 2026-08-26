@@ -102,6 +102,15 @@ The combined comparison was opened as one side-by-side image. MASTERDECK preserv
 - Interaction evidence: privacy switch changed checked state; Save preferences produced a visible token-correct toast; light/dark theme controls updated every audited surface.
 - Automated evidence: eight test files / 25 tests passed, including shared theme-surface regression guards.
 
+### Pass 7 — first portfolio onboarding (2026-08-26)
+
+- Replaced the empty portfolio canvas with a clear first-run setup screen instead of zero-value metrics and vague import copy.
+- Added explicit IBKR connection and Superhero report import choices, a three-step explanation, and read-only safety context.
+- Reused the setup guidance on empty Holdings and Transactions screens.
+- Deep-linked IBKR into its connection form and the import path into the focused Superhero upload action.
+- Browser QA covered desktop and 390 × 844 mobile, the import navigation/focus loop, console health, and a mobile overflow regression found and fixed during testing.
+- Automated regression coverage: 31 tests passed across 9 files; typecheck, lint, build, and `git diff --check` passed.
+
 ## Functional evidence
 
 - `npm.cmd run typecheck`: passed.

@@ -6,6 +6,7 @@ import { usePortfolio } from '../context/PortfolioContext'
 import { summarisePortfolio } from '../lib/portfolio'
 import { date, downloadCsv, money } from '../lib/format'
 import { EmptyState, PrivateMoney } from '../components/ui'
+import { PortfolioSetupGuide } from '../components/PortfolioSetupGuide'
 import type { Position } from '../types'
 
 type GroupBy = 'Exchange' | 'Sector' | 'Currency' | 'Holding Type'
@@ -64,11 +65,14 @@ export function Overview() {
   const filtered = useMemo(() => bundle.holdings.filter((item) => { if (!`${item.symbol} ${item.name} ${item.market} ${item.account_name}`.toLowerCase().includes(query.toLowerCase())) return false; if ((positionsMode === 'Open Positions Only' || hideClosed) && item.quantity <= 0) return false; return filters.every((filter) => { if (!filter.field || !filter.value) return true; const matches = groupValue(item, filter.field).toLowerCase() === filter.value.toLowerCase(); return filter.operator === 'is' ? matches : !matches }) }), [bundle.holdings, filters, hideClosed, positionsMode, query])
   const groups = useMemo(() => { const output = new Map<string, Position[]>(); filtered.forEach((item) => { const key = groupValue(item, groupBy); output.set(key, [...(output.get(key) || []), item]) }); const direction = sort.direction === 'ascending' ? 1 : -1; return [...output.entries()].map(([key, items]) => [key, [...items].sort((a, b) => { const av = a[sort.key]; const bv = b[sort.key]; return (typeof av === 'string' ? av.localeCompare(String(bv)) : Number(av) - Number(bv)) * direction })] as [string, Position[]]) }, [filtered, groupBy, sort])
   const totalReturn = summary.unrealised + summary.income; const totalReturnPct = summary.cost ? (totalReturn / summary.cost) * 100 : 0
+  const isFirstRun = !bundle.holdings.length && !bundle.transactions.length && !bundle.connections.length
   const addFilter = () => setFilters((current) => [...current, { id: Date.now(), field: '', operator: 'is', value: '' }]); const updateFilter = (id: number, changes: Partial<PortfolioFilter>) => setFilters((current) => current.map((item) => item.id === id ? { ...item, ...changes } : item))
   const toggleSort = (key: SortKey) => setSort((current) => ({ key, direction: current.key === key && current.direction === 'ascending' ? 'descending' : 'ascending' })); const toggleColumn = (key: ColumnKey) => setVisibleColumns((current) => current.includes(key) ? current.filter((item) => item !== key) : [...current, key])
   const reorderColumn = (target: ColumnKey) => { if (!draggedColumn || draggedColumn === target || !visibleColumns.includes(draggedColumn) || !visibleColumns.includes(target)) return; setVisibleColumns((current) => { const next = current.filter((item) => item !== draggedColumn); next.splice(next.indexOf(target), 0, draggedColumn); return next }); setDraggedColumn(null) }
   const exportHoldings = () => downloadCsv('masterdeck-holdings.csv', ['Symbol', 'Market', 'Price', 'Quantity', 'Value AUD', 'Capital gain AUD', 'Capital gain %'], filtered.map((item) => [item.symbol, item.market, item.current_price, item.quantity, item.value_aud, item.unrealised_gain_aud, item.return_pct])); const getFilterValues = (field: FilterField) => field ? [...new Set(bundle.holdings.map((item) => groupValue(item, field)))].sort() : []
   const headerFor = (key: ColumnKey) => { const def = columns.find((item) => item.key === key)!; const sortKey: SortKey = ({ price: 'current_price', average_cost: 'current_price', quantity: 'quantity', value: 'value_aud', capital_gain: 'unrealised_gain_aud', capital_gain_pct: 'return_pct', income_return: 'unrealised_gain_aud', income_return_pct: 'return_pct', currency_gain: 'unrealised_gain_aud', currency_gain_pct: 'return_pct', total_return: 'unrealised_gain_aud', total_return_pct: 'return_pct' })[key] as SortKey; return <th key={key} className="numeric" aria-sort={sort.key === sortKey ? sort.direction : 'none'}><button onClick={() => toggleSort(sortKey)}>{def.label}{sort.key === sortKey ? (sort.direction === 'ascending' ? <ArrowUp size={11}/> : <ArrowDown size={11}/>) : null}</button></th> }
+
+  if (isFirstRun) return <div className="portfolio-page portfolio-first-run"><PortfolioSetupGuide /></div>
 
   return <div className="portfolio-page">
     <div className="portfolio-toolbar"><label className="portfolio-filter"><Search size={15}/><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Filter holdings…" aria-label="Filter holdings"/></label>

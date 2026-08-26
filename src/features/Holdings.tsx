@@ -4,6 +4,7 @@ import { usePortfolio } from '../context/PortfolioContext'
 import { allocationBy, summarisePortfolio } from '../lib/portfolio'
 import { downloadCsv, money, number, percent } from '../lib/format'
 import { Badge, Button, Card, EmptyState, MetricCard, PageHeader, PrivateMoney, SearchInput, Select } from '../components/ui'
+import { PortfolioSetupGuide } from '../components/PortfolioSetupGuide'
 
 type SortKey = 'value_aud' | 'return_pct' | 'symbol' | 'day_change_aud'
 
@@ -32,6 +33,7 @@ export function Holdings() {
   return (
     <>
       <PageHeader title="Holdings" description="Every current position across your connected portfolio." actions={<Button icon={Download} onClick={exportRows} disabled={!rows.length}>Export CSV</Button>} />
+      {!bundle.holdings.length && !bundle.transactions.length && !bundle.connections.length ? <PortfolioSetupGuide compact /> : <>
       <div className="metric-grid four compact">
         <MetricCard label="Invested value" value={<PrivateMoney value={summary.invested} />} detail="excluding cash" />
         <MetricCard label="Total cost" value={<PrivateMoney value={summary.cost} />} detail="AUD cost base" />
@@ -51,6 +53,7 @@ export function Holdings() {
         {rows.length ? <div className="table-scroll"><table className="holdings-table"><thead><tr><th>Asset</th><th>Broker / account</th><th className="numeric">Quantity</th><th className="numeric">Price</th><th className="numeric">Market value</th><th className="numeric">Cost</th><th className="numeric">Unrealised</th><th className="numeric">Today</th></tr></thead><tbody>{rows.map((item) => <tr key={`${item.provider}-${item.account_name}-${item.symbol}`}><td><span className="asset-cell"><i>{item.symbol.slice(0, 2)}</i><span><strong>{item.symbol}</strong><small>{item.name || item.symbol}</small></span></span></td><td><Badge tone={item.provider === 'ibkr' ? 'purple' : 'success'}>{item.provider === 'ibkr' ? 'IBKR' : 'Superhero'}</Badge><small className="account-subline">{item.account_name}</small></td><td className="numeric">{number(item.quantity, 4)}</td><td className="numeric">{money(item.current_price, item.currency, 2)}<small className="currency-subline">{item.currency}</small></td><td className="numeric private-value"><strong>{money(item.value_aud)}</strong><small>{summary.invested ? (item.value_aud / summary.invested * 100).toFixed(1) : '0'}% weight</small></td><td className="numeric private-value">{money(item.cost_aud)}</td><td className={`numeric private-value ${item.unrealised_gain_aud >= 0 ? 'positive' : 'negative'}`}><strong>{money(item.unrealised_gain_aud)}</strong><small>{percent(item.return_pct)}</small></td><td className={`numeric private-value ${item.day_change_aud >= 0 ? 'positive' : 'negative'}`}>{money(item.day_change_aud)}</td></tr>)}</tbody></table></div> : <EmptyState icon={bundle.holdings.length ? SearchX : BriefcaseBusiness} title={bundle.holdings.length ? 'No holdings match these filters' : 'No holdings imported'} description={bundle.holdings.length ? 'Clear the search or choose a different account.' : 'Connect IBKR or import a Superhero portfolio report to populate this table.'} />}
         <div className="table-footer"><span>{rows.length} of {bundle.holdings.length} holdings</span><span>Values converted to AUD using each position’s latest FX rate</span></div>
       </Card>
+      </>}
     </>
   )
 }
