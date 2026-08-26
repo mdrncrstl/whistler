@@ -2,6 +2,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 import type { Session } from '@supabase/supabase-js'
 import { demoBundle } from '../data/demo'
+import { LoadingScreen } from '../components/ui'
 import { portfolioApi } from '../lib/api'
 import type { PortfolioBundle, Profile, SuperheroReport } from '../types'
 
@@ -31,8 +32,19 @@ interface PortfolioContextValue {
 
 const PortfolioContext = createContext<PortfolioContextValue | null>(null)
 
+const emptyLiveBundle: PortfolioBundle = {
+  profile: null,
+  holdings: [],
+  transactions: [],
+  cash: [],
+  snapshots: [],
+  connections: [],
+  syncRuns: [],
+  demo: false,
+}
+
 export function PortfolioProvider({ session, demo, children }: { session: Session | null; demo: boolean; children: ReactNode }) {
-  const [bundle, setBundle] = useState<PortfolioBundle>(() => structuredClone(demoBundle))
+  const [bundle, setBundle] = useState<PortfolioBundle>(() => structuredClone(demo ? demoBundle : emptyLiveBundle))
   const [loading, setLoading] = useState(!demo)
   const [action, setAction] = useState<string | null>(null)
   const [notice, setNotice] = useState<Notice | null>(null)
@@ -103,7 +115,7 @@ export function PortfolioProvider({ session, demo, children }: { session: Sessio
       : run('save-profile', () => portfolioApi.updateProfile(requireSession(), profile)),
   }), [action, bundle, demo, loading, notice, refresh, requireSession, run, session])
 
-  return <PortfolioContext.Provider value={value}>{children}</PortfolioContext.Provider>
+  return <PortfolioContext.Provider value={value}>{loading ? <LoadingScreen /> : children}</PortfolioContext.Provider>
 }
 
 export function usePortfolio() {

@@ -30,6 +30,8 @@ export function Connections() {
   const ibkr = bundle.connections.find((item) => item.provider === 'ibkr')
   const superhero = bundle.connections.find((item) => item.provider === 'superhero')
   const gmail = bundle.connections.find((item) => item.provider === 'google_gmail')
+  const ibkrReference = ibkr?.config?.mode === 'reference-portfolio'
+  const superheroReference = superhero?.config?.mode === 'reference-portfolio'
   const catalog = useMemo(() => [
     { name: 'Stake', region: 'Australia / US', method: 'Statement import', icon: Building2, status: 'available' },
     { name: 'CommSec', region: 'Australia', method: 'CSV statement', icon: Building2, status: 'available' },
@@ -100,7 +102,7 @@ export function Connections() {
     <Card className="connection-card">
       <div className="connection-icon">{provider === 'ibkr' ? <KeyRound /> : provider === 'google_gmail' ? <Mail /> : <FileSpreadsheet />}</div>
       <div className="connection-body">
-        <div className="connection-title"><div><h2>{providerName(provider)}</h2><p>{description}</p></div>{connection ? <Badge tone={connection.status === 'connected' ? 'success' : connection.status === 'error' ? 'error' : 'warning'}>{connection.status}</Badge> : <Badge>Not connected</Badge>}</div>
+        <div className="connection-title"><div><h2>{providerName(provider)}</h2><p>{description}</p></div>{connection?.config?.mode === 'reference-portfolio' ? <Badge>Reference portfolio</Badge> : connection ? <Badge tone={connection.status === 'connected' ? 'success' : connection.status === 'error' ? 'error' : 'warning'}>{connection.status}</Badge> : <Badge>Not connected</Badge>}</div>
         {connection && <div className="connection-meta"><span><strong>{connection.label}</strong> · {relativeDate(connection.last_synced_at)}</span>{connection.last_error && <span className="connection-error"><AlertTriangle size={14} />{connection.last_error}</span>}</div>}
         <div className="connection-actions">{actions}{connection && !demo && <Button variant="ghost" icon={Trash2} onClick={() => setDisconnecting(connection)}>Disconnect</Button>}</div>
       </div>
@@ -114,8 +116,8 @@ export function Connections() {
       {!bundle.holdings.length && <section className="connection-onboarding" aria-label="Portfolio setup progress"><div><strong>Add investments in two steps</strong><p>Choose a source below, then review the holdings Masterdeck finds. Your portfolio fills automatically after a successful sync or import.</p></div><ol><li className="active"><span>1</span>Choose a source</li><li><span>2</span>Review and import</li></ol></section>}
       {demo && <div className="demo-banner"><ShieldCheck size={18} /><span>The demo shows connection states but never accepts or sends private broker credentials. Sign in to connect real accounts.</span></div>}
       <div className="connections-grid">
-        {connectionCard(ibkr, 'ibkr', 'Automatic Activity Flex sync for positions, cash and complete account activity.', <>{ibkr ? <Button icon={RefreshCw} busy={action === `sync-${ibkr.id}`} disabled={demo} onClick={() => syncIbkr(ibkr.id)}>Sync IBKR now</Button> : <Button variant="primary" icon={KeyRound} disabled={demo} onClick={() => setIbkrOpen(true)}>Connect IBKR</Button>}<span className="read-only-label"><ShieldCheck size={14} /> Flex Web Service v3 · read only</span></>)}
-        {connectionCard(superhero, 'superhero', 'Upload a Full Portfolio Report, Transaction Statement, Valuation CSV or contract-note PDF.', <Button variant={superhero ? 'secondary' : 'primary'} icon={CloudUpload} onClick={() => fileInput.current?.click()}>{superhero ? 'Import another report' : 'Choose Superhero report'}</Button>)}
+        {connectionCard(ibkr, 'ibkr', 'Automatic Activity Flex sync for positions, cash and complete account activity.', <>{ibkrReference ? <Button variant="primary" icon={KeyRound} disabled={demo} onClick={() => setIbkrOpen(true)}>Connect live IBKR</Button> : ibkr ? <Button icon={RefreshCw} busy={action === `sync-${ibkr.id}`} disabled={demo} onClick={() => syncIbkr(ibkr.id)}>Sync IBKR now</Button> : <Button variant="primary" icon={KeyRound} disabled={demo} onClick={() => setIbkrOpen(true)}>Connect IBKR</Button>}<span className="read-only-label"><ShieldCheck size={14} /> {ibkrReference ? 'Saved reference portfolio · no live broker access' : 'Flex Web Service v3 · read only'}</span></>)}
+        {connectionCard(superhero, 'superhero', 'Upload a Full Portfolio Report, Transaction Statement, Valuation CSV or contract-note PDF.', <Button variant={superhero && !superheroReference ? 'secondary' : 'primary'} icon={CloudUpload} onClick={() => fileInput.current?.click()}>{superheroReference ? 'Replace with a broker report' : superhero ? 'Import another report' : 'Choose Superhero report'}</Button>)}
         {connectionCard(gmail, 'google_gmail', 'Optional separate Gmail read-only authorisation for narrow Superhero contract-note searches.', <>{gmail ? <Button icon={RefreshCw} busy={action === `sync-${gmail.id}`} disabled={demo} onClick={() => syncGmail(gmail.id)}>Scan Gmail now</Button> : <Button icon={Mail} disabled={demo} onClick={() => gmailLogin()}>Connect Gmail read-only</Button>}<span className="read-only-label"><ShieldCheck size={14} /> Requested scope: gmail.readonly</span></>)}
       </div>
 

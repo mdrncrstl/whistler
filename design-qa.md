@@ -111,6 +111,17 @@ The combined comparison was opened as one side-by-side image. MASTERDECK preserv
 - Browser QA covered desktop and 390 × 844 mobile, the import navigation/focus loop, console health, and a mobile overflow regression found and fixed during testing.
 - Automated regression coverage: 31 tests passed across 9 files; typecheck, lint, build, and `git diff --check` passed.
 
+### Pass 8 — authenticated portfolio persistence (2026-08-26)
+
+- Root cause: authenticated sessions initially rendered the bundled reference portfolio (`$139,854.61`) while the real account bundle loaded, then replaced it with the account's empty server response.
+- Account baseline before the requested copy: 0 positions, 0 transactions, 0 cash balances, 0 snapshots and 0 broker connections.
+- Persistence fix: saved the reference portfolio to the authenticated account as 8 positions, 12 transactions, 2 cash balances and 12 snapshots. The resulting database value is `$139,854.61`.
+- Provenance: the copied rows and two disabled connection records are explicitly labelled as a static reference portfolio; they do not claim live broker access or store broker credentials.
+- Hydration fix: live sessions now begin with an empty private bundle and show the shared loading screen until the authenticated Edge Function response arrives. Demo data is only initialized in explicit demo mode.
+- Connection safety: reference IBKR and Superhero records now offer real connection/import replacement actions instead of a non-functional sync action.
+- Production browser evidence: after a 3.2 second settled reload, `$139,854.61` and AAPL remained visible, first-run onboarding was absent, and the console contained zero warnings or errors.
+- Automated regression coverage: 32 tests passed across 10 files, including an authenticated hydration test that proves no AAPL/reference-data flash occurs before the live bundle resolves; typecheck, lint, build and `git diff --check` passed.
+
 ## Functional evidence
 
 - `npm.cmd run typecheck`: passed.
