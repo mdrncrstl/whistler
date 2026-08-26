@@ -898,6 +898,7 @@ body { font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-s
 .portfolio-holdings th > button { width: 100%; height: 100%; padding: 0; border: 0; display: inline-flex; align-items: center; justify-content: inherit; gap: 4px; background: transparent; color: inherit; font: inherit; letter-spacing: inherit; text-transform: inherit; cursor: pointer; }
 .portfolio-holdings th.numeric > button { justify-content: flex-end; }
 .portfolio-holdings th:first-child,.portfolio-holdings td:first-child { position: sticky; left: 0; z-index: 2; background: var(--bg); }
+.portfolio-holdings tbody tr:not(.market-row):not(.subtotal-row):not(.grand-total):hover td { background: var(--surface-2); }
 .portfolio-symbol { min-width: 180px; display: flex; align-items: center; gap: 9px; }
 .holding-avatar { width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; background: #1e293b; color: white; font-size: 10px; font-weight: 700; }
 .holding-link { padding: 0; border: 0; display: flex; align-items: center; gap: 9px; background: transparent; color: var(--text); text-align: left; cursor: pointer; }
@@ -911,7 +912,8 @@ body { font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-s
 .grand-total td { height: 44px; border-top: 1px solid var(--line-strong); background: #eef1f4; font-weight: 700; }
 .row-menu { width: 34px; color: var(--muted-2); text-align: center; }
 .row-menu { position: relative; }
-.row-menu > button { width: 26px; height: 26px; padding: 0; border: 0; border-radius: 5px; display: grid; place-items: center; background: transparent; color: inherit; cursor: pointer; }
+.row-menu > button { width: 26px; height: 26px; padding: 0; border: 0; border-radius: 5px; display: grid; place-items: center; background: transparent; color: inherit; cursor: pointer; opacity: 0; transition: opacity 120ms ease, background-color 120ms ease, color 120ms ease; }
+.portfolio-holdings tbody tr:hover .row-menu > button,.portfolio-holdings tbody tr:focus-within .row-menu > button,.row-menu > button[aria-expanded="true"] { opacity: 1; }
 .row-menu > button:hover { background: var(--surface-2); color: var(--text); }
 .row-menu-popover { width: 145px; padding: 5px; border: 1px solid var(--line); border-radius: 6px; position: absolute; top: 34px; right: 8px; z-index: 20; display: grid; background: var(--surface); box-shadow: 0 10px 24px rgb(15 23 42 / 14%); }
 .row-menu-popover button { height: 30px; padding: 0 8px; border: 0; border-radius: 4px; background: transparent; color: var(--text); font: inherit; font-size: 11px; text-align: left; cursor: pointer; }
