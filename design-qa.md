@@ -63,16 +63,28 @@ The combined comparison was opened as one side-by-side image. MASTERDECK preserv
 - Interaction evidence: nested links navigate to their existing deep routes; the MCP card dismisses; browser console reported zero warnings or errors.
 - Post-fix comparison found no actionable P0/P1/P2 sidebar differences.
 
+### Pass 4 — portfolio interaction parity and collapsible navigation (2026-08-26)
+
+- Source inspection: live authenticated `https://www.navexa.com/n/portfolio`, including the nested Performance/Tax parents, bottom rail collapse control, portfolio picker, Ctrl+K search, filter builder, time/position menus, chart modes, holding grouping, group collapse, sortable headers, column settings and PDF export.
+- Reference captures: `C:\Users\moder\.codex\tmp\navexa-portfolio-audit-2026-08-26\01-portfolio-main.png`, `02-performance-collapsed.png`, and `03-global-search.png`.
+- Implementation captures: `04-masterdeck-expanded.png` and `05-masterdeck-collapsed.png` in the same temporary audit folder. `06-reference-comparison.png` places source and implementation into one visual comparison input.
+- [P1] Performance and Tax Reporting looked expandable but were inert; the full rail had no collapse control.
+- [P1] Portfolio picker, global search, range, positions, filter, Amount/Percent, Line/Bar, grouping, group rows, columns, sorting and row actions were static or incomplete.
+- Fix: added persisted nested and whole-rail collapse states, a working portfolio menu and command palette, exact source-equivalent range/position choices, multi-filter builder, amount/percent and line/bar chart behavior, D/M/Y bar controls, four grouping modes, collapsible groups, sortable columns, searchable column settings, PDF/CSV export and holding detail/action menus.
+- Browser interaction evidence: 17/17 assertions passed for sidebar sections, rail collapse, filter application, chart mode switching, D/M/Y visibility, group collapse, columns dialog defaults, sector grouping, both export actions, command search and holding details.
+- Visual fidelity: passed for hierarchy, control density, source-like white/slate/blue palette, table rhythm and collapse states. Masterdeck retains independent branding, demo data and icons.
+- Accessibility: passed. Collapse controls expose `aria-expanded`, group toggles expose state, menus/dialogs have roles and labels, sortable headers expose `aria-sort`, and every new input is labelled.
+
 ## Functional evidence
 
 - `npm.cmd run typecheck`: passed.
 - `npm.cmd run lint`: passed.
-- `npm.cmd test`: 6 files / 17 tests passed.
+- `npm.cmd test`: 6 files / 20 tests passed.
 - `npm.cmd run build`: passed.
 - Desktop browser audit: 21/21 authenticated routes had meaningful DOM, zero page-level overflow and zero console errors.
 - Mobile browser audit: 21/21 authenticated routes settled at 390 x 844 with meaningful DOM and zero page-level overflow.
 - Production audit: all 16 rebuilt report, tax and tool routes rendered at `https://masterdeck-eosin.vercel.app` under the signed-in account, preserved their deep links, showed no demo portfolio state and had zero page-level overflow.
-- Interactions: report holding filter, sale-allocation selector, Deck AI suggestion/response, custom-group creation and route navigation passed.
+- Interactions: report holding filter, sale-allocation selector, Deck AI suggestion/response, custom-group creation, nested/full sidebar collapse, command search, portfolio filters, chart modes, group/sort/column controls, exports, holding details and route navigation passed.
 
 ## Findings
 

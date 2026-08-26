@@ -1,6 +1,6 @@
-import { ArrowLeftRight, ArrowUpRight, BarChart3, Bell, BriefcaseBusiness, CalendarDays, ChevronDown, ChevronUp, CircleDollarSign, Command, FileText, History, Inbox, Layers3, LineChart, ListTree, Menu, MessageSquare, Moon, PieChart, RefreshCw, Scale, Search, Settings, Sparkles, Sun, Table2, Target, TrendingUp, WalletCards, X, type LucideIcon } from 'lucide-react'
+import { ArrowLeftRight, ArrowUpRight, BarChart3, Bell, BriefcaseBusiness, CalendarDays, ChevronsLeft, ChevronsRight, ChevronDown, ChevronUp, CircleDollarSign, Command, FileText, History, Inbox, Layers3, LineChart, ListTree, Menu, MessageSquare, Moon, PieChart, Plus, RefreshCw, Scale, Search, Settings, Sparkles, Sun, Table2, Target, TrendingUp, WalletCards, X, type LucideIcon } from 'lucide-react'
 import { useEffect, useState, type ReactNode } from 'react'
-import { NavLink, useLocation } from 'react-router-dom'
+import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { usePortfolio } from '../context/PortfolioContext'
 import { Brand, Button, IconButton, Toast } from './ui'
 
@@ -47,8 +47,15 @@ export function AppShell({ children }: { children: ReactNode; onExitDemo: () => 
   const { bundle, demo, action, notice, setNotice, refreshQuotes } = usePortfolio()
   const [mobileOpen, setMobileOpen] = useState(false)
   const [mcpPromoOpen, setMcpPromoOpen] = useState(true)
+  const [performanceOpen, setPerformanceOpen] = useState(() => window.localStorage.getItem('masterdeck-performance-open') !== 'false')
+  const [taxOpen, setTaxOpen] = useState(() => window.localStorage.getItem('masterdeck-tax-open') !== 'false')
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => window.localStorage.getItem('masterdeck-sidebar-collapsed') === 'true')
+  const [portfolioMenuOpen, setPortfolioMenuOpen] = useState(false)
+  const [searchOpen, setSearchOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
   const [theme, setTheme] = useState<'light' | 'dark'>(() => window.localStorage.getItem('masterdeck-theme') === 'dark' ? 'dark' : 'light')
   const location = useLocation()
+  const navigate = useNavigate()
   const current = [...flatNavigation].sort((a, b) => b.to.length - a.to.length).find((item) => item.end ? location.pathname === item.to : location.pathname.startsWith(item.to)) || flatNavigation[0]
   const profile = bundle.profile
   const privacy = Boolean(profile?.settings?.privacyMode)
@@ -58,10 +65,54 @@ export function AppShell({ children }: { children: ReactNode; onExitDemo: () => 
     window.localStorage.setItem('masterdeck-theme', theme)
   }, [theme])
 
+  useEffect(() => {
+    window.localStorage.setItem('masterdeck-performance-open', String(performanceOpen))
+    window.localStorage.setItem('masterdeck-tax-open', String(taxOpen))
+    window.localStorage.setItem('masterdeck-sidebar-collapsed', String(sidebarCollapsed))
+  }, [performanceOpen, taxOpen, sidebarCollapsed])
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
+        event.preventDefault()
+        setSearchOpen(true)
+      }
+      if (event.key === 'Escape') {
+        setSearchOpen(false)
+        setPortfolioMenuOpen(false)
+      }
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [])
+
+  const searchCommands = [
+    { label: 'Portfolio', group: 'Navigation', to: '/app', icon: BriefcaseBusiness },
+    { label: 'Add holdings', group: 'Navigation', to: '/app/connections', icon: Plus },
+    { label: 'Manage portfolios', group: 'Navigation', to: '/app/settings', icon: Layers3 },
+    { label: 'Masterdeck AI', group: 'Navigation', to: '/app/tools/assistant', icon: Sparkles },
+    { label: 'Tax reports', group: 'Tax Reporting', to: '/app/tax', icon: FileText },
+    { label: 'Settings', group: 'Settings', to: '/app/settings', icon: Settings },
+  ].filter((item) => item.label.toLowerCase().includes(searchQuery.toLowerCase()))
+
+  const openCommand = (to: string) => {
+    navigate(to)
+    setSearchOpen(false)
+    setSearchQuery('')
+    setMobileOpen(false)
+  }
+
   const nav = (
     <>
       <div className="sidebar-brand"><Brand /></div>
-      <button className="portfolio-switcher"><span className="portfolio-monogram">MD</span><span><strong>All portfolios</strong><small>{bundle.holdings.length} holdings · AUD</small></span><ChevronDown size={14} /></button>
+      <div className="portfolio-switcher-wrap">
+        <button className="portfolio-switcher" aria-haspopup="menu" aria-expanded={portfolioMenuOpen} onClick={() => setPortfolioMenuOpen(!portfolioMenuOpen)}><span className="portfolio-monogram">MD</span><span><strong>All portfolios</strong><small>{bundle.holdings.length} holdings · AUD</small></span><ChevronDown size={14} /></button>
+        {portfolioMenuOpen && <div className="portfolio-menu" role="menu">
+          <span>My portfolios</span>
+          <button role="menuitem" onClick={() => setPortfolioMenuOpen(false)}><span className="portfolio-monogram">MD</span><span><strong>All portfolios</strong><small>{bundle.holdings.length} holdings · AUD</small></span></button>
+          <button role="menuitem" onClick={() => openCommand('/app/settings')}><Settings size={14}/><span>Manage portfolios</span></button>
+        </div>}
+      </div>
       <nav className="side-nav" aria-label="Portfolio navigation">
         <div className="nav-section">
           <span className="nav-group-label">Portfolio</span>
@@ -74,17 +125,17 @@ export function AppShell({ children }: { children: ReactNode; onExitDemo: () => 
 
         <div className="nav-section nav-expanded-section">
           <span className="nav-group-label">Reports</span>
-          <div className="nav-parent"><LineChart size={15}/><span>Performance</span><ChevronUp size={13}/></div>
-          {reportItems.map(({ to, label, icon: Icon, subGroup, end }) => <div className="nav-child-wrap" key={to}>
+          <button className="nav-parent" type="button" aria-expanded={performanceOpen} onClick={() => setPerformanceOpen(!performanceOpen)}><LineChart size={15}/><span>Performance</span>{performanceOpen ? <ChevronUp size={13}/> : <ChevronDown size={13}/>}</button>
+          <div className={`nav-branch ${performanceOpen ? 'open' : ''}`} aria-hidden={!performanceOpen}>{reportItems.map(({ to, label, icon: Icon, subGroup, end }) => <div className="nav-child-wrap" key={to}>
             {subGroup && <span className="nav-subgroup-label">{subGroup}</span>}
             <NavLink className="nav-child" to={to} end={end} onClick={() => setMobileOpen(false)}><Icon size={15}/><span>{label}</span></NavLink>
-          </div>)}
+          </div>)}</div>
 
-          <div className="nav-parent nav-tax-parent"><FileText size={15}/><span>Tax Reporting</span><ChevronUp size={13}/></div>
-          {taxItems.map(({ to, label, icon: Icon, subGroup, end }) => <div className="nav-child-wrap" key={to}>
+          <button className="nav-parent nav-tax-parent" type="button" aria-expanded={taxOpen} onClick={() => setTaxOpen(!taxOpen)}><FileText size={15}/><span>Tax Reporting</span>{taxOpen ? <ChevronUp size={13}/> : <ChevronDown size={13}/>}</button>
+          <div className={`nav-branch ${taxOpen ? 'open' : ''}`} aria-hidden={!taxOpen}>{taxItems.map(({ to, label, icon: Icon, subGroup, end }) => <div className="nav-child-wrap" key={to}>
             {subGroup && <span className="nav-subgroup-label">{subGroup}</span>}
             <NavLink className="nav-child" to={to} end={end} onClick={() => setMobileOpen(false)}><Icon size={15}/><span>{label}</span></NavLink>
-          </div>)}
+          </div>)}</div>
         </div>
 
         <div className="nav-section">
@@ -105,13 +156,14 @@ export function AppShell({ children }: { children: ReactNode; onExitDemo: () => 
           <NavLink to="/app/settings">Connect <ArrowUpRight size={12}/></NavLink>
         </aside>}
         <NavLink className="sidebar-feedback" to="/app/settings"><MessageSquare size={15}/><span>Feedback</span></NavLink>
+        <button className="sidebar-collapse-toggle" type="button" aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'} onClick={() => setSidebarCollapsed(!sidebarCollapsed)}>{sidebarCollapsed ? <ChevronsRight size={15}/> : <ChevronsLeft size={15}/>}<span>{sidebarCollapsed ? 'Expand' : 'Collapse'}</span></button>
       </div>
     </>
   )
 
   const compact = Boolean(profile?.settings?.compactTables)
   return (
-    <div className={`app-shell ${privacy ? 'privacy-on' : ''} ${compact ? 'compact-tables' : ''}`}>
+    <div className={`app-shell ${sidebarCollapsed ? 'sidebar-collapsed' : ''} ${privacy ? 'privacy-on' : ''} ${compact ? 'compact-tables' : ''}`}>
       <aside className="sidebar">{nav}</aside>
       {mobileOpen && <div className="mobile-drawer"><div className="drawer-panel">{nav}</div><button className="drawer-dismiss" aria-label="Close menu" onClick={() => setMobileOpen(false)}><X /></button></div>}
       <main className="app-main">
@@ -121,7 +173,7 @@ export function AppShell({ children }: { children: ReactNode; onExitDemo: () => 
             <div><strong>{current.label}</strong><span>{demo ? 'Illustrative demo data' : 'Live private workspace'}</span></div>
           </div>
           <div className="topbar-actions">
-            <label className="global-search"><Search size={15}/><input placeholder="Search holdings, reports…" aria-label="Search workspace"/><kbd><Command size={10}/>K</kbd></label>
+            <button className="global-search" type="button" onClick={() => setSearchOpen(true)}><Search size={15}/><span>Search holdings, reports…</span><kbd><Command size={10}/>K</kbd></button>
             <Button variant="ghost" icon={RefreshCw} busy={action === 'refresh-quotes'} onClick={() => refreshQuotes()}>Refresh prices</Button>
             <IconButton label="Notifications"><Bell size={17}/></IconButton>
             <IconButton label={`Use ${theme === 'light' ? 'dark' : 'light'} theme`} onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}>{theme === 'light' ? <Moon size={17}/> : <Sun size={17}/>}</IconButton>
@@ -136,6 +188,17 @@ export function AppShell({ children }: { children: ReactNode; onExitDemo: () => 
         ))}
       </nav>
       {notice && <Toast tone={notice.tone} message={notice.message} onClose={() => setNotice(null)} />}
+      {searchOpen && <div className="command-backdrop" role="presentation" onMouseDown={() => setSearchOpen(false)}>
+        <div className="command-palette" role="dialog" aria-modal="true" aria-label="Search workspace" onMouseDown={(event) => event.stopPropagation()}>
+          <label><Search size={17}/><input autoFocus value={searchQuery} onChange={(event) => setSearchQuery(event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter' && searchCommands[0]) openCommand(searchCommands[0].to) }} placeholder="Search or jump to…" aria-label="Search or jump to"/><kbd>ESC</kbd></label>
+          <div className="command-results">{searchCommands.length ? ['Navigation', 'Tax Reporting', 'Settings'].map((group) => {
+            const items = searchCommands.filter((item) => item.group === group)
+            if (!items.length) return null
+            return <section key={group}><span>{group}</span>{items.map(({ label, to, icon: Icon }) => <button key={label} onClick={() => openCommand(to)}><Icon size={16}/><strong>{label}</strong><small>↵</small></button>)}</section>
+          }) : <p>No matching pages</p>}</div>
+          <footer><span>↑↓ Navigate</span><span>↵ Open</span><span>ESC Close</span></footer>
+        </div>
+      </div>}
     </div>
   )
 }

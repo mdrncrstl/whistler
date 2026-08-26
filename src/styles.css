@@ -603,17 +603,28 @@ body { font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-s
 .brand-mark { width: 28px; height: 28px; background: transparent; }
 .brand-mark svg { width: 21px; height: 21px; }
 .portfolio-switcher { top: 0; left: 36px; width: 200px; min-height: 32px; border-color: #d7dde4; }
+.portfolio-switcher-wrap { position: relative; z-index: 25; }
+.portfolio-menu { width: 220px; padding: 7px; border: 1px solid var(--line); border-radius: 7px; position: absolute; top: 35px; left: 28px; display: grid; gap: 3px; background: var(--surface); box-shadow: 0 14px 34px rgb(15 23 42 / 14%); }
+.portfolio-menu > span { padding: 5px 8px 4px; color: var(--muted-2); font-size: 10px; }
+.portfolio-menu > button { min-height: 38px; padding: 6px 8px; border: 0; border-radius: 5px; display: flex; align-items: center; gap: 9px; background: transparent; color: var(--text); text-align: left; cursor: pointer; }
+.portfolio-menu > button:hover { background: var(--surface-2); }
+.portfolio-menu > button > span:nth-child(2) { display: grid; }
+.portfolio-menu small { color: var(--muted-2); font-size: 9px; }
 .portfolio-switcher strong { font-size: 13px; font-weight: 600; }
 .side-nav { margin-top: 6px; gap: 14px; }
 .nav-section { gap: 0; }
 .nav-group-label { height: 27px; padding: 7px 8px 4px; color: #91a0ba; font-size: 11px; line-height: 16px; }
-.side-nav a,.nav-parent { min-height: 32px; padding: 0 8px; border-radius: 6px; display: flex; align-items: center; gap: 16px; color: #111827; font-size: 13px; font-weight: 400; line-height: 1; }
+.side-nav a,.nav-parent { width: 100%; min-height: 32px; padding: 0 8px; border: 0; border-radius: 6px; display: flex; align-items: center; gap: 16px; background: transparent; color: #111827; font-family: inherit; font-size: 13px; font-weight: 400; line-height: 1; text-align: left; cursor: pointer; }
 .side-nav a svg,.nav-parent svg { flex: 0 0 auto; color: #7f8998; stroke-width: 1.65; }
-.side-nav a:hover { background: #e7e9ec; }
+.side-nav a:hover,.nav-parent:hover { background: #e7e9ec; }
 .side-nav a.active { color: #111827; background: #dfe2e5; box-shadow: none; }
 .side-nav a.active svg { color: #5f6875; }
 .nav-parent > span { flex: 1; }
 .nav-parent > svg:last-child { color: #b7bec8; }
+.nav-branch { max-height: 0; opacity: 0; overflow: hidden; transition: max-height .22s ease, opacity .15s ease; }
+.nav-branch > * { visibility: hidden; }
+.nav-branch.open { max-height: 520px; opacity: 1; overflow: visible; }
+.nav-branch.open > * { visibility: visible; }
 .nav-child-wrap { display: grid; }
 .nav-subgroup-label { height: 26px; padding: 7px 8px 3px 38px; color: #91a0ba; font-size: 10px; line-height: 16px; }
 .side-nav a.nav-child { padding-left: 24px; gap: 12px; }
@@ -628,6 +639,20 @@ body { font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-s
 .side-nav + .sidebar-foot .mcp-promo > a,.mcp-promo > a { min-height: auto; padding: 0; display: inline-flex; gap: 4px; color: #3a6ff5; background: transparent; font-size: 10px; font-weight: 600; }
 .sidebar-feedback { height: 40px; margin: 0 -8px; padding: 0 15px !important; border-top: 1px solid #dfe3e8; border-bottom: 1px solid #dfe3e8; border-radius: 0 !important; display: flex; align-items: center; gap: 9px; color: #111827; font-size: 12px; }
 .sidebar-feedback:hover { background: #e7e9ec; }
+.sidebar-collapse-toggle { width: calc(100% + 16px); height: 34px; margin: -8px -8px 0; padding: 0 15px; border: 0; display: flex; align-items: center; gap: 10px; background: transparent; color: #7f8998; font: inherit; font-size: 11px; cursor: pointer; }
+.sidebar-collapse-toggle:hover { background: #e7e9ec; color: #111827; }
+.app-shell.sidebar-collapsed { grid-template-columns: 52px minmax(0, 1fr); }
+.sidebar-collapsed > .sidebar { width: 52px; padding-inline: 6px; overflow: visible; }
+.sidebar-collapsed > .sidebar .sidebar-brand { justify-content: center; }
+.sidebar-collapsed > .sidebar .portfolio-switcher-wrap { display: none; }
+.sidebar-collapsed > .sidebar .side-nav { margin-top: 5px; gap: 7px; }
+.sidebar-collapsed > .sidebar .nav-group-label,.sidebar-collapsed > .sidebar .side-nav span,.sidebar-collapsed > .sidebar .nav-parent > svg:last-child,.sidebar-collapsed > .sidebar .nav-branch,.sidebar-collapsed > .sidebar .mcp-promo,.sidebar-collapsed > .sidebar .sidebar-feedback span,.sidebar-collapsed > .sidebar .sidebar-collapse-toggle span { display: none; }
+.sidebar-collapsed > .sidebar .side-nav a,.sidebar-collapsed > .sidebar .nav-parent { width: 40px; padding: 0; justify-content: center; gap: 0; }
+.sidebar-collapsed > .sidebar .nav-section { gap: 2px; }
+.sidebar-collapsed > .sidebar .nav-settings-section { padding-top: 7px; }
+.sidebar-collapsed > .sidebar .sidebar-foot { margin-inline: -6px; padding-inline: 6px; }
+.sidebar-collapsed > .sidebar .sidebar-feedback,.sidebar-collapsed > .sidebar .sidebar-collapse-toggle { width: 52px; margin-inline: -6px; padding: 0; justify-content: center; }
+.drawer-panel .sidebar-collapse-toggle { display: none; }
 :root[data-theme="dark"] .sidebar,:root[data-theme="dark"] .sidebar-foot { background: #0b1410; }
 :root[data-theme="dark"] .mcp-promo { border-color: var(--line); background: var(--surface-2); color: var(--text); }
 .topbar { height: 48px; padding: 0 12px; background: rgb(255 255 255 / 96%); }
@@ -635,7 +660,21 @@ body { font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-s
 .topbar-actions { width: 100%; justify-content: flex-end; }
 .topbar-actions > .button { display: none; }
 .global-search { position: absolute; left: 50%; width: 400px; height: 34px; transform: translateX(-50%); background: #f3f5f7; }
-.global-search input { font-size: 13px; }
+.global-search { border: 1px solid var(--line); font-family: inherit; cursor: pointer; }
+.global-search span { min-width: 0; flex: 1; overflow: hidden; color: var(--muted-2); font-size: 13px; text-align: left; text-overflow: ellipsis; white-space: nowrap; }
+.command-backdrop { position: fixed; inset: 0; z-index: 100; display: grid; place-items: start center; padding-top: 105px; background: rgb(15 23 42 / 28%); backdrop-filter: blur(2px); }
+.command-palette { width: min(590px, calc(100vw - 32px)); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--surface); box-shadow: 0 24px 70px rgb(15 23 42 / 24%); }
+.command-palette > label { height: 52px; padding: 0 15px; border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 10px; color: var(--muted-2); }
+.command-palette input { flex: 1; border: 0; outline: 0; background: transparent; color: var(--text); font: inherit; font-size: 14px; }
+.command-palette kbd { padding: 3px 6px; border: 1px solid var(--line); border-radius: 4px; font-size: 9px; }
+.command-results { max-height: 390px; padding: 8px; overflow-y: auto; }
+.command-results section { display: grid; }
+.command-results section > span { padding: 8px 9px 5px; color: var(--muted-2); font-size: 10px; font-weight: 600; text-transform: uppercase; }
+.command-results button { min-height: 40px; padding: 0 10px; border: 0; border-radius: 6px; display: grid; grid-template-columns: 22px 1fr 20px; align-items: center; background: transparent; color: var(--text); text-align: left; cursor: pointer; }
+.command-results button:hover,.command-results button:focus { outline: 0; background: var(--surface-2); }
+.command-results button small { color: var(--muted-2); text-align: right; }
+.command-results > p { padding: 30px; color: var(--muted-2); text-align: center; }
+.command-palette footer { height: 34px; padding: 0 14px; border-top: 1px solid var(--line); display: flex; align-items: center; justify-content: flex-end; gap: 14px; color: var(--muted-2); font-size: 9px; }
 .topbar-avatar { width: 30px; height: 30px; border: 0; border-radius: 50%; background: #e5e7eb; color: var(--muted); }
 .app-content { padding: 32px 32px 72px; }
 
@@ -644,6 +683,24 @@ body { font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-s
 .portfolio-toolbar button,.holdings-head button { height: 28px; padding: 0 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); color: var(--muted); display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-size: 12px; font-weight: 500; cursor: pointer; }
 .portfolio-toolbar button:hover,.holdings-head button:hover { border-color: var(--line-strong); color: var(--text); }
 .portfolio-toolbar .refresh-market { margin-left: auto; }
+.control-popover-wrap { position: relative; }
+.control-menu { min-width: 180px; padding: 5px; border: 1px solid var(--line); border-radius: 7px; position: absolute; top: calc(100% + 5px); right: 0; z-index: 30; display: grid; gap: 2px; background: var(--surface); box-shadow: 0 12px 30px rgb(15 23 42 / 14%); }
+.portfolio-toolbar .control-menu { right: auto; left: 0; }
+.control-menu button { width: 100%; min-height: 31px; padding: 0 8px; border: 0 !important; justify-content: flex-start; background: transparent !important; color: var(--text) !important; text-align: left; }
+.control-menu button:hover,.control-menu button.selected { background: var(--surface-2) !important; }
+.control-menu button span { flex: 1; }
+.range-menu { width: 240px; max-height: 370px; overflow-y: auto; }
+.filter-count { min-width: 17px; height: 17px; border-radius: 99px; display: grid; place-items: center; background: var(--blue); color: white; font-size: 9px; }
+.portfolio-toolbar button.active-control,.holdings-head button.active-control { border-color: #cfd9ff; background: #eef2ff; color: var(--blue); }
+.filter-builder { margin-top: 10px; padding: 11px 12px; border: 1px solid var(--line); border-radius: 7px; display: flex; align-items: center; flex-wrap: wrap; gap: 8px; background: var(--surface); }
+.filter-builder > span { color: var(--muted-2); font-size: 11px; }
+.custom-range { width: fit-content; margin-top: 9px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 7px; display: flex; align-items: center; gap: 10px; background: var(--surface); }
+.custom-range label { display: flex; align-items: center; gap: 6px; color: var(--muted-2); font-size: 10px; }
+.custom-range input { height: 28px; padding: 0 7px; border: 1px solid var(--line); border-radius: 5px; background: var(--surface); color: var(--text); font: inherit; font-size: 11px; }
+.filter-row { display: flex; align-items: center; gap: 6px; }
+.filter-row select { height: 30px; min-width: 120px; padding: 0 27px 0 8px; border: 1px solid var(--line); border-radius: 5px; background: var(--surface); color: var(--text); font: inherit; font-size: 11px; }
+.filter-row select:disabled { color: var(--muted-2); background: var(--surface-2); }
+.filter-row button,.filter-builder .add-filter { height: 30px; padding: 0 9px; border: 1px solid var(--line); border-radius: 5px; display: inline-flex; align-items: center; background: var(--surface); color: var(--muted); cursor: pointer; }
 .portfolio-filter { width: 400px; height: 28px; padding: 0 10px; border: 1px solid var(--line); border-radius: 6px; display: flex; align-items: center; gap: 7px; background: var(--surface); color: var(--muted-2); }
 .portfolio-filter input { min-width: 0; flex: 1; border: 0; outline: 0; background: transparent; color: var(--text); font-size: 12px; }
 .portfolio-metrics { height: 135px; padding: 30px 10px 14px; display: grid; grid-template-columns: repeat(5, minmax(150px, 220px)); gap: 0; align-items: stretch; }
@@ -673,16 +730,47 @@ body { font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-s
 .portfolio-holdings table { min-width: 1240px; }
 .portfolio-holdings th,.portfolio-holdings td { height: 45px; padding: 0 14px; border-bottom: 1px solid var(--line); font-size: 13px; }
 .portfolio-holdings th { height: 40px; background: transparent; color: var(--muted-2); font-size: 10px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
+.portfolio-holdings th > button { width: 100%; height: 100%; padding: 0; border: 0; display: inline-flex; align-items: center; justify-content: inherit; gap: 4px; background: transparent; color: inherit; font: inherit; letter-spacing: inherit; text-transform: inherit; cursor: pointer; }
+.portfolio-holdings th.numeric > button { justify-content: flex-end; }
 .portfolio-holdings th:first-child,.portfolio-holdings td:first-child { position: sticky; left: 0; z-index: 2; background: var(--bg); }
 .portfolio-symbol { min-width: 180px; display: flex; align-items: center; gap: 9px; }
 .holding-avatar { width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; background: #1e293b; color: white; font-size: 10px; font-weight: 700; }
+.holding-link { padding: 0; border: 0; display: flex; align-items: center; gap: 9px; background: transparent; color: var(--text); text-align: left; cursor: pointer; }
+.holding-link > span:last-child { display: grid; gap: 2px; }
+.holding-link small { max-width: 150px; overflow: hidden; color: var(--muted-2); font-size: 9px; font-weight: 400; text-overflow: ellipsis; white-space: nowrap; }
 .holding-price { color: var(--text); }
 .market-row td { height: 34px; background: #f4f5f7 !important; color: var(--muted-2); font-size: 11px; font-weight: 600; }
 .market-row td svg { margin-right: 6px; vertical-align: middle; }
+.market-row td > button { width: 100%; height: 100%; padding: 0; border: 0; display: flex; align-items: center; background: transparent; color: inherit; font: inherit; font-weight: inherit; cursor: pointer; }
 .subtotal-row td { height: 40px; background: #f7f8fa; font-weight: 600; }
 .grand-total td { height: 44px; border-top: 1px solid var(--line-strong); background: #eef1f4; font-weight: 700; }
 .row-menu { width: 34px; color: var(--muted-2); text-align: center; }
+.row-menu { position: relative; }
+.row-menu > button { width: 26px; height: 26px; padding: 0; border: 0; border-radius: 5px; display: grid; place-items: center; background: transparent; color: inherit; cursor: pointer; }
+.row-menu > button:hover { background: var(--surface-2); color: var(--text); }
+.row-menu-popover { width: 145px; padding: 5px; border: 1px solid var(--line); border-radius: 6px; position: absolute; top: 34px; right: 8px; z-index: 20; display: grid; background: var(--surface); box-shadow: 0 10px 24px rgb(15 23 42 / 14%); }
+.row-menu-popover button { height: 30px; padding: 0 8px; border: 0; border-radius: 4px; background: transparent; color: var(--text); font: inherit; font-size: 11px; text-align: left; cursor: pointer; }
+.row-menu-popover button:hover { background: var(--surface-2); }
 .portfolio-footnote { margin: 12px 0 0; color: var(--muted-2); font-size: 11px; }
+.modal-backdrop { position: fixed; inset: 0; z-index: 110; display: grid; place-items: center; padding: 20px; background: rgb(15 23 42 / 30%); backdrop-filter: blur(2px); }
+.column-settings,.holding-detail { width: min(450px, calc(100vw - 30px)); max-height: calc(100vh - 50px); border: 1px solid var(--line); border-radius: 9px; overflow: auto; background: var(--surface); box-shadow: 0 24px 70px rgb(15 23 42 / 24%); }
+.column-settings > header,.holding-detail > header { padding: 18px; border-bottom: 1px solid var(--line); display: flex; align-items: flex-start; gap: 11px; }
+.column-settings h2,.holding-detail h2 { margin: 0; font-size: 16px; }
+.column-settings p,.holding-detail p { margin: 4px 0 0; color: var(--muted-2); font-size: 11px; }
+.column-settings header > div:first-child { flex: 1; }
+.column-settings header > button,.holding-detail header > button { width: 28px; height: 28px; margin-left: auto; padding: 0; border: 0; border-radius: 5px; display: grid; place-items: center; background: transparent; color: var(--muted); cursor: pointer; }
+.column-settings > label { height: 36px; margin: 12px; padding: 0 9px; border: 1px solid var(--line); border-radius: 6px; display: flex; align-items: center; gap: 7px; color: var(--muted-2); }
+.column-settings > label input { flex: 1; border: 0; outline: 0; background: transparent; color: var(--text); font: inherit; }
+.column-list { padding: 0 12px 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 2px 12px; }
+.column-list label { min-height: 34px; display: flex; align-items: center; gap: 8px; color: var(--text); font-size: 11px; }
+.column-list label[draggable="true"] { cursor: grab; }
+.column-list label[draggable="true"]:active { cursor: grabbing; }
+.column-settings > footer { padding: 12px 18px; border-top: 1px solid var(--line); color: var(--muted-2); font-size: 10px; }
+.holding-detail header { align-items: center; }
+.holding-detail dl { margin: 0; padding: 8px 18px 18px; display: grid; grid-template-columns: 1fr 1fr; gap: 0 22px; }
+.holding-detail dl > div { padding: 12px 0; border-bottom: 1px solid var(--line); }
+.holding-detail dt { color: var(--muted-2); font-size: 10px; }
+.holding-detail dd { margin: 5px 0 0; color: var(--text); font-size: 13px; font-weight: 600; }
 
 @media (max-width: 900px) {
   .topbar { padding: 0 12px; }
