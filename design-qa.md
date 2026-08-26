@@ -123,6 +123,26 @@ The combined comparison was opened as one side-by-side image. MASTERDECK preserv
 - Production browser evidence: a cold Edge start resolved to `$139,854.61` with AAPL present and no error/onboarding fallback. A second full refresh settled in 1.68 seconds with the same value, and Connections exposed the reference labels and replacement actions without the broken live-sync action.
 - Automated regression coverage: 32 tests passed across 10 files, including an authenticated hydration test that proves no AAPL/reference-data flash occurs before the live bundle resolves; typecheck, lint, build and `git diff --check` passed.
 
+### Pass 9 — portfolio density and chart polish (2026-08-26)
+
+- Source visual truth: `C:\Users\moder\AppData\Local\Temp\codex-clipboard-ba218640-c3b2-47d3-9be1-d646c987b35b.png`, Navexa portfolio at 2559 × 1424 px. The app-content comparison crop begins below the 129 px browser chrome.
+- Pre-fix implementation evidence: `C:\Users\moder\AppData\Local\Temp\codex-clipboard-6a401d22-66f3-43a0-82ca-1658b22c0aa6.png`, Masterdeck production at 2559 × 1439 px.
+- Post-fix browser implementation: `C:\Users\moder\AppData\Local\Temp\masterdeck-portfolio-refinement-verified.png`, browser-rendered local demo at a 1280 × 720 CSS viewport, DPR 1.
+- Focused equal-density comparison: `C:\Users\moder\AppData\Local\Temp\navexa-masterdeck-refinement-verified-comparison.png`. The source uses an unscaled 1280 × 720 crop from the left side of the 2559 px source app canvas; the implementation remains unscaled at 1280 × 720. This preserves pixel density and the shared 240 px sidebar geometry, while intentionally comparing only the source's leading desktop region.
+- Full-view comparison: `C:\Users\moder\AppData\Local\Temp\navexa-masterdeck-refinement-comparison.png` records the overall composition; it is used only for hierarchy because the full source was proportionally reduced. The unscaled focused comparison is the fidelity gate.
+- State: light theme, populated portfolio, All Time, Amount, Line, expanded report/tax sidebar branches.
+- [P1] The chart acquired a thick native focus frame and exposed raw `value_aud`/ISO tooltip copy while being inspected.
+- [P2] Masterdeck's 48 px desktop top bar pushed the complete portfolio composition 14 px below the source; 300-weight global typography, over-inset metrics, and two-line holding labels made the page feel softer and busier.
+- Fix: reduced the desktop top bar to 34 px and search to 28 px while preserving the 48 px mobile bar; recalibrated the metric/chart vertical rhythm; moved small UI typography to a supported 400 weight; aligned metric copy to the source edge; removed redundant company-name sublines; and added source-like chart axis, fill, cursor, focus and tooltip treatment.
+- Post-fix geometry at 1280 × 720: sidebar 240 px, top bar 34 px, toolbar y=66, active metric y=130–231, chart y=294–584, holdings section y=664, and no page-level horizontal overflow.
+- Fonts and typography: passed. Inter remains the single bundled family, numeric values use the source-like weight and scale, small body text no longer relies on an underweight 300 face, and chart/table numbers preserve compact scanability.
+- Spacing and layout rhythm: passed for the unscaled leading-region comparison. Filter controls, metric baseline, segmented controls, chart frame and holdings heading align within the expected small optical variance. The supplied Masterdeck Brave screenshot appears at approximately 125% per-origin page zoom (its 240 CSS px rail occupies about 300 screenshot pixels); browser zoom is external to the app CSS.
+- Colors and visual tokens: passed. The white/slate/blue hierarchy, active metric surface, restrained green gains and fine neutral rules match the target without reproducing Navexa branding.
+- Image quality and asset fidelity: no new raster assets occur on this portfolio surface. The existing independent Masterdeck mark remains intentionally different from Navexa; a final generated brand mark is tracked separately because the built-in image generator was unavailable during the preceding branding request.
+- Copy and content: passed. The chart tooltip now formats the date for Australian readers and labels the series `Portfolio` instead of exposing an internal database field.
+- Interaction evidence: Percent hides the incompatible Line/Bar selector, returning to Amount restores it, `$139,854.61` remains present, the browser console reports zero warnings/errors, and no framework overlay is present.
+- Remaining P3: replace generic holding initials with a licensed or provider-backed security-logo source when one is selected.
+
 ## Functional evidence
 
 - `npm.cmd run typecheck`: passed.

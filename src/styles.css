@@ -724,7 +724,7 @@ tbody tr:hover { background: var(--surface-2); }
   --blue: #3a6ff5;
   --radius: 6px;
 }
-body { font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 15px; font-weight: 300; line-height: 1.5; }
+body { font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 14px; font-weight: 400; line-height: 1.5; }
 .app-shell { grid-template-columns: 239px minmax(0, 1fr); }
 .sidebar { padding: 0 8px 8px; background: #f7f8fa; }
 .sidebar-brand { height: 48px; padding: 0; display: flex; align-items: center; }
@@ -806,11 +806,11 @@ body { font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-s
 :root[data-theme="dark"] .side-nav a,:root[data-theme="dark"] .nav-parent,:root[data-theme="dark"] .sidebar-feedback,:root[data-theme="dark"] .sidebar-collapse-toggle { color: var(--muted); }
 :root[data-theme="dark"] .side-nav a:hover,:root[data-theme="dark"] .nav-parent:hover,:root[data-theme="dark"] .sidebar-feedback:hover,:root[data-theme="dark"] .sidebar-collapse-toggle:hover { background: var(--surface-2); color: var(--text); }
 :root[data-theme="dark"] .side-nav a.active { background: var(--surface-3); color: var(--text); }
-.topbar { height: 48px; padding: 0 12px; background: rgb(255 255 255 / 96%); }
+.topbar { height: 34px; padding: 0 12px; background: rgb(255 255 255 / 96%); }
 .topbar-title { display: none; }
 .topbar-actions { width: 100%; justify-content: flex-end; }
 .topbar-actions > .button { display: none; }
-.global-search { position: absolute; left: 50%; width: 400px; height: 34px; transform: translateX(-50%); background: #f3f5f7; }
+.global-search { position: absolute; left: 50%; width: 400px; height: 28px; transform: translateX(-50%); background: #f3f5f7; }
 .global-search { border: 1px solid var(--line); font-family: inherit; cursor: pointer; }
 :root[data-theme="dark"] .topbar { background: color-mix(in srgb, var(--surface) 96%, transparent); }
 :root[data-theme="dark"] .global-search { background: var(--surface-2); }
@@ -828,7 +828,7 @@ body { font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-s
 .command-results button small { color: var(--muted-2); text-align: right; }
 .command-results > p { padding: 30px; color: var(--muted-2); text-align: center; }
 .command-palette footer { height: 34px; padding: 0 14px; border-top: 1px solid var(--line); display: flex; align-items: center; justify-content: flex-end; gap: 14px; color: var(--muted-2); font-size: 9px; }
-.topbar-avatar { width: 30px; height: 30px; border: 0; border-radius: 50%; background: #e5e7eb; color: var(--muted); }
+.topbar-avatar { width: 26px; height: 26px; border: 0; border-radius: 50%; background: #e5e7eb; color: var(--muted); }
 .app-content { padding: 32px 32px 72px; }
 
 .portfolio-page { min-width: 960px; }
@@ -856,8 +856,8 @@ body { font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-s
 .filter-row button,.filter-builder .add-filter { height: 30px; padding: 0 9px; border: 1px solid var(--line); border-radius: 5px; display: inline-flex; align-items: center; background: var(--surface); color: var(--muted); cursor: pointer; }
 .portfolio-filter { width: 400px; height: 28px; padding: 0 10px; border: 1px solid var(--line); border-radius: 6px; display: flex; align-items: center; gap: 7px; background: var(--surface); color: var(--muted-2); }
 .portfolio-filter input { min-width: 0; flex: 1; border: 0; outline: 0; background: transparent; color: var(--text); font-size: 12px; }
-.portfolio-metrics { height: 135px; padding: 30px 10px 14px; display: grid; grid-template-columns: repeat(5, minmax(150px, 220px)); gap: 0; align-items: stretch; }
-.portfolio-metrics > div { padding: 13px 18px 10px; border-bottom: 2px solid transparent; }
+.portfolio-metrics { height: 151px; padding: 36px 0 14px; display: grid; grid-template-columns: repeat(5, minmax(150px, 220px)); gap: 0; align-items: stretch; }
+.portfolio-metrics > div { padding: 13px 12px 10px; border-bottom: 2px solid transparent; }
 .portfolio-metrics > div.active { background: #f5f6f8; border-bottom-color: var(--blue); }
 .portfolio-metrics span,.portfolio-metrics strong,.portfolio-metrics small { display: block; }
 .portfolio-metrics > div > span { color: var(--muted-2); font-size: 11px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; }
@@ -865,7 +865,7 @@ body { font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-s
 .portfolio-metrics small { margin-top: 5px; color: var(--muted); font-size: 12px; font-weight: 600; }
 .portfolio-metrics small em { margin-left: 5px; color: var(--muted-2); font-size: 10px; font-style: normal; font-weight: 500; }
 .portfolio-chart-section { border: 0; }
-.chart-mode-row { height: 34px; display: flex; align-items: center; gap: 8px; }
+.chart-mode-row { height: 34px; margin-top: 15px; display: flex; align-items: center; gap: 8px; }
 .chart-mode-row > div { display: inline-flex; }
 .chart-mode-row button { height: 26px; padding: 0 12px; border: 1px solid var(--line); background: var(--surface); color: var(--text); font-size: 12px; font-weight: 500; cursor: pointer; }
 .chart-mode-row div button:first-child { border-radius: 5px 0 0 5px; }
@@ -874,6 +874,11 @@ body { font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-s
 .period-shortcuts { margin-left: auto; }
 .period-shortcuts button.selected { color: var(--blue); background: #eef2ff; }
 .portfolio-main-chart,.portfolio-chart-empty { height: 290px; border-top: 1px solid var(--line); }
+.portfolio-main-chart .recharts-wrapper:focus,.portfolio-main-chart .recharts-surface:focus { outline: none; }
+.portfolio-main-chart .recharts-cartesian-axis-tick-value { fill: var(--muted); font-size: 11px; font-variant-numeric: tabular-nums; }
+.portfolio-main-chart .recharts-default-tooltip { padding: 11px 13px !important; border: 1px solid var(--line) !important; border-radius: 7px; background: var(--surface) !important; box-shadow: 0 8px 24px rgb(15 23 42 / 9%); }
+.portfolio-main-chart .recharts-tooltip-label { margin-bottom: 6px !important; color: var(--muted) !important; font-size: 11px; }
+.portfolio-main-chart .recharts-tooltip-item { padding: 0 !important; color: var(--text) !important; font-size: 11px; }
 .portfolio-chart-empty .empty-state { min-height: 290px; }
 .portfolio-holdings { margin-top: 80px; }
 .holdings-head { min-height: 42px; display: flex; align-items: center; justify-content: space-between; }
@@ -890,7 +895,7 @@ body { font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-s
 .holding-avatar { width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; background: #1e293b; color: white; font-size: 10px; font-weight: 700; }
 .holding-link { padding: 0; border: 0; display: flex; align-items: center; gap: 9px; background: transparent; color: var(--text); text-align: left; cursor: pointer; }
 .holding-link > span:last-child { display: grid; gap: 2px; }
-.holding-link small { max-width: 150px; overflow: hidden; color: var(--muted-2); font-size: 9px; font-weight: 400; text-overflow: ellipsis; white-space: nowrap; }
+.holding-link small { display: none; }
 .holding-price { color: var(--text); }
 .market-row td { height: 34px; background: #f4f5f7 !important; color: var(--muted-2); font-size: 11px; font-weight: 600; }
 .market-row td svg { margin-right: 6px; vertical-align: middle; }
@@ -926,7 +931,7 @@ body { font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-s
 .holding-detail dd { margin: 5px 0 0; color: var(--text); font-size: 13px; font-weight: 600; }
 
 @media (max-width: 900px) {
-  .topbar { padding: 0 12px; }
+  .topbar { height: 48px; padding: 0 12px; }
   .topbar-title { display: flex; }
   .topbar-title > div { display: none; }
   .global-search { display: none; }
