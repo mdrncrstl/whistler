@@ -1,50 +1,54 @@
-import { BarChart3, Bell, Bot, BriefcaseBusiness, ChevronDown, CircleDollarSign, Command, FileText, Landmark, LogOut, Mail, Menu, Moon, RefreshCw, Search, Settings, ShieldCheck, Sun, TableProperties, Tags, WalletCards, X } from 'lucide-react'
+import { ArrowLeftRight, ArrowUpRight, BarChart3, Bell, BriefcaseBusiness, CalendarDays, ChevronDown, ChevronUp, CircleDollarSign, Command, FileText, History, Inbox, Layers3, LineChart, ListTree, Menu, MessageSquare, Moon, PieChart, RefreshCw, Scale, Search, Settings, Sparkles, Sun, Table2, Target, TrendingUp, WalletCards, X, type LucideIcon } from 'lucide-react'
 import { useEffect, useState, type ReactNode } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
-import { authClient } from '../lib/supabase'
 import { usePortfolio } from '../context/PortfolioContext'
 import { Brand, Button, IconButton, Toast } from './ui'
 
-const navigation = [
-  { group: 'Portfolio', items: [
-    { to: '/app', label: 'Portfolio', icon: BarChart3, end: true },
-    { to: '/app/holdings', label: 'Holdings', icon: BriefcaseBusiness },
-    { to: '/app/transactions', label: 'Transactions', icon: TableProperties },
-  ]},
-  { group: 'Reports', items: [
-    { to: '/app/reports/benchmark', label: 'Benchmark analysis', icon: FileText },
-    { to: '/app/reports/performance', label: 'Performance breakdown', icon: BarChart3 },
-    { to: '/app/reports/diversification', label: 'Diversification', icon: Tags },
-    { to: '/app/reports/growth', label: 'Growth & goals', icon: BarChart3 },
-    { to: '/app/reports/income', label: 'Income breakdown', icon: CircleDollarSign },
-    { to: '/app/reports/income-calendar', label: 'Income calendar', icon: FileText },
-  ]},
-  { group: 'Tax reporting', items: [
-    { to: '/app/tax', label: 'Overview', icon: Landmark, end: true },
-    { to: '/app/tax/mytax', label: 'ATO myTax', icon: FileText },
-    { to: '/app/tax/capital-gains', label: 'Capital gains tax', icon: FileText },
-    { to: '/app/tax/taxable-income', label: 'Taxable income', icon: FileText },
-    { to: '/app/tax/valuation', label: 'Portfolio valuation', icon: FileText },
-    { to: '/app/tax/unrealised', label: 'Unrealised gains', icon: FileText },
-    { to: '/app/tax/historical-cost', label: 'Historical cost', icon: FileText },
-  ]},
-  { group: 'Tools', items: [
-    { to: '/app/tools/assistant', label: 'Deck AI', icon: Bot },
-    { to: '/app/tools/inbox', label: 'Document inbox', icon: Mail },
-    { to: '/app/tools/groups', label: 'Custom groups', icon: Tags },
-    { to: '/app/connections', label: 'Connections', icon: WalletCards },
-  ]},
-  { group: '', items: [
-    { to: '/app/settings', label: 'Settings', icon: Settings },
-  ]},
+type NavItem = { to: string; label: string; icon: LucideIcon; end?: boolean; subGroup?: string }
+
+const portfolioItems: NavItem[] = [
+  { to: '/app', label: 'Portfolio', icon: BriefcaseBusiness, end: true },
+  { to: '/app/transactions', label: 'Transactions', icon: ArrowLeftRight },
 ]
 
-export function AppShell({ children, onExitDemo }: { children: ReactNode; onExitDemo: () => void }) {
+const reportItems: NavItem[] = [
+  { to: '/app/reports/benchmark', label: 'Benchmark Analysis', icon: Scale },
+  { to: '/app/reports/performance', label: 'Performance Breakdown', icon: ListTree },
+  { to: '/app/reports/diversification', label: 'Diversification', icon: PieChart },
+  { to: '/app/reports/growth', label: 'Growth & Goals', icon: Target },
+  { to: '/app/reports/income', label: 'Income Breakdown', icon: CircleDollarSign, subGroup: 'Income' },
+  { to: '/app/reports/income-calendar', label: 'Income Calendar', icon: CalendarDays },
+]
+
+const taxItems: NavItem[] = [
+  { to: '/app/tax', label: 'Overview', icon: Table2, end: true },
+  { to: '/app/tax/mytax', label: 'ATO MyTax', icon: FileText, subGroup: 'Tax Reports' },
+  { to: '/app/tax/capital-gains', label: 'Capital Gains Tax', icon: ListTree },
+  { to: '/app/tax/taxable-income', label: 'Taxable Income', icon: CircleDollarSign },
+  { to: '/app/tax/valuation', label: 'Portfolio Valuation', icon: WalletCards, subGroup: 'Tax Planning' },
+  { to: '/app/tax/unrealised', label: 'Unrealized Gains', icon: TrendingUp },
+  { to: '/app/tax/historical-cost', label: 'Historical Cost', icon: History },
+]
+
+const toolItems: NavItem[] = [
+  { to: '/app/tools/assistant', label: 'Masterdeck AI', icon: Sparkles },
+  { to: '/app/tools/inbox', label: 'Email Inbox', icon: Inbox },
+  { to: '/app/tools/groups', label: 'Custom Groups', icon: Layers3 },
+]
+
+const flatNavigation: NavItem[] = [
+  ...portfolioItems, ...reportItems, ...taxItems, ...toolItems,
+  { to: '/app/settings', label: 'Settings', icon: Settings },
+  { to: '/app/holdings', label: 'Holdings', icon: BarChart3 },
+  { to: '/app/connections', label: 'Connections', icon: WalletCards },
+]
+
+export function AppShell({ children }: { children: ReactNode; onExitDemo: () => void }) {
   const { bundle, demo, action, notice, setNotice, refreshQuotes } = usePortfolio()
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [mcpPromoOpen, setMcpPromoOpen] = useState(true)
   const [theme, setTheme] = useState<'light' | 'dark'>(() => window.localStorage.getItem('masterdeck-theme') === 'dark' ? 'dark' : 'light')
   const location = useLocation()
-  const flatNavigation = navigation.flatMap((section) => section.items)
   const current = [...flatNavigation].sort((a, b) => b.to.length - a.to.length).find((item) => item.end ? location.pathname === item.to : location.pathname.startsWith(item.to)) || flatNavigation[0]
   const profile = bundle.profile
   const privacy = Boolean(profile?.settings?.privacyMode)
@@ -54,32 +58,53 @@ export function AppShell({ children, onExitDemo }: { children: ReactNode; onExit
     window.localStorage.setItem('masterdeck-theme', theme)
   }, [theme])
 
-  const signOut = async () => {
-    if (demo) return onExitDemo()
-    await authClient.auth.signOut({ scope: 'local' })
-  }
-
   const nav = (
     <>
       <div className="sidebar-brand"><Brand /></div>
       <button className="portfolio-switcher"><span className="portfolio-monogram">MD</span><span><strong>All portfolios</strong><small>{bundle.holdings.length} holdings · AUD</small></span><ChevronDown size={14} /></button>
       <nav className="side-nav" aria-label="Portfolio navigation">
-        {navigation.map((section) => <div className="nav-section" key={section.group || 'settings'}>
-          {section.group && <span className="nav-group-label">{section.group}</span>}
-          {section.items.map(({ to, label, icon: Icon, end }) => (
+        <div className="nav-section">
+          <span className="nav-group-label">Portfolio</span>
+          {portfolioItems.map(({ to, label, icon: Icon, end }) => (
             <NavLink key={to} to={to} end={end} onClick={() => setMobileOpen(false)}>
               <Icon size={15} /><span>{label}</span>
             </NavLink>
           ))}
-        </div>)}
+        </div>
+
+        <div className="nav-section nav-expanded-section">
+          <span className="nav-group-label">Reports</span>
+          <div className="nav-parent"><LineChart size={15}/><span>Performance</span><ChevronUp size={13}/></div>
+          {reportItems.map(({ to, label, icon: Icon, subGroup, end }) => <div className="nav-child-wrap" key={to}>
+            {subGroup && <span className="nav-subgroup-label">{subGroup}</span>}
+            <NavLink className="nav-child" to={to} end={end} onClick={() => setMobileOpen(false)}><Icon size={15}/><span>{label}</span></NavLink>
+          </div>)}
+
+          <div className="nav-parent nav-tax-parent"><FileText size={15}/><span>Tax Reporting</span><ChevronUp size={13}/></div>
+          {taxItems.map(({ to, label, icon: Icon, subGroup, end }) => <div className="nav-child-wrap" key={to}>
+            {subGroup && <span className="nav-subgroup-label">{subGroup}</span>}
+            <NavLink className="nav-child" to={to} end={end} onClick={() => setMobileOpen(false)}><Icon size={15}/><span>{label}</span></NavLink>
+          </div>)}
+        </div>
+
+        <div className="nav-section">
+          <span className="nav-group-label">Tools</span>
+          {toolItems.map(({ to, label, icon: Icon }) => <NavLink key={to} to={to} onClick={() => setMobileOpen(false)}><Icon size={15}/><span>{label}</span></NavLink>)}
+        </div>
+
+        <div className="nav-section nav-settings-section">
+          <NavLink to="/app/settings" onClick={() => setMobileOpen(false)}><Settings size={15}/><span>Settings</span></NavLink>
+        </div>
       </nav>
       <div className="sidebar-foot">
-        <div className="security-note"><ShieldCheck size={16} /><span>Read-only connections<br /><small>Trades cannot be placed</small></span></div>
-        <button className="identity" onClick={signOut}>
-          {profile?.avatar_url ? <img src={profile.avatar_url} alt="" referrerPolicy="no-referrer" /> : <span>{(profile?.full_name || profile?.email || 'M').slice(0, 1).toUpperCase()}</span>}
-          <span><strong>{profile?.full_name || (demo ? 'Demo Investor' : 'Investor')}</strong><small>{demo ? 'Demo workspace' : profile?.email}</small></span>
-          <LogOut size={16} />
-        </button>
+        {mcpPromoOpen && <aside className="mcp-promo" aria-label="Masterdeck MCP server beta">
+          <button type="button" aria-label="Dismiss Masterdeck MCP server card" onClick={() => setMcpPromoOpen(false)}><X size={13}/></button>
+          <span>New</span>
+          <strong>Masterdeck MCP server (beta)</strong>
+          <p>Connect your AI agent (Claude, ChatGPT, etc.) to your portfolio.</p>
+          <NavLink to="/app/settings">Connect <ArrowUpRight size={12}/></NavLink>
+        </aside>}
+        <NavLink className="sidebar-feedback" to="/app/settings"><MessageSquare size={15}/><span>Feedback</span></NavLink>
       </div>
     </>
   )

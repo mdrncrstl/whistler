@@ -47,11 +47,27 @@ The combined comparison was opened as one side-by-side image. MASTERDECK preserv
 - Post-fix evidence: browser-rendered route audit, `qa/masterdeck-performance-parity-local.png`, and the shared-shell combined comparison.
 - No actionable P0/P1/P2 findings remain.
 
+### Pass 3 — expanded sidebar fidelity (2026-08-26)
+
+- Source visual truth: `C:\Users\moder\AppData\Local\Temp\codex-clipboard-fbe34674-1c18-4ebf-835d-aaa34109fe53.png`, 257 x 1241 px at DPR 1.
+- Implementation: `qa/masterdeck-sidebar-parity-local.png`, browser-rendered at a 1440 x 1241 CSS viewport and cropped to the same 257 x 1241 px sidebar region at DPR 1.
+- Combined full-view and focused-region evidence: `qa/sidebar-parity-comparison.png`; both equal-density sidebar captures are placed side by side without scaling.
+- State: light-theme demo portfolio, Portfolio route active, all report and tax branches expanded, MCP card visible.
+- [P1] The prior sidebar flattened reports and tax into peer routes, omitted the source's parent rows and subgroup labels, and added Holdings and Connections to the primary rail.
+- Fix: recreated the Performance and Tax Reporting parent hierarchy, Income/Tax Reports/Tax Planning subgroup labels, exact child ordering and indentation, source-density link geometry, separator, MCP promo and Feedback footer. Holdings and Connections remain functional through direct routes but no longer alter the reference sidebar IA.
+- Fonts and typography: passed. Inter, 13 px navigation text, 11 px group labels, 10 px subgroup labels and regular optical weight match the reference hierarchy.
+- Spacing and layout rhythm: passed. The 240 px rail, 32 px row height, active-row width, nested offsets, footer card placement and 16 px lower gutter align in the equal-size comparison.
+- Colors and visual tokens: passed. Neutral slate rail, blue-grey labels, dark navigation copy, grey active row and fine separators match the source while retaining Masterdeck's blue mark.
+- Image quality and asset fidelity: passed. The Masterdeck mark remains an independent vector asset; navigation uses the project's sharp library icons and does not copy the Navexa logo.
+- Copy and content: passed. Source labels and hierarchy are preserved with only product-identity substitutions (`Masterdeck AI`, `Masterdeck MCP server`).
+- Interaction evidence: nested links navigate to their existing deep routes; the MCP card dismisses; browser console reported zero warnings or errors.
+- Post-fix comparison found no actionable P0/P1/P2 sidebar differences.
+
 ## Functional evidence
 
 - `npm.cmd run typecheck`: passed.
 - `npm.cmd run lint`: passed.
-- `npm.cmd test`: 6 files / 16 tests passed.
+- `npm.cmd test`: 6 files / 17 tests passed.
 - `npm.cmd run build`: passed.
 - Desktop browser audit: 21/21 authenticated routes had meaningful DOM, zero page-level overflow and zero console errors.
 - Mobile browser audit: 21/21 authenticated routes settled at 390 x 844 with meaningful DOM and zero page-level overflow.
