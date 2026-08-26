@@ -89,6 +89,19 @@ The combined comparison was opened as one side-by-side image. MASTERDECK preserv
 - Console evidence: zero browser warnings or errors after navigation, interaction and responsive checks.
 - Automated evidence: landing tests cover the full section journey, shared pricing state, FAQ state and mobile menu behavior.
 
+### Pass 6 — complete theme surface repair (2026-08-26)
+
+- User reference: `C:\Users\moder\AppData\Local\Temp\codex-clipboard-1c3d470e-174c-4441-ada9-be719477e7e9.png`, showing dark Settings inputs and switch tracks leaking into the light workspace.
+- Implementation capture: `C:\Users\moder\.codex\tmp\masterdeck-light-mode-2026-08-26\settings-after.png` at the same desktop state.
+- Combined comparison input: `C:\Users\moder\.codex\tmp\masterdeck-light-mode-2026-08-26\settings-before-after.png`.
+- [P1] Shared form fields, switch tracks, modal dialogs and toast notifications used hard-coded dark backgrounds in light mode. Mobile navigation also forced a light surface when dark mode was active.
+- Fix: replaced hard-coded surfaces with `--surface`, `--surface-2`, `--surface-3`, line and semantic colour tokens; restored disabled-field contrast; added theme-aware switch geometry; and corrected dark sidebar/topbar/search contrast exposed during the reciprocal theme check.
+- Light desktop evidence: editable input `rgb(255,255,255)`, disabled inputs `rgb(243,245,247)`, switch tracks `rgb(233,237,241)`, toast `rgb(255,255,255)`, no console warnings or errors.
+- Dark desktop evidence: editable input `rgb(13,25,19)`, disabled inputs `rgb(17,31,24)`, toast `rgb(13,25,19)`, readable sidebar links and token-matched topbar/search surfaces.
+- Mobile evidence: 390 x 844 light Settings view, theme-aware bottom navigation, no page-level horizontal overflow and no console warnings or errors.
+- Interaction evidence: privacy switch changed checked state; Save preferences produced a visible token-correct toast; light/dark theme controls updated every audited surface.
+- Automated evidence: eight test files / 25 tests passed, including shared theme-surface regression guards.
+
 ## Functional evidence
 
 - `npm.cmd run typecheck`: passed.
