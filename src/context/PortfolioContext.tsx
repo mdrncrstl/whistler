@@ -1,5 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import type { Session } from '@supabase/supabase-js'
 import { demoBundle } from '../data/demo'
 import { LoadingScreen } from '../components/ui'
@@ -48,11 +48,16 @@ export function PortfolioProvider({ session, demo, children }: { session: Sessio
   const [loading, setLoading] = useState(!demo)
   const [action, setAction] = useState<string | null>(null)
   const [notice, setNotice] = useState<Notice | null>(null)
+  const sessionRef = useRef(session)
+
+  useEffect(() => {
+    sessionRef.current = session
+  }, [session])
 
   const requireSession = useCallback(() => {
-    if (!session) throw new Error('Sign in to use a live connection.')
-    return session
-  }, [session])
+    if (!sessionRef.current) throw new Error('Sign in to use a live connection.')
+    return sessionRef.current
+  }, [])
 
   const refresh = useCallback(async () => {
     if (demo) {
@@ -87,7 +92,7 @@ export function PortfolioProvider({ session, demo, children }: { session: Sessio
 
   useEffect(() => {
     Promise.resolve().then(refresh).catch(() => undefined)
-  }, [refresh])
+  }, [refresh, session?.user?.id])
 
   const value = useMemo<PortfolioContextValue>(() => ({
     bundle,
