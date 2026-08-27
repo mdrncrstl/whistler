@@ -1,5 +1,5 @@
 import Stripe from 'https://esm.sh/stripe@18.5.0?target=denonext'
-import { admin, billingConfigured, stripe } from '../_shared/billing.ts'
+import { admin, stripe, stripeConfigured } from '../_shared/billing.ts'
 
 const cryptoProvider = Stripe.createSubtleCryptoProvider()
 
@@ -24,7 +24,7 @@ async function saveSubscription(subscription: Stripe.Subscription, fallbackUserI
 
 Deno.serve(async (request) => {
   if (request.method !== 'POST') return new Response('Method not allowed', { status: 405 })
-  if (!billingConfigured || !Deno.env.get('STRIPE_WEBHOOK_SIGNING_SECRET')) return new Response('Stripe webhook is not activated.', { status: 503 })
+  if (!stripeConfigured || !Deno.env.get('STRIPE_WEBHOOK_SIGNING_SECRET')) return new Response('Stripe webhook is not activated.', { status: 503 })
   try {
     const rawBody = await request.text()
     const signature = request.headers.get('Stripe-Signature')

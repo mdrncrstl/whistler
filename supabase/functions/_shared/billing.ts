@@ -1,7 +1,17 @@
 import Stripe from 'https://esm.sh/stripe@18.5.0?target=denonext'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.57.4'
 
-export const billingConfigured = Boolean(Deno.env.get('STRIPE_SECRET_KEY'))
+const priceEnvironment = {
+  basic: { monthly: 'STRIPE_PRICE_ESSENTIAL_MONTHLY', annual: 'STRIPE_PRICE_ESSENTIAL_ANNUAL' },
+  standard: { monthly: 'STRIPE_PRICE_INVESTOR_MONTHLY', annual: 'STRIPE_PRICE_INVESTOR_ANNUAL' },
+  premium: { monthly: 'STRIPE_PRICE_PRIVATE_WEALTH_MONTHLY', annual: 'STRIPE_PRICE_PRIVATE_WEALTH_ANNUAL' },
+} as const
+
+export type CheckoutPlan = keyof typeof priceEnvironment
+export type CheckoutInterval = 'monthly' | 'annual'
+
+export const stripeConfigured = Boolean(Deno.env.get('STRIPE_SECRET_KEY'))
+export const billingConfigured = stripeConfigured && Object.values(priceEnvironment).every((prices) => Object.values(prices).every((name) => Boolean(Deno.env.get(name))))
 export const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || 'sk_test_masterdeck_not_configured')
 export const admin = createClient(Deno.env.get('SUPABASE_URL') || '', Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '', { auth: { persistSession: false } })
 
@@ -13,6 +23,10 @@ export const corsHeaders = {
 }
 
 export const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
+
+export function priceIdForPlan(plan: CheckoutPlan, interval: CheckoutInterval) {
+  return Deno.env.get(priceEnvironment[plan][interval]) || ''
+}
 
 export async function authenticatedUser(request: Request) {
   const header = request.headers.get('Authorization') || ''

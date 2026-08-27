@@ -23,7 +23,7 @@ describe('Masterdeck public conversion funnel', () => {
     expect(screen.getByText('$14')).toBeInTheDocument()
     fireEvent.click(monthly)
     expect(monthly).toHaveAttribute('aria-pressed', 'true')
-    expect(screen.getByText('$18')).toBeInTheDocument()
+    expect(screen.getByText('$18.90')).toBeInTheDocument()
 
     const brokerQuestion = screen.getByRole('button', { name: 'Is Masterdeck a broker?' })
     expect(brokerQuestion).toHaveAttribute('aria-expanded', 'true')

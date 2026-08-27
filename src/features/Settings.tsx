@@ -2,23 +2,29 @@ import { CreditCard, Eye, EyeOff, LogOut, Save, ShieldCheck, SlidersHorizontal, 
 import { Link } from 'react-router-dom'
 import { useState } from 'react'
 import { usePortfolio } from '../context/PortfolioContext'
+import { useBillingStatus } from '../hooks/useBillingStatus'
+import { planForSubscription } from '../lib/billing'
 import { authClient } from '../lib/supabase'
 import type { TaxMethod } from '../types'
 import { Badge, Button, Card, PageHeader, Select } from '../components/ui'
 
 export function Settings({ onExitDemo }: { onExitDemo: () => void }) {
-  const { bundle, demo, action, updateProfile } = usePortfolio()
+  const { bundle, demo, action, updateProfile, session } = usePortfolio()
   const profile = bundle.profile
-  return <SettingsForm key={`${profile?.id}-${JSON.stringify(profile?.settings || {})}`} profile={profile} demo={demo} action={action} updateProfile={updateProfile} onExitDemo={onExitDemo} />
+  return <SettingsForm key={`${profile?.id}-${JSON.stringify(profile?.settings || {})}`} profile={profile} demo={demo} action={action} updateProfile={updateProfile} onExitDemo={onExitDemo} session={session} />
 }
 
-function SettingsForm({ profile, demo, action, updateProfile, onExitDemo }: {
+function SettingsForm({ profile, demo, action, updateProfile, onExitDemo, session }: {
   profile: ReturnType<typeof usePortfolio>['bundle']['profile']
   demo: boolean
   action: string | null
   updateProfile: ReturnType<typeof usePortfolio>['updateProfile']
+  session: ReturnType<typeof usePortfolio>['session']
   onExitDemo: () => void
-}) {
+  }) {
+  const { subscription, loading: billingLoading } = useBillingStatus(session, demo)
+  const billingPlan = planForSubscription(subscription?.plan)
+  const paid = subscription?.status === 'active' || subscription?.status === 'trialing'
   const [name, setName] = useState(profile?.full_name || '')
   const [privacyMode, setPrivacyMode] = useState(Boolean(profile?.settings?.privacyMode))
   const [compactTables, setCompactTables] = useState(Boolean(profile?.settings?.compactTables))
@@ -63,7 +69,7 @@ function SettingsForm({ profile, demo, action, updateProfile, onExitDemo }: {
         </Card>
         <Card className="settings-card billing-settings-card">
           <div className="settings-title"><CreditCard /><div><h2>Plan & billing</h2><p>Compare plans, subscribe securely or manage an existing subscription.</p></div></div>
-          <div className="session-row"><span><strong>Current plan</strong><small>{demo ? 'Illustrative demo workspace' : 'Free workspace'}</small></span><Badge>{demo ? 'Demo' : 'Free'}</Badge></div>
+          <div className="session-row"><span><strong>Current plan</strong><small>{demo ? 'Illustrative demo workspace' : paid ? `${subscription?.billing_interval === 'annual' ? 'Annual' : 'Monthly'} subscription` : 'No paid subscription'}</small></span><Badge tone={paid ? 'success' : undefined}>{billingLoading ? 'Checking…' : demo ? 'Demo' : billingPlan?.name || 'Free'}</Badge></div>
           <Link className="button button-primary" to="/app/billing"><CreditCard size={16}/><span>View plans & billing</span></Link>
         </Card>
       </div>

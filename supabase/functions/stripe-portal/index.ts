@@ -3,7 +3,7 @@ import { admin, authenticatedUser, billingConfigured, corsHeaders, json, safeRet
 Deno.serve(async (request) => {
   if (request.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders })
   if (request.method !== 'POST') return json({ error: 'Method not allowed.' }, 405)
-  if (!billingConfigured) return json({ error: 'Stripe activation is waiting for the MASTERDECK Stripe secret.' }, 503)
+  if (!billingConfigured) return json({ error: 'MASTERDECK payments are not active yet. Stripe products and server secrets still need to be connected.' }, 503)
   try {
     const user = await authenticatedUser(request)
     const { data, error } = await admin.from('billing_customers').select('stripe_customer_id').eq('user_id', user.id).single()
