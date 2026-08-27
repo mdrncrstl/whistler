@@ -19,7 +19,7 @@ The combined comparison was opened as one side-by-side image. MASTERDECK preserv
 - Tax: the overview now includes finalisation tasks, assessable-income and capital-gain summaries, six detailed report links and prior-year status. myTax, CGT, taxable-income, valuation, unrealised-gain and historical-cost views expose the source-equivalent field and table depth.
 - Tools: Deck AI matches the captured title/welcome/suggestion/fixed-composer structure and returns deterministic portfolio-grounded answers. Inbox and custom groups now include setup, filtering, creation and empty states.
 - Mobile: the navigation changes to the existing mobile shell; report controls wrap, metric grids reduce to two columns and dense tables remain internally scrollable.
-- Assets: MASTERDECK retains its own mark and Lucide icon set. No Navexa logo, holding logo, copied SVG, hotlink, fake logo or photographic placeholder was introduced.
+- Assets: MASTERDECK retains its own mark and Lucide icon set. Security marks now use packaged issuer-source favicon/logo assets for the eight populated holdings; no Navexa identity asset is used.
 
 ## Required fidelity surfaces
 
@@ -156,11 +156,32 @@ The combined comparison was opened as one side-by-side image. MASTERDECK preserv
 - Interaction evidence: opening Filter exposes the complete Where/field/operator/value/add-filter builder; closing it leaves the `Filter Holdings` hover state; All Positions and Hide Closed expose the audited explanatory copy; Columns supports pending checkbox changes and only updates the table after Apply Changes.
 - Automated evidence: 10 files / 32 tests passed. The portfolio interaction test now asserts the hover-help contracts and proves a hidden column appears only after the settings dialog's Apply action.
 
+### Pass 11 — metric, holding, account and icon interaction parity (2026-08-27)
+
+- Source visual truth: `C:\Users\moder\AppData\Local\Temp\codex-clipboard-aa45b2ff-6c7e-447e-9510-c0c20c17f011.png` for the equal desktop portfolio composition, `C:\Users\moder\AppData\Local\Temp\codex-clipboard-07d285d4-bc6c-4d34-8cbd-5c9bbc5e7f05.png` for the metric hover state, and `C:\Users\moder\AppData\Local\Temp\codex-clipboard-2efa74b8-e592-4a1b-8510-2587771a5e33.png` for the full holding-detail route.
+- Browser-rendered implementation: `qa/masterdeck-interaction-parity-local.png` at a 1280 x 720 CSS viewport and DPR 1; focused hover implementation: `qa/masterdeck-metric-hover-local.png`, 1000 x 165 px.
+- Full-view comparison input: `qa/navexa-masterdeck-interaction-comparison.png`, 2560 x 720 px. The Navexa app region is an unscaled 1280 x 720 crop below browser chrome; the implementation is the same 1280 x 720 CSS state.
+- Focused comparison input: `qa/navexa-masterdeck-metric-hover-comparison.png`, normalized to two 1000 x 165 panels. Both show the portfolio metric selected while the capital-gain tile exposes its value on pointer hover.
+- State: light theme, populated portfolio, All Time, Amount, Line, expanded report/tax branches. Masterdeck intentionally retains its independent portfolio values and product identity.
+- [P1] Summary metrics looked selectable but only Total Return had a hard-coded active surface; there was no hover value layer and selecting a metric did not update the plotted series.
+- [P1] Holding rows opened a small terminal modal instead of a navigable holding workspace; Overview/Trades/Income/Notes, range/position controls, performance comparison, key stats and private notes were absent.
+- [P1] The top-right identity mark was inert, notifications had no open state, and ticker rows used generic initial discs even when issuer marks were known.
+- Fix: converted the five summary metrics into semantic tabs with selected state, hover/focus values and metric-specific chart data; added `/app/holdings/:symbol` with four working tabs and responsive ledgers; added account and notification menus with functional navigation/theme/referral/logout actions; packaged and rendered issuer-source marks for AAPL, AMZN, MSFT, NVDA, BHP, CBA, VAS and VGS.
+- Post-fix interaction evidence: physical pointer movement produced hover opacity `1`; Capital Gain changed `aria-selected` to `true`; VAS navigated to `/app/holdings/VAS`; Trades and Notes displayed their state; the account menu exposed billing and referral actions; all eight packaged marks loaded with non-zero natural width and no fallback; desktop console warnings/errors were empty.
+- Responsive evidence: portfolio and VAS detail both reported `scrollWidth === clientWidth` at the browser's 375 px effective mobile viewport. Dense ledgers remain internally scrollable.
+- Fonts and typography: passed. Inter hierarchy and compact financial number treatment remain aligned with the source comparison.
+- Spacing and layout rhythm: passed. Metric cards, chart controls and holding-detail summary use source-equivalent vertical rhythm without changing the 240 px rail.
+- Colors and visual tokens: passed. Hover, selected and menu surfaces use the established light/dark tokens and blue/green/red semantic states.
+- Image quality and asset fidelity: passed. The eight populated securities use packaged issuer-source assets with non-zero rendered dimensions; no initial fallback remains in the verified state.
+- Copy and content: passed. Tabs, ledgers, notes and menus use standalone Masterdeck language while matching the source information anatomy.
+- Automated evidence: 10 files / 35 tests passed; typecheck, lint and production build passed.
+- Post-fix comparison found no actionable P0/P1/P2 differences in the requested metric, icon, holding-detail and account interaction scope.
+
 ## Functional evidence
 
 - `npm.cmd run typecheck`: passed.
 - `npm.cmd run lint`: passed.
-- `npm.cmd test`: 6 files / 20 tests passed.
+- `npm.cmd test`: 10 files / 35 tests passed.
 - `npm.cmd run build`: passed.
 - Desktop browser audit: 21/21 authenticated routes had meaningful DOM, zero page-level overflow and zero console errors.
 - Mobile browser audit: 21/21 authenticated routes settled at 390 x 844 with meaningful DOM and zero page-level overflow.
@@ -170,7 +191,7 @@ The combined comparison was opened as one side-by-side image. MASTERDECK preserv
 ## Findings
 
 - No actionable P0/P1/P2 findings remain.
-- [P3] Holding avatars remain independent initial markers until a licensed security-logo source is selected.
+- No actionable P0/P1/P2 findings remain in the interaction and icon scope covered by Pass 11.
 - [P3] Projected income dates are clearly marked indicative because connected broker data does not expose forward company guidance.
 
 ## Final result

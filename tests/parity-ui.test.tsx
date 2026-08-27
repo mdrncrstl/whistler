@@ -8,6 +8,7 @@ import { Reports } from '../src/features/Reports'
 import { TaxCentre } from '../src/features/TaxCentre'
 import { Tools } from '../src/features/Tools'
 import { Overview } from '../src/features/Overview'
+import { HoldingDetail } from '../src/features/HoldingDetail'
 
 function renderRoute(path: string, route: string, node: ReactNode) {
   return render(<MemoryRouter initialEntries={[path]}><PortfolioProvider session={null} demo><Routes><Route path={route} element={node}/></Routes></PortfolioProvider></MemoryRouter>)
@@ -48,6 +49,15 @@ describe('Navexa-depth workspace routes', () => {
     expect(screen.getByRole('button', { name: /Add holdings/ })).toBeInTheDocument()
   })
 
+  it('opens the complete account menu and changes theme without leaving the page', () => {
+    render(<MemoryRouter initialEntries={['/app']}><PortfolioProvider session={null} demo><AppShell onExitDemo={() => undefined}><div>Workspace</div></AppShell></PortfolioProvider></MemoryRouter>)
+    fireEvent.click(screen.getByRole('button', { name: 'Open account menu' }))
+    expect(screen.getByRole('menuitem', { name: /Billing & Subscription/ })).toBeInTheDocument()
+    expect(screen.getByRole('menuitem', { name: /Refer a Friend/ })).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('menuitem', { name: /Dark mode/ }))
+    expect(document.documentElement).toHaveAttribute('data-theme', 'dark')
+  })
+
   it('makes the portfolio filter, chart, groups and columns interactive', () => {
     renderRoute('/app', '/app', <Overview/>)
     fireEvent.click(screen.getByRole('button', { name: 'All Time' }))
@@ -67,6 +77,19 @@ describe('Navexa-depth workspace routes', () => {
     fireEvent.click(averagePrice)
     fireEvent.click(screen.getByRole('button', { name: 'Apply Changes' }))
     expect(screen.getByRole('columnheader', { name: 'Avg Buy Price' })).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('tab', { name: /Capital Gain/ }))
+    expect(screen.getByRole('tab', { name: /Capital Gain/ })).toHaveAttribute('aria-selected', 'true')
+  })
+
+  it('opens a full holding route with working tabs instead of a modal', () => {
+    renderRoute('/app/holdings/VAS', '/app/holdings/:symbol', <HoldingDetail/>)
+    expect(screen.getByRole('heading', { name: /Vanguard/ })).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Trades' }))
+    expect(screen.getByRole('heading', { name: 'Trades' })).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Notes' }))
+    fireEvent.change(screen.getByPlaceholderText(/Add a note about VAS/), { target: { value: 'Review allocation' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Save note' }))
+    expect(window.localStorage.getItem('masterdeck-note-VAS')).toBe('Review allocation')
   })
 
   it('renders the performance controls, metrics and grouped ledger', async () => {

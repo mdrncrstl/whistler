@@ -1,8 +1,9 @@
-import { ArrowLeftRight, ArrowUpRight, BarChart3, Bell, BriefcaseBusiness, CalendarDays, ChevronsLeft, ChevronsRight, ChevronDown, ChevronUp, CircleDollarSign, Command, FileText, History, Inbox, Layers3, LineChart, ListTree, Menu, MessageSquare, Moon, PieChart, Plus, RefreshCw, Scale, Search, Settings, Sparkles, Sun, Table2, Target, TrendingUp, WalletCards, X, type LucideIcon } from 'lucide-react'
+import { ArrowLeftRight, ArrowUpRight, BarChart3, Bell, BriefcaseBusiness, CalendarDays, ChevronsLeft, ChevronsRight, ChevronDown, ChevronUp, CircleDollarSign, Command, CreditCard, FileText, Gift, History, Inbox, Layers3, LineChart, ListTree, LogOut, Menu, MessageSquare, Moon, PieChart, Plus, RefreshCw, Scale, Search, Settings, Sparkles, Sun, Table2, Target, TrendingUp, UserRound, WalletCards, X, type LucideIcon } from 'lucide-react'
 import { useEffect, useState, type ReactNode } from 'react'
 import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { usePortfolio } from '../context/PortfolioContext'
 import { Brand, Button, IconButton, Toast } from './ui'
+import { authClient } from '../lib/supabase'
 
 type NavItem = { to: string; label: string; icon: LucideIcon; end?: boolean; subGroup?: string }
 
@@ -43,7 +44,7 @@ const flatNavigation: NavItem[] = [
   { to: '/app/connections', label: 'Connections', icon: WalletCards },
 ]
 
-export function AppShell({ children }: { children: ReactNode; onExitDemo: () => void }) {
+export function AppShell({ children, onExitDemo }: { children: ReactNode; onExitDemo: () => void }) {
   const { bundle, demo, action, notice, setNotice, refreshQuotes } = usePortfolio()
   const [mobileOpen, setMobileOpen] = useState(false)
   const [mcpPromoOpen, setMcpPromoOpen] = useState(true)
@@ -51,6 +52,8 @@ export function AppShell({ children }: { children: ReactNode; onExitDemo: () => 
   const [taxOpen, setTaxOpen] = useState(() => window.localStorage.getItem('masterdeck-tax-open') !== 'false')
   const [sidebarCollapsed, setSidebarCollapsed] = useState(() => window.localStorage.getItem('masterdeck-sidebar-collapsed') === 'true')
   const [portfolioMenuOpen, setPortfolioMenuOpen] = useState(false)
+  const [accountMenuOpen, setAccountMenuOpen] = useState(false)
+  const [notificationsOpen, setNotificationsOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [theme, setTheme] = useState<'light' | 'dark'>(() => window.localStorage.getItem('masterdeck-theme') === 'dark' ? 'dark' : 'light')
@@ -80,6 +83,8 @@ export function AppShell({ children }: { children: ReactNode; onExitDemo: () => 
       if (event.key === 'Escape') {
         setSearchOpen(false)
         setPortfolioMenuOpen(false)
+        setAccountMenuOpen(false)
+        setNotificationsOpen(false)
       }
     }
     window.addEventListener('keydown', onKeyDown)
@@ -98,8 +103,16 @@ export function AppShell({ children }: { children: ReactNode; onExitDemo: () => 
   const openCommand = (to: string) => {
     navigate(to)
     setSearchOpen(false)
+    setAccountMenuOpen(false)
     setSearchQuery('')
     setMobileOpen(false)
+  }
+
+  const signOut = async () => {
+    setAccountMenuOpen(false)
+    if (demo) onExitDemo()
+    else await authClient.auth.signOut()
+    navigate('/')
   }
 
   const nav = (
@@ -175,9 +188,17 @@ export function AppShell({ children }: { children: ReactNode; onExitDemo: () => 
           <div className="topbar-actions">
             <button className="global-search" type="button" onClick={() => setSearchOpen(true)}><Search size={15}/><span>Search holdings, reports…</span><kbd><Command size={10}/>K</kbd></button>
             <Button variant="ghost" icon={RefreshCw} busy={action === 'refresh-quotes'} onClick={() => refreshQuotes()}>Refresh prices</Button>
-            <IconButton label="Notifications"><Bell size={17}/></IconButton>
+            <div className="notifications-wrap"><IconButton label="Notifications" onClick={() => setNotificationsOpen(!notificationsOpen)}><Bell size={17}/></IconButton>{notificationsOpen && <div className="notifications-menu" role="status"><header><strong>Notifications</strong><button onClick={() => setNotificationsOpen(false)} aria-label="Close notifications"><X size={14}/></button></header><div><span><Bell size={17}/></span><strong>You’re all caught up</strong><p>Sync alerts and portfolio updates will appear here.</p></div></div>}</div>
             <IconButton label={`Use ${theme === 'light' ? 'dark' : 'light'} theme`} onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}>{theme === 'light' ? <Moon size={17}/> : <Sun size={17}/>}</IconButton>
-            <div className="topbar-avatar" title={profile?.email || undefined}>{(profile?.full_name || profile?.email || 'M').slice(0, 1).toUpperCase()}</div>
+            <div className="account-menu-wrap"><button className="topbar-avatar" type="button" title={profile?.email || undefined} aria-label="Open account menu" aria-haspopup="menu" aria-expanded={accountMenuOpen} onClick={() => setAccountMenuOpen(!accountMenuOpen)}>{(profile?.full_name || profile?.email || 'M').slice(0, 1).toUpperCase()}</button>{accountMenuOpen && <div className="account-menu" role="menu">
+              <header><span className="account-avatar"><UserRound size={18}/></span><span><strong>{profile?.full_name || 'Masterdeck investor'}</strong><small>{profile?.email || (demo ? 'Demo workspace' : 'Private workspace')}</small></span></header>
+              <button role="menuitem" onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}><Moon size={15}/><span>Dark mode</span><span className={`menu-switch ${theme === 'dark' ? 'on' : ''}`} aria-hidden="true"/></button>
+              <button role="menuitem" onClick={() => openCommand('/app/settings')}><Settings size={15}/><span>Settings</span></button>
+              <button role="menuitem" onClick={() => openCommand('/app/billing')}><ArrowUpRight size={15}/><span>Change Plan</span></button>
+              <button role="menuitem" onClick={() => openCommand('/app/billing')}><CreditCard size={15}/><span>Billing &amp; Subscription</span></button>
+              <button role="menuitem" onClick={() => { navigator.clipboard?.writeText(window.location.origin); setNotice({ tone: 'success', message: 'Referral link copied.' }); setAccountMenuOpen(false) }}><Gift size={15}/><span>Refer a Friend</span></button>
+              <button role="menuitem" onClick={signOut}><LogOut size={15}/><span>Log out</span></button>
+            </div>}</div>
           </div>
         </header>
         <div className="app-content">{children}</div>

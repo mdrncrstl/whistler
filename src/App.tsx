@@ -10,6 +10,7 @@ import { authClient } from './lib/supabase'
 
 const Overview = lazy(() => import('./features/Overview').then((module) => ({ default: module.Overview })))
 const Holdings = lazy(() => import('./features/Holdings').then((module) => ({ default: module.Holdings })))
+const HoldingDetail = lazy(() => import('./features/HoldingDetail').then((module) => ({ default: module.HoldingDetail })))
 const Transactions = lazy(() => import('./features/Transactions').then((module) => ({ default: module.Transactions })))
 const Income = lazy(() => import('./features/Income').then((module) => ({ default: module.Income })))
 const TaxCentre = lazy(() => import('./features/TaxCentre').then((module) => ({ default: module.TaxCentre })))
@@ -26,6 +27,7 @@ function PortfolioRoutes({ onExitDemo }: { onExitDemo: () => void }) {
         <Routes>
           <Route index element={<Overview />} />
           <Route path="holdings" element={<Holdings />} />
+          <Route path="holdings/:symbol" element={<HoldingDetail />} />
           <Route path="transactions" element={<Transactions />} />
           <Route path="income" element={<Income />} />
           <Route path="reports/:report?" element={<Reports />} />
