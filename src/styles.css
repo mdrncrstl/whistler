@@ -776,13 +776,14 @@ body { font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-s
 
 /* Source-faithful expanded sidebar hierarchy. */
 .app-shell { grid-template-columns: 240px minmax(0, 1fr); }
-.sidebar { width: 240px; padding: 0 8px; overflow-x: hidden; background: #f3f5f7; }
+.sidebar { width: 240px; padding: 0 8px; overflow-x: hidden; scrollbar-width: none; -ms-overflow-style: none; background: #f3f5f7; }
+.sidebar::-webkit-scrollbar { width: 0; height: 0; }
 .sidebar-brand { height: 34px; }
 .brand-mark { width: 28px; height: 28px; background: transparent; }
 .brand-mark svg { width: 21px; height: 21px; }
-.portfolio-switcher { top: 0; left: 36px; width: 200px; min-height: 32px; border-color: #d7dde4; }
+.portfolio-switcher { top: 0; right: 0; left: 36px; width: auto; min-height: 32px; border-color: #d7dde4; }
 .portfolio-switcher-wrap { position: relative; z-index: 25; }
-.portfolio-menu { width: 220px; padding: 7px; border: 1px solid var(--line); border-radius: 7px; position: absolute; top: 35px; left: 28px; display: grid; gap: 3px; background: var(--surface); box-shadow: 0 14px 34px rgb(15 23 42 / 14%); }
+.portfolio-menu { width: auto; padding: 7px; border: 1px solid var(--line); border-radius: 7px; position: absolute; top: 35px; right: 0; left: 36px; display: grid; gap: 3px; background: var(--surface); box-shadow: 0 14px 34px rgb(15 23 42 / 14%); }
 .portfolio-menu > span { padding: 5px 8px 4px; color: var(--muted-2); font-size: 10px; }
 .portfolio-menu > button { min-height: 38px; padding: 6px 8px; border: 0; border-radius: 5px; display: flex; align-items: center; gap: 9px; background: transparent; color: var(--text); text-align: left; cursor: pointer; }
 .portfolio-menu > button:hover { background: var(--surface-2); }
