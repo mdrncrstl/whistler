@@ -1,6 +1,60 @@
 import { AlertCircle, Check, ChevronDown, LoaderCircle, Search, X, type LucideIcon } from 'lucide-react'
-import { useEffect, type ButtonHTMLAttributes, type InputHTMLAttributes, type ReactNode } from 'react'
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
+import { useEffect, type AriaRole, type ButtonHTMLAttributes, type InputHTMLAttributes, type ReactNode } from 'react'
 import { money } from '../lib/format'
+
+const easeOut = [0.23, 1, 0.32, 1] as const
+const popoverIdentity = 'translateY(0px) scale(1)'
+const toastIdentity = 'translateY(0%)'
+
+export function MotionPopover({ open, children, className, origin = 'top right', role, ariaLabel }: { open: boolean; children: ReactNode; className: string; origin?: string; role?: AriaRole; ariaLabel?: string }) {
+  const reduceMotion = useReducedMotion()
+  const hiddenTransform = reduceMotion ? popoverIdentity : 'translateY(-4px) scale(0.97)'
+  return (
+    <AnimatePresence initial={false}>
+      {open && <motion.div
+        className={className}
+        role={role}
+        aria-label={ariaLabel}
+        style={{ transformOrigin: origin }}
+        initial={{ opacity: 0, transform: hiddenTransform }}
+        animate={{ opacity: 1, transform: popoverIdentity }}
+        exit={{ opacity: 0, transform: hiddenTransform, transition: { duration: reduceMotion ? 0.1 : 0.11, ease: easeOut } }}
+        transition={{ duration: reduceMotion ? 0.12 : 0.16, ease: easeOut }}
+      >{children}</motion.div>}
+    </AnimatePresence>
+  )
+}
+
+export function MotionDialogSurface({ open, className, labelledBy, onClose, children }: { open: boolean; className: string; labelledBy: string; onClose: () => void; children: ReactNode }) {
+  const reduceMotion = useReducedMotion()
+  const hiddenTransform = reduceMotion ? popoverIdentity : 'translateY(8px) scale(0.97)'
+  return (
+    <AnimatePresence initial={false}>
+      {open && <motion.div
+        className="modal-backdrop"
+        role="presentation"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0, transition: { duration: 0.12, ease: easeOut } }}
+        transition={{ duration: 0.16, ease: easeOut }}
+        onMouseDown={(event) => { if (event.target === event.currentTarget) onClose() }}
+      >
+        <motion.section
+          className={className}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby={labelledBy}
+          initial={{ opacity: 0, transform: hiddenTransform }}
+          animate={{ opacity: 1, transform: popoverIdentity }}
+          exit={{ opacity: 0, transform: hiddenTransform, transition: { duration: 0.14, ease: easeOut } }}
+          transition={{ duration: reduceMotion ? 0.14 : 0.2, ease: easeOut }}
+          onMouseDown={(event) => event.stopPropagation()}
+        >{children}</motion.section>
+      </motion.div>}
+    </AnimatePresence>
+  )
+}
 
 export function Brand({ compact = false }: { compact?: boolean }) {
   return (
@@ -76,30 +130,35 @@ export function Modal({ open, title, description, children, onClose }: { open: b
     window.addEventListener('keydown', listener)
     return () => window.removeEventListener('keydown', listener)
   }, [onClose, open])
-  if (!open) return null
   return (
-    <div className="modal-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) onClose() }}>
-      <div className="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <MotionDialogSurface open={open} className="modal-dialog" labelledBy="modal-title" onClose={onClose}>
         <div className="modal-head">
           <div><h2 id="modal-title">{title}</h2>{description && <p>{description}</p>}</div>
           <IconButton label="Close dialog" onClick={onClose}><X size={18} /></IconButton>
         </div>
         {children}
-      </div>
-    </div>
+    </MotionDialogSurface>
   )
 }
 
 export function Toast({ tone, message, onClose }: { tone: 'success' | 'error' | 'info'; message: string; onClose: () => void }) {
+  const reduceMotion = useReducedMotion()
   useEffect(() => {
     const timeout = window.setTimeout(onClose, 6000)
     return () => window.clearTimeout(timeout)
   }, [message, onClose])
   const Icon = tone === 'success' ? Check : tone === 'error' ? AlertCircle : AlertCircle
   return (
-    <div className={`toast toast-${tone}`} role="status">
+    <motion.div
+      className={`toast toast-${tone}`}
+      role="status"
+      initial={{ opacity: 0, transform: reduceMotion ? toastIdentity : 'translateY(100%)' }}
+      animate={{ opacity: 1, transform: toastIdentity }}
+      exit={{ opacity: 0, transform: reduceMotion ? toastIdentity : 'translateY(100%)', transition: { duration: 0.14, ease: easeOut } }}
+      transition={{ duration: reduceMotion ? 0.14 : 0.2, ease: easeOut }}
+    >
       <Icon size={18} /><span>{message}</span><IconButton label="Dismiss notification" onClick={onClose}><X size={16} /></IconButton>
-    </div>
+    </motion.div>
   )
 }
 

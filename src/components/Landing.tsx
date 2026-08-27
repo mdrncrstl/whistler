@@ -5,7 +5,7 @@ import {
 import { useState, type ReactNode } from 'react'
 import { billingPlans } from '../lib/billing'
 import { authClient } from '../lib/supabase'
-import { Brand } from './ui'
+import { Brand, MotionPopover } from './ui'
 
 const benefits = ['Track every holding in one view', 'Measure your real returns', 'Prepare Australian tax reports', 'Keep broker access read-only']
 const featureGroups = [
@@ -46,7 +46,7 @@ export function Landing({ onDemo, signedIn = false, onOpenApp }: LandingProps) {
       <div className="marketing-nav-wrap">
         <a href="#top" aria-label="Masterdeck home"><Brand /></a>
         <nav className="marketing-desktop-nav" aria-label="Main navigation">
-          <div className="marketing-menu-wrap"><button aria-expanded={menu} onClick={() => setMenu(!menu)}>Features <ChevronDown /></button>{menu && <div className="marketing-dropdown"><strong>Explore Masterdeck</strong>{featureGroups.map(group => <a key={group.title} href="#features" onClick={() => setMenu(false)}><span>{group.title}</span><small>{group.detail}</small></a>)}</div>}</div>
+          <div className="marketing-menu-wrap"><button aria-expanded={menu} onClick={() => setMenu(!menu)}>Features <ChevronDown /></button><MotionPopover open={menu} className="marketing-dropdown" origin="top left"><strong>Explore Masterdeck</strong>{featureGroups.map(group => <a key={group.title} href="#features" onClick={() => setMenu(false)}><span>{group.title}</span><small>{group.detail}</small></a>)}</MotionPopover></div>
           <a href="#how-it-works">How it works</a><a href="#integrations">Connections</a><a href="#pricing">Pricing</a><a href="#faq">FAQ</a>
         </nav>
         <div className="marketing-nav-actions"><button className="marketing-login" onClick={beginGoogleSignIn}>{signedIn ? 'Open app' : 'Log in'}</button><button className="marketing-button small" onClick={beginGoogleSignIn} disabled={redirecting}>{primaryLabel} <ArrowRight /></button></div>

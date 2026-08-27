@@ -1,8 +1,9 @@
 import { ArrowLeftRight, ArrowUpRight, BarChart3, Bell, BriefcaseBusiness, CalendarDays, ChevronsLeft, ChevronsRight, ChevronDown, ChevronUp, CircleDollarSign, Command, CreditCard, FileText, Gift, History, Inbox, Layers3, LineChart, ListTree, LogOut, Menu, MessageSquare, Moon, PieChart, Plus, RefreshCw, Scale, Search, Settings, Sparkles, Sun, Table2, Target, TrendingUp, UserRound, WalletCards, X, type LucideIcon } from 'lucide-react'
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { useEffect, useState, type ReactNode } from 'react'
 import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { usePortfolio } from '../context/PortfolioContext'
-import { Brand, Button, IconButton, Toast } from './ui'
+import { Brand, Button, IconButton, MotionPopover, Toast } from './ui'
 import { authClient } from '../lib/supabase'
 
 type NavItem = { to: string; label: string; icon: LucideIcon; end?: boolean; subGroup?: string }
@@ -59,6 +60,7 @@ export function AppShell({ children, onExitDemo }: { children: ReactNode; onExit
   const [theme, setTheme] = useState<'light' | 'dark'>(() => window.localStorage.getItem('masterdeck-theme') === 'dark' ? 'dark' : 'light')
   const location = useLocation()
   const navigate = useNavigate()
+  const reduceMotion = useReducedMotion()
   const current = [...flatNavigation].sort((a, b) => b.to.length - a.to.length).find((item) => item.end ? location.pathname === item.to : location.pathname.startsWith(item.to)) || flatNavigation[0]
   const profile = bundle.profile
   const privacy = Boolean(profile?.settings?.privacyMode)
@@ -120,11 +122,11 @@ export function AppShell({ children, onExitDemo }: { children: ReactNode; onExit
       <div className="sidebar-brand"><Brand /></div>
       <div className="portfolio-switcher-wrap">
         <button className="portfolio-switcher" aria-haspopup="menu" aria-expanded={portfolioMenuOpen} onClick={() => setPortfolioMenuOpen(!portfolioMenuOpen)}><span className="portfolio-monogram">MD</span><span><strong>All portfolios</strong><small>{bundle.holdings.length} holdings · AUD</small></span><ChevronDown size={14} /></button>
-        {portfolioMenuOpen && <div className="portfolio-menu" role="menu">
+        <MotionPopover open={portfolioMenuOpen} className="portfolio-menu" role="menu" origin="top left">
           <span>My portfolios</span>
           <button role="menuitem" onClick={() => setPortfolioMenuOpen(false)}><span className="portfolio-monogram">MD</span><span><strong>All portfolios</strong><small>{bundle.holdings.length} holdings · AUD</small></span></button>
           <button role="menuitem" onClick={() => openCommand('/app/settings')}><Settings size={14}/><span>Manage portfolios</span></button>
-        </div>}
+        </MotionPopover>
       </div>
       <nav className="side-nav" aria-label="Portfolio navigation">
         <div className="nav-section">
@@ -178,7 +180,12 @@ export function AppShell({ children, onExitDemo }: { children: ReactNode; onExit
   return (
     <div className={`app-shell ${sidebarCollapsed ? 'sidebar-collapsed' : ''} ${privacy ? 'privacy-on' : ''} ${compact ? 'compact-tables' : ''}`}>
       <aside className="sidebar">{nav}</aside>
-      {mobileOpen && <div className="mobile-drawer"><div className="drawer-panel">{nav}</div><button className="drawer-dismiss" aria-label="Close menu" onClick={() => setMobileOpen(false)}><X /></button></div>}
+      <AnimatePresence initial={false}>
+        {mobileOpen && <motion.div className="mobile-drawer" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, transition: { duration: 0.12, ease: [0.23, 1, 0.32, 1] } }} transition={{ duration: 0.16, ease: [0.23, 1, 0.32, 1] }}>
+          <motion.div className="drawer-panel" initial={{ transform: reduceMotion ? 'translateX(0%)' : 'translateX(-100%)' }} animate={{ transform: 'translateX(0%)' }} exit={{ transform: reduceMotion ? 'translateX(0%)' : 'translateX(-100%)', transition: { duration: reduceMotion ? 0.12 : 0.17, ease: [0.32, 0.72, 0, 1] } }} transition={{ duration: reduceMotion ? 0.14 : 0.22, ease: [0.32, 0.72, 0, 1] }}>{nav}</motion.div>
+          <button className="drawer-dismiss" aria-label="Close menu" onClick={() => setMobileOpen(false)}><X /></button>
+        </motion.div>}
+      </AnimatePresence>
       <main className="app-main">
         <header className="topbar">
           <div className="topbar-title">
@@ -188,9 +195,9 @@ export function AppShell({ children, onExitDemo }: { children: ReactNode; onExit
           <div className="topbar-actions">
             <button className="global-search" type="button" onClick={() => setSearchOpen(true)}><Search size={15}/><span>Search holdings, reports…</span><kbd><Command size={10}/>K</kbd></button>
             <Button variant="ghost" icon={RefreshCw} busy={action === 'refresh-quotes'} onClick={() => refreshQuotes()}>Refresh prices</Button>
-            <div className="notifications-wrap"><IconButton label="Notifications" onClick={() => setNotificationsOpen(!notificationsOpen)}><Bell size={17}/></IconButton>{notificationsOpen && <div className="notifications-menu" role="status"><header><strong>Notifications</strong><button onClick={() => setNotificationsOpen(false)} aria-label="Close notifications"><X size={14}/></button></header><div><span><Bell size={17}/></span><strong>You’re all caught up</strong><p>Sync alerts and portfolio updates will appear here.</p></div></div>}</div>
+            <div className="notifications-wrap"><IconButton label="Notifications" onClick={() => setNotificationsOpen(!notificationsOpen)}><Bell size={17}/></IconButton><MotionPopover open={notificationsOpen} className="notifications-menu" role="status"><header><strong>Notifications</strong><button onClick={() => setNotificationsOpen(false)} aria-label="Close notifications"><X size={14}/></button></header><div><span><Bell size={17}/></span><strong>You’re all caught up</strong><p>Sync alerts and portfolio updates will appear here.</p></div></MotionPopover></div>
             <IconButton label={`Use ${theme === 'light' ? 'dark' : 'light'} theme`} onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}>{theme === 'light' ? <Moon size={17}/> : <Sun size={17}/>}</IconButton>
-            <div className="account-menu-wrap"><button className="topbar-avatar" type="button" title={profile?.email || undefined} aria-label="Open account menu" aria-haspopup="menu" aria-expanded={accountMenuOpen} onClick={() => setAccountMenuOpen(!accountMenuOpen)}>{(profile?.full_name || profile?.email || 'M').slice(0, 1).toUpperCase()}</button>{accountMenuOpen && <div className="account-menu" role="menu">
+            <div className="account-menu-wrap"><button className="topbar-avatar" type="button" title={profile?.email || undefined} aria-label="Open account menu" aria-haspopup="menu" aria-expanded={accountMenuOpen} onClick={() => setAccountMenuOpen(!accountMenuOpen)}>{(profile?.full_name || profile?.email || 'M').slice(0, 1).toUpperCase()}</button><MotionPopover open={accountMenuOpen} className="account-menu" role="menu">
               <header><span className="account-avatar"><UserRound size={18}/></span><span><strong>{profile?.full_name || 'Masterdeck investor'}</strong><small>{profile?.email || (demo ? 'Demo workspace' : 'Private workspace')}</small></span></header>
               <button role="menuitem" onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}><Moon size={15}/><span>Dark mode</span><span className={`menu-switch ${theme === 'dark' ? 'on' : ''}`} aria-hidden="true"/></button>
               <button role="menuitem" onClick={() => openCommand('/app/settings')}><Settings size={15}/><span>Settings</span></button>
@@ -198,7 +205,7 @@ export function AppShell({ children, onExitDemo }: { children: ReactNode; onExit
               <button role="menuitem" onClick={() => openCommand('/app/billing')}><CreditCard size={15}/><span>Billing &amp; Subscription</span></button>
               <button role="menuitem" onClick={() => { navigator.clipboard?.writeText(window.location.origin); setNotice({ tone: 'success', message: 'Referral link copied.' }); setAccountMenuOpen(false) }}><Gift size={15}/><span>Refer a Friend</span></button>
               <button role="menuitem" onClick={signOut}><LogOut size={15}/><span>Log out</span></button>
-            </div>}</div>
+            </MotionPopover></div>
           </div>
         </header>
         <div className="app-content">{children}</div>
@@ -208,7 +215,7 @@ export function AppShell({ children, onExitDemo }: { children: ReactNode; onExit
           <NavLink key={to} to={to} end={end}><Icon size={19} /><span>{label === 'Transactions' ? 'Activity' : label.replace(' centre', '')}</span></NavLink>
         ))}
       </nav>
-      {notice && <Toast tone={notice.tone} message={notice.message} onClose={() => setNotice(null)} />}
+      <AnimatePresence initial={false}>{notice && <Toast key={notice.message} tone={notice.tone} message={notice.message} onClose={() => setNotice(null)} />}</AnimatePresence>
       {searchOpen && <div className="command-backdrop" role="presentation" onMouseDown={() => setSearchOpen(false)}>
         <div className="command-palette" role="dialog" aria-modal="true" aria-label="Search workspace" onMouseDown={(event) => event.stopPropagation()}>
           <label><Search size={17}/><input autoFocus value={searchQuery} onChange={(event) => setSearchQuery(event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter' && searchCommands[0]) openCommand(searchCommands[0].to) }} placeholder="Search or jump to…" aria-label="Search or jump to"/><kbd>ESC</kbd></label>
