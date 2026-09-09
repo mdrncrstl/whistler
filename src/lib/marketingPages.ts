@@ -17,8 +17,8 @@ export const marketingPages = [
     ['Review disposals and parcels','Inspect capital-gains reports and parcel matching against your recorded transactions. Accurate purchase dates, costs and sale records are essential to useful results.'],
     ['Bring income into the picture','The taxable-income and MyTax views help organise recorded amounts. Check source statements for any tax components that have not been supplied.'],
     ['Plan with the right context','Review unrealised gains, valuations and historical costs. These reports support record preparation; your circumstances and final tax treatment should be checked with your tax adviser.']]),
-  page('/features/integrations','Connections & imports','Features','Bring in your records. Keep your broker.','Connect Interactive Brokers or import supported statements to start building your portfolio history.',[
-    ['Connect Interactive Brokers','Create a read-only Activity Flex query in Interactive Brokers, then enter its connection details in Masterdeck. The connection imports records; it cannot place trades or move your money.'],
+  page('/features/integrations','Connections & imports','Features','Bring in your records. Keep your broker.','Import records from the sources you already use and keep each portfolio in one working history.',[
+    ['Choose the right path','Use a supported direct read-only feed where available, or bring in a CSV export or PDF statement. No connection can place trades or move your money.'],
     ['Import a statement','Upload supported CSV or PDF reports, including supported Superhero statements. Compatibility depends on the report format, so inspect the preview and resolve any flagged records.'],
     ['Check before you continue','Compare holdings, cash and transactions with your broker statement. A supported exchange is not the same as an automatic connection to every broker on that exchange.']]),
   page('/features/portfolio-assistant','Portfolio assistant','Features','Ask a question. Follow the numbers.','Get focused summaries calculated from the portfolio records loaded in your workspace.',[
@@ -47,7 +47,7 @@ export const marketingPages = [
     ['What we cannot answer','Masterdeck organises your records and prepares reports. We cannot advise on which investments to hold or how your personal tax position should be treated; those belong with a licensed adviser.']]),
   page('/company/help','Help centre','Company','Get your first portfolio into shape.','Start with these practical steps, then use your workspace to check the details.',[
     ['1. Create your workspace','Choose Try Masterdeck free and create an account. Complete onboarding, then open Connections to choose a supported connection or import.'],
-    ['2. Add and review records','For Interactive Brokers, use an Activity Flex query. For statement imports, choose a supported CSV or PDF and inspect the preview before confirming the records.'],
+    ['2. Add and review records','Choose a supported direct feed, CSV export or PDF statement, then inspect the preview before confirming the records.'],
     ['3. Reconcile and explore','Compare cash, quantities and transaction dates with your broker. Start with Portfolio, then explore performance, income and tax reports. If something is wrong, include the affected page and a clear description when contacting support.']]),
 ]
 export const marketingGroups = ['Features','Who it’s for','Company'] as const

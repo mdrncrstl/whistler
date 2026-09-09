@@ -6,12 +6,13 @@ import { config } from '../lib/config'
 import { GoogleLogin } from '@react-oauth/google'
 import {
   ArrowLeft, ArrowRight, BarChart3, Calculator, Check, ChevronDown, Database, Eye, EyeOff,
-  FileCheck2, FileSpreadsheet, Gauge, Globe2, Landmark, Link2, LockKeyhole, Mail, Menu,
+  FileCheck2, FileSpreadsheet, Gauge, Globe2, Link2, LockKeyhole, Mail, Menu,
   Network, ShieldCheck, TrendingUp, X,
 } from 'lucide-react'
 import { AnimatePresence, motion, useInView, useMotionValueEvent, useReducedMotion, useScroll } from 'framer-motion'
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react'
 import { annualSavingsPercent, billingPlans, formatAud } from '../lib/billing'
+import { brokers } from '../lib/brokers'
 import { demoBundle } from '../data/demo'
 import { money, percent } from '../lib/format'
 import { summarisePortfolio } from '../lib/portfolio'
@@ -20,16 +21,17 @@ import { HoldingLogo } from './HoldingLogo'
 import { Brand, MotionDialogSurface } from './ui-Wifi-G'
 
 const howItWorks = [
-  ['Bring in your records', 'Connect Interactive Brokers with a read-only Activity Flex query, or import a CSV or supported statement. Nothing you connect can place a trade or move money.'],
+  ['Bring in your records', 'Bring one or several portfolios through a read-only connection, a CSV export, or a supported statement. Nothing you connect can place a trade or move money.'],
   ['Check what came in', 'The import preview flags unmapped columns, ambiguous numbers, duplicate rows and missing exchange rates before anything is saved. Reconcile the totals against your broker statement.'],
   ['Read the reports', 'Performance, income, diversification and Australian tax reports are all built from those records, and every figure keeps a path back to the transaction behind it.'],
 ] as const
 
 const proofStats = [
   { value: 'Global', label: 'portfolio tracking', icon: Globe2 },
-  { value: 'Any broker', label: 'CSV import, or automatic IBKR sync', icon: Link2 },
+  { value: '1–10', label: 'portfolios per workspace', icon: BarChart3 },
+  { value: `${brokers.filter((broker) => broker.id !== 'other').length}+`, label: 'named broker guides + any CSV', icon: Link2 },
   { value: '3', label: 'Australian CGT methods', icon: Calculator },
-  { value: '100%', label: 'read-only tracking', icon: ShieldCheck },
+  { value: 'CSV + PDF', label: 'supported statement imports', icon: FileSpreadsheet },
 ]
 
 const productViews = [
@@ -58,7 +60,7 @@ const productViews = [
 
 const faqs = [
   ['Is Masterdeck a broker?', 'No. Masterdeck tracks and analyses portfolios. It cannot hold assets, move money or place trades.'],
-  ['Which accounts can I connect?', 'Connect Interactive Brokers through its read-only Flex service, or import supported CSV and PDF reports, including Superhero statements. Import coverage depends on the file format; review the records before adding them.'],
+  ['Which accounts can I connect?', 'Bring records from named broker formats, any broker that exports CSV, and supported PDF statements. Where a direct read-only sync is available, it is optional; every import is reviewed before it is saved.'],
   ['Does it work for global portfolios?', 'Track performance, income, currency and allocation for supported global holdings, with dedicated Australian CGT records.'],
   ['Can I try it before paying?', 'Yes. Start a 14-day free trial without a credit card, or explore the demo without creating an account. The trial does not automatically charge you.'],
 ]
@@ -395,19 +397,19 @@ export function Landing({ onDemo, signedIn = false, onOpenApp, page }: LandingPr
         <Reveal className="cloud-connections cloud-container" id="connections">
           <div className="cloud-connections-head">
             <div>
-              <h2 aria-label="Bring every account into one history.">Bring every account<br /><em>into one history.</em></h2>
+              <h2 aria-label="Bring every portfolio into one history.">Bring every portfolio<br /><em>into one history.</em></h2>
             </div>
-            <div className="cloud-connections-proof"><strong>CSV + PDF</strong><span>supported statement imports</span></div>
+            <div className="cloud-connections-proof"><strong>1–10</strong><span>portfolios in one workspace</span></div>
           </div>
           <div className="cloud-connection-rows">
             <div className="cloud-connection-row">
-              <span>01</span><Globe2 /><div><strong>Global holdings</strong><p>Bring supported holdings and currencies into one portfolio.</p></div><ArrowRight />
+              <span>01</span><Globe2 /><div><strong>Global holdings</strong><p>Track holdings, currencies and returns across the markets you already use.</p></div><ArrowRight />
             </div>
             <div className="cloud-connection-row">
-              <span>02</span><Landmark /><div><strong>Interactive Brokers sync</strong><p>Connect with a read-only Activity Flex query.</p></div><ArrowRight />
+              <span>02</span><BarChart3 /><div><strong>Multiple portfolios</strong><p>Keep up to ten portfolios together while their records and returns stay distinct.</p></div><ArrowRight />
             </div>
             <div className="cloud-connection-row">
-              <span>03</span><FileSpreadsheet /><div><strong>Statement workflows</strong><p>Bring in accounts that do not offer a direct feed.</p></div><ArrowRight />
+              <span>03</span><FileSpreadsheet /><div><strong>CSV and PDF imports</strong><p>Start with a named broker guide or upload any compatible export for review.</p></div><ArrowRight />
             </div>
           </div>
           <a className="cloud-button cloud-button-outline-light cloud-connections-cta" href="/pricing">See pricing<ArrowRight /></a>

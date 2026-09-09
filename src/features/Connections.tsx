@@ -11,7 +11,7 @@ import { Badge, Button, Card, EmptyState, Modal, PageHeader } from '../component
 export { Connections } from './Connections-Wifi-G'
 
 function providerName(provider: BrokerConnection['provider']) {
-  if (provider === 'ibkr') return 'Interactive Brokers'
+  if (provider === 'ibkr') return 'Direct read-only sync'
   if (provider === 'google_gmail') return 'Superhero Gmail'
   return 'Superhero'
 }
@@ -114,11 +114,11 @@ export function LegacyConnections() {
 
   return (
     <>
-      <PageHeader title="Connections" description="Bring every broker, exchange and portfolio into one read-only workspace." />
+      <PageHeader title="Connections" description="Bring every portfolio in through a read-only sync, a CSV export, or a supported PDF statement." />
       {!bundle.holdings.length && <section className="connection-onboarding" aria-label="Portfolio setup progress"><div><strong>Add investments in two steps</strong><p>Choose a source below, then review the holdings Masterdeck finds. Your portfolio fills automatically after a successful sync or import.</p></div><ol><li className="active"><span>1</span>Choose a source</li><li><span>2</span>Review and import</li></ol></section>}
       {demo && <div className="demo-banner"><ShieldCheck size={18} /><span>The demo shows connection states but never accepts or sends private broker credentials. Sign in to connect real accounts.</span></div>}
       <div className="connections-grid">
-        {connectionCard(ibkr, 'ibkr', 'Automatic Activity Flex sync for positions, cash and complete account activity.', <>{ibkrReference ? <Button variant="primary" icon={KeyRound} disabled={demo} onClick={() => setIbkrOpen(true)}>Connect live IBKR</Button> : ibkr ? <Button icon={RefreshCw} busy={action === `sync-${ibkr.id}`} disabled={demo} onClick={() => syncIbkr(ibkr.id)}>Sync IBKR now</Button> : <Button variant="primary" icon={KeyRound} disabled={demo} onClick={() => setIbkrOpen(true)}>Connect IBKR</Button>}<span className="read-only-label"><ShieldCheck size={14} /> {ibkrReference ? 'Saved reference portfolio · no live broker access' : 'Flex Web Service v3 · read only'}</span></>)}
+        {connectionCard(ibkr, 'ibkr', 'Optional direct sync for positions, cash and account activity where a supported feed is available.', <>{ibkrReference ? <Button variant="primary" icon={KeyRound} disabled={demo} onClick={() => setIbkrOpen(true)}>Connect direct sync</Button> : ibkr ? <Button icon={RefreshCw} busy={action === `sync-${ibkr.id}`} disabled={demo} onClick={() => syncIbkr(ibkr.id)}>Sync latest records</Button> : <Button variant="primary" icon={KeyRound} disabled={demo} onClick={() => setIbkrOpen(true)}>Connect direct sync</Button>}<span className="read-only-label"><ShieldCheck size={14} /> {ibkrReference ? 'Saved reference portfolio · no live access' : 'Read-only connection · no trades or money movement'}</span></>)}
         {connectionCard(superhero, 'superhero', 'Upload a Full Portfolio Report, Transaction Statement, Valuation CSV or contract-note PDF.', <Button variant={superhero && !superheroReference ? 'secondary' : 'primary'} icon={CloudUpload} onClick={() => fileInput.current?.click()}>{superheroReference ? 'Replace with a broker report' : superhero ? 'Import another report' : 'Choose Superhero report'}</Button>)}
         {connectionCard(gmail, 'google_gmail', 'Optional separate Gmail read-only authorisation for narrow Superhero contract-note searches.', <>{gmail ? <Button icon={RefreshCw} busy={action === `sync-${gmail.id}`} disabled={demo} onClick={() => syncGmail(gmail.id)}>Scan Gmail now</Button> : <Button icon={Mail} disabled={demo} onClick={() => gmailLogin()}>Connect Gmail read-only</Button>}<span className="read-only-label"><ShieldCheck size={14} /> Requested scope: gmail.readonly</span></>)}
       </div>
@@ -131,7 +131,7 @@ export function LegacyConnections() {
 
       <Card className="sync-history"><div className="card-title-row"><div><span className="section-label">ACTIVITY</span><h2>Recent sync runs</h2></div></div>{bundle.syncRuns.length ? <div className="sync-list">{bundle.syncRuns.map((run) => <div key={run.id}><span className={`sync-status ${run.status}`}>{run.status === 'success' ? <CheckCircle2 size={16} /> : run.status === 'error' ? <AlertTriangle size={16} /> : <RefreshCw size={16} />}</span><span><strong>{run.message || `${providerName(run.provider)} sync`}</strong><small>{date(run.started_at, { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' })} · {run.imported_count} rows processed</small></span><Badge tone={run.status === 'success' ? 'success' : run.status === 'error' ? 'error' : 'warning'}>{run.status}</Badge></div>)}</div> : <EmptyState icon={WalletCards} title="No sync history yet" description="Completed broker syncs and report imports will appear here." />}</Card>
 
-      <Modal open={ibkrOpen} title="Connect Interactive Brokers" description="Use an Activity Flex Query with read-only reporting access." onClose={closeIbkrSetup}>
+      <Modal open={ibkrOpen} title="Connect a direct read-only sync" description="The current direct feed uses an Interactive Brokers Activity Flex Query with reporting-only access." onClose={closeIbkrSetup}>
         <form className="form-stack" onSubmit={saveIbkr}>
           <label><span>Account label</span><input value={label} onChange={(event) => setLabel(event.target.value)} maxLength={80} required /></label>
           <label><span>Flex Web Service token</span><input value={token} onChange={(event) => setToken(event.target.value)} type="password" autoComplete="off" inputMode="numeric" placeholder="Private Flex token" required /></label>

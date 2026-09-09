@@ -1,4 +1,4 @@
-import { ArrowRight, FileSpreadsheet, KeyRound, ShieldCheck } from 'lucide-react'
+import { ArrowRight, FileSpreadsheet, Globe2, ShieldCheck } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
 export function PortfolioSetupGuide({ compact = false }: { compact?: boolean }) {
@@ -13,11 +13,11 @@ export function PortfolioSetupGuide({ compact = false }: { compact?: boolean }) 
         </div>
       </div>
       <div className="portfolio-setup-options" aria-label="Ways to add investments">
-        <Link className="portfolio-setup-option primary" to="/app/connections?setup=ibkr">
-          <span><KeyRound size={19} /></span><div><strong>Connect a broker</strong><small>Read-only sync with Interactive Brokers</small></div><ArrowRight size={17} />
+        <Link className="portfolio-setup-option primary" to="/app/connections?setup=import">
+          <span><FileSpreadsheet size={19} /></span><div><strong>Import portfolio records</strong><small>CSV exports or supported PDF statements from any broker</small></div><ArrowRight size={17} />
         </Link>
-        <Link className="portfolio-setup-option" to="/app/connections?setup=import">
-          <span><FileSpreadsheet size={19} /></span><div><strong>Import a spreadsheet</strong><small>Match columns from your broker or exchange CSV</small></div><ArrowRight size={17} />
+        <Link className="portfolio-setup-option" to="/app/connections">
+          <span><Globe2 size={19} /></span><div><strong>Browse broker guides</strong><small>Use a named guide, direct sync, or the universal CSV mapper</small></div><ArrowRight size={17} />
         </Link>
       </div>
       <div className="portfolio-setup-steps" aria-label="What happens next">

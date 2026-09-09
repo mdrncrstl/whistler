@@ -9,7 +9,7 @@ export function ChartRangeReadout({ summary, dragging, onClear, formatValue, for
   formatLabel: (label: string) => string
 }) {
   if (!summary) {
-    return <p className="chart-range-hint">Drag across the chart to measure a period.</p>
+    return <p className="chart-range-hint">Drag across the chart to see the % change.</p>
   }
   const direction = summary.change > 0 ? 'positive' : summary.change < 0 ? 'negative' : ''
   return (

@@ -9,9 +9,9 @@ describe('Masterdeck public conversion funnel', () => {
     expect(screen.getByRole('heading', { name: /Know what your portfolio is really doing/i })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: /One portfolio. No blind spots/i })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: /Clear pricing. Try it before you pay/i })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: /Bring every account into one history/i })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: /Bring every portfolio into one history/i })).toBeInTheDocument()
     expect(screen.getAllByRole('link', { name: 'See pricing' }).length).toBeGreaterThan(0)
-    expect(screen.getByText('Interactive Brokers sync')).toBeInTheDocument()
+    expect(screen.getAllByText('Multiple portfolios').length).toBeGreaterThan(0)
     expect(screen.queryByText('200+ global brokers')).not.toBeInTheDocument()
   })
 
@@ -29,7 +29,7 @@ describe('Masterdeck public conversion funnel', () => {
     expect(brokerQuestion).toHaveAttribute('aria-expanded', 'true')
     fireEvent.click(screen.getByRole('button', { name: 'Which accounts can I connect?' }))
     expect(brokerQuestion).toHaveAttribute('aria-expanded', 'false')
-    expect(screen.getByText(/read-only Flex service/)).toBeInTheDocument()
+    expect(screen.getByText(/named broker formats/)).toBeInTheDocument()
   })
 
   it('keeps all product panels mounted when navigating the scroll story', () => {
@@ -51,7 +51,7 @@ describe('Masterdeck public conversion funnel', () => {
     render(<Landing onDemo={vi.fn()} signedIn onOpenApp={vi.fn()} />)
     expect(screen.getByRole('img', { name: /Masterdeck portfolio dashboard/ })).toHaveAttribute('src', '/marketing/masterdeck-portfolio-hero.png')
     expect(screen.getByText('Actual Masterdeck app · Demo portfolio')).toBeInTheDocument()
-    expect(screen.getByText('CSV import, or automatic IBKR sync')).toBeInTheDocument()
+    expect(screen.getByText(/named broker guides \+ any CSV/)).toBeInTheDocument()
     expect(screen.queryByText('IBKR')).not.toBeInTheDocument()
   })
 

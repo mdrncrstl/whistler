@@ -23,7 +23,7 @@ export interface Broker {
 }
 
 export const brokers: Broker[] = [
-  { id: 'ibkr', name: 'Interactive Brokers', method: 'sync', market: 'NASDAQ', currency: 'USD', region: 'Global', note: 'Read-only Activity Flex query, synced automatically' },
+  { id: 'ibkr', name: 'Interactive Brokers', method: 'sync', market: 'NASDAQ', currency: 'USD', region: 'Global', note: 'Optional read-only Activity Flex feed' },
   { id: 'superhero', name: 'Superhero', method: 'parser', market: 'ASX', currency: 'AUD', region: 'Australia', note: 'Portfolio report, transaction statement, valuation CSV or contract-note PDF' },
 
   { id: 'commsec', name: 'CommSec', method: 'csv', market: 'ASX', currency: 'AUD', region: 'Australia' },
@@ -57,13 +57,13 @@ export const brokers: Broker[] = [
 ]
 
 export const methodLabel: Record<BrokerMethod, string> = {
-  sync: 'Automatic sync',
+  sync: 'Direct read-only sync',
   parser: 'Statement import',
   csv: 'CSV import',
 }
 
 export const methodDetail: Record<BrokerMethod, string> = {
-  sync: 'Masterdeck holds a read-only connection and pulls new records for you.',
+  sync: 'Use an optional supported feed to pull records without trading access.',
   parser: 'Masterdeck reads this broker’s own export format directly.',
   csv: 'Export a CSV from the broker and map its columns once. Not a live connection.',
 }

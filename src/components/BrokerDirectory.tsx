@@ -27,9 +27,8 @@ export function BrokerDirectory() {
         <span className="section-label">SUPPORTED BROKERS</span>
         <h2 id="broker-directory-title">Bring in records from any broker.</h2>
         <p>
-          Interactive Brokers connects and syncs itself. Superhero statements are read directly.
-          Every other broker imports from a CSV export you map once — so a broker missing from this
-          list is still supported, it just is not pre-labelled.
+          Choose a named guide, use a supported direct feed, or import a CSV export you map once.
+          A broker missing from this list is still supported when it can provide a compatible export.
         </p>
       </div>
       <label className="md-broker-search">

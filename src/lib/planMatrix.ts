@@ -45,7 +45,7 @@ export const planMatrix: MatrixGroup[] = [
   {
     title: 'Connections and data',
     rows: [
-      { label: 'Interactive Brokers import', note: 'Read-only Activity Flex query', cells: [true, true, true] },
+      { label: 'Optional direct read-only sync', note: 'Available on supported feeds', cells: [true, true, true] },
       { label: 'CSV and statement import', cells: [true, true, true] },
       { label: 'Read-only access to your broker', cells: [true, true, true] },
       { label: 'CSV and PDF export', cells: [true, true, true] },
@@ -64,7 +64,7 @@ export const pricingFaqs: [string, string][] = [
   ['Which currency am I charged in?',
    'Australian dollars. Prices shown on this page are the amounts you are charged.'],
   ['Is my broker connection read-only?',
-   'Yes. The Interactive Brokers connection uses a read-only Activity Flex query. It imports records; it cannot place trades or move money.'],
+   'Yes. Any direct connection is reporting-only. It imports records; it cannot place trades or move money.'],
   ['What counts as a portfolio?',
    'A portfolio is one set of holdings and transactions, usually one account or one strategy. You can view any single portfolio or the combined All Portfolios view.'],
 ]

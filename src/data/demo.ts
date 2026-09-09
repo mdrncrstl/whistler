@@ -58,7 +58,7 @@ export const demoBundle: PortfolioBundle = {
     { id: 'demo-superhero', provider: 'superhero', label: 'Superhero', status: 'connected', last_synced_at: '2026-08-23T09:30:00Z', config: { mode: 'report-import' } },
   ],
   syncRuns: [
-    { id: 'run-1', provider: 'ibkr', status: 'success', message: 'IBKR portfolio refreshed', imported_count: 184, started_at: '2026-08-24T01:14:12Z', finished_at: '2026-08-24T01:15:00Z' },
+    { id: 'run-1', provider: 'ibkr', status: 'success', message: 'Direct portfolio sync refreshed', imported_count: 184, started_at: '2026-08-24T01:14:12Z', finished_at: '2026-08-24T01:15:00Z' },
   ],
   demo: true,
 }

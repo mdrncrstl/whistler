@@ -46,20 +46,20 @@ describe('first portfolio onboarding', () => {
   ])('shows clear setup choices on the empty %s screen', (_name, node) => {
     renderScreen(node)
     expect(screen.getByRole('heading', { name: 'Build your portfolio' })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /Connect a broker/ })).toHaveAttribute('href', '/app/connections?setup=ibkr')
-    expect(screen.getByRole('link', { name: /Import a spreadsheet/ })).toHaveAttribute('href', '/app/connections?setup=import')
+    expect(screen.getByRole('link', { name: /Import portfolio records/ })).toHaveAttribute('href', '/app/connections?setup=import')
+    expect(screen.getByRole('link', { name: /Browse broker guides/ })).toHaveAttribute('href', '/app/connections')
     expect(screen.getByText(/cannot place or modify trades/i)).toBeInTheDocument()
   })
 
   it('takes the import action to the exact connection setup state', () => {
     renderScreen(<Overview />)
-    fireEvent.click(screen.getByRole('link', { name: /Import a spreadsheet/ }))
+    fireEvent.click(screen.getByRole('link', { name: /Import portfolio records/ }))
     expect(screen.getByLabelText('Current location')).toHaveTextContent('/app/connections?setup=import')
   })
 
   it('opens the IBKR form when that setup path is selected', () => {
     render(<GoogleOAuthProvider clientId="test-client"><MemoryRouter initialEntries={['/app/connections?setup=ibkr']}><Connections /></MemoryRouter></GoogleOAuthProvider>)
-    expect(screen.getByRole('dialog', { name: 'Connect Interactive Brokers' })).toBeInTheDocument()
+    expect(screen.getByRole('dialog', { name: 'Connect a direct read-only sync' })).toBeInTheDocument()
     expect(screen.getByLabelText('Flex Web Service token')).toBeInTheDocument()
   })
 

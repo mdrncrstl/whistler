@@ -1,6 +1,6 @@
 # MASTERDECK
 
-MASTERDECK is a private, read-only portfolio workspace for Interactive Brokers and Superhero investors. It combines holdings, cash, activity, income, performance and Australian financial-year tax-lot reporting in one responsive web app.
+MASTERDECK is a private, read-only workspace for up to 10 portfolios. Bring records from named broker formats, any compatible CSV export, or supported PDF statements, then keep holdings, cash, activity, income, performance and Australian financial-year tax-lot reporting together.
 
 ## Stack
 
