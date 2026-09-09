@@ -13,6 +13,7 @@ import './laptop-density.css'
 import './product-story.css'
 import './marketing-pages.css'
 import './assistant-motion.css'
+import './site-editorial.css'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

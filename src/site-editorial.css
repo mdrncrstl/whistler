@@ -1,0 +1,424 @@
+/*
+ * Shared editorial surface system.
+ *
+ * The public site and the workspace use different content densities, but they
+ * should still feel like one product: wide reading edges, quiet surfaces,
+ * rounded modules, and space doing the grouping work.
+ */
+:root {
+  --site-canvas: #f7faf8;
+  --site-panel: #ffffff;
+  --site-panel-soft: #eef5f0;
+  --site-rule: #d9e5dd;
+  --site-shadow: 0 18px 48px rgb(22 54 40 / 7%);
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Public marketing pages */
+.cloud-page {
+  background: var(--site-canvas);
+}
+
+.cloud-container {
+  width: min(1280px, calc(100% - 80px));
+}
+
+.cloud-header {
+  border-bottom-color: color-mix(in srgb, var(--site-rule) 88%, transparent);
+  background: color-mix(in srgb, var(--site-canvas) 94%, transparent);
+  box-shadow: 0 8px 26px rgb(24 64 46 / 4%);
+}
+
+.cloud-hero,
+.cloud-product-stage,
+.cloud-connections,
+.cloud-pricing-grid article,
+.cloud-module,
+.md-public-body aside,
+.md-public-body article,
+.md-related a {
+  border-radius: 24px;
+}
+
+.cloud-hero {
+  box-shadow: 0 22px 58px rgb(0 47 33 / 12%);
+}
+
+.cloud-region,
+.cloud-product,
+.cloud-pricing,
+.cloud-faq {
+  padding-block: 124px;
+}
+
+.cloud-region {
+  gap: 10%;
+}
+
+.cloud-stat-table {
+  border-radius: 24px;
+  box-shadow: var(--site-shadow);
+}
+
+.cloud-stat-row {
+  min-height: 154px;
+  padding: 26px;
+}
+
+.cloud-product-stage {
+  padding: 40px;
+  box-shadow: var(--site-shadow);
+}
+
+.cloud-product-story .cloud-product-rail a {
+  border-bottom: 0;
+  border-radius: 16px;
+}
+
+.cloud-product-story .cloud-product-rail a[aria-current],
+.cloud-product-story .cloud-product-rail a:hover {
+  background: var(--site-panel-soft);
+}
+
+.cloud-module {
+  box-shadow: 0 16px 36px rgb(24 64 46 / 8%);
+}
+
+.cloud-pricing-grid {
+  gap: 16px;
+}
+
+.cloud-pricing-grid article {
+  box-shadow: 0 12px 32px rgb(24 64 46 / 5%);
+}
+
+.cloud-faq-list,
+.cloud-stat-table,
+.cloud-principles-list {
+  overflow: hidden;
+}
+
+/* Public detail pages use the same two-column editorial cadence as the home page. */
+.md-public-content {
+  background: var(--site-canvas);
+}
+
+.md-public-hero {
+  padding-block: 116px 84px;
+}
+
+.md-public-hero h1 {
+  max-width: 14ch;
+  margin-block: 24px 20px;
+  font-size: clamp(42px, 5.2vw, 76px);
+  line-height: .96;
+  text-wrap: balance;
+}
+
+.md-public-hero > p {
+  max-width: 56ch;
+  line-height: 1.65;
+  text-wrap: pretty;
+}
+
+.md-public-body {
+  grid-template-columns: minmax(220px, .55fr) minmax(0, 1.45fr);
+  gap: 64px;
+  padding-block: 0 112px;
+  border-top: 0;
+}
+
+.md-public-body aside {
+  align-self: start;
+  position: sticky;
+  top: 104px;
+  padding: 28px;
+  background: var(--site-panel-soft);
+  box-shadow: var(--site-shadow);
+}
+
+.md-public-body aside p {
+  margin-block: 18px 22px;
+  font-size: 21px;
+}
+
+.md-public-body > div {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.md-public-body article {
+  min-height: 245px;
+  display: block;
+  margin: 0;
+  padding: 28px;
+  border: 1px solid var(--site-rule);
+  background: var(--site-panel);
+  box-shadow: 0 12px 30px rgb(24 64 46 / 4%);
+}
+
+.md-public-body article > span {
+  display: block;
+  padding: 0;
+  color: #0b986b;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .12em;
+}
+
+.md-public-body article h2 {
+  margin: 32px 0 13px;
+  font-size: 24px;
+  line-height: 1.08;
+  text-wrap: balance;
+}
+
+.md-public-body article p {
+  font-size: 13px;
+  line-height: 1.65;
+  text-wrap: pretty;
+}
+
+.md-public-image {
+  margin-top: 0;
+}
+
+.md-public-image img {
+  border-radius: 26px;
+  box-shadow: var(--site-shadow);
+  outline: 1px solid rgb(0 0 0 / 10%);
+  outline-offset: -1px;
+}
+
+.md-related {
+  padding-block: 112px 128px;
+}
+
+.md-related > div {
+  gap: 16px;
+}
+
+.md-related a {
+  min-height: 168px;
+  padding: 26px;
+  border: 1px solid var(--site-rule);
+  background: var(--site-panel);
+  box-shadow: 0 12px 30px rgb(24 64 46 / 4%);
+  transition: transform .2s var(--ease-out), border-color .2s var(--ease-out), box-shadow .2s var(--ease-out);
+}
+
+.md-related a:hover {
+  border-color: #91cdb0;
+  box-shadow: 0 18px 38px rgb(24 64 46 / 9%);
+  transform: translateY(-2px);
+}
+
+/* Authenticated workspace */
+.app-shell {
+  grid-template-columns: 248px minmax(0, 1fr);
+  background: var(--site-canvas);
+}
+
+.sidebar {
+  padding: 22px 16px 16px;
+  background: var(--site-panel);
+  border-right-color: var(--site-rule);
+}
+
+.topbar {
+  height: 72px;
+  padding-inline: 34px;
+  background: color-mix(in srgb, var(--site-panel) 91%, transparent);
+  border-bottom-color: var(--site-rule);
+}
+
+.app-content {
+  width: min(1380px, calc(100% - 80px));
+  margin-inline: auto;
+  padding: 36px 0 96px;
+}
+
+.page-heading {
+  min-height: 70px;
+  margin-bottom: 30px;
+}
+
+.page-heading h1 {
+  margin-bottom: 9px;
+  font-size: 27px;
+  line-height: 1.05;
+  text-wrap: balance;
+}
+
+.page-heading p {
+  max-width: 62ch;
+  font-size: 12px;
+  line-height: 1.55;
+  text-wrap: pretty;
+}
+
+.card,
+.data-card,
+.settings-section-rail,
+.settings-panel,
+.connection-card,
+.portfolio-setup-guide,
+.supply-chain-map-card,
+.supply-chain-inspector,
+.supply-chain-ledger {
+  border-color: var(--site-rule);
+  border-radius: 18px;
+  box-shadow: var(--site-shadow);
+}
+
+.dashboard-grid,
+.income-grid,
+.tax-method-explainer,
+.insight-rail,
+.connections-grid,
+.supply-chain-layout {
+  gap: 18px;
+}
+
+.performance-card,
+.allocation-card,
+.holdings-preview,
+.movers-card,
+.income-chart-card,
+.payer-card,
+.income-ledger,
+.tax-table,
+.connection-card {
+  padding: 22px;
+}
+
+.portfolio-toolbar {
+  min-height: 58px;
+  height: auto;
+  flex-wrap: wrap;
+  padding: 9px;
+  border: 1px solid var(--site-rule);
+  border-radius: 16px;
+  background: var(--site-panel);
+  box-shadow: 0 10px 26px rgb(24 64 46 / 5%);
+}
+
+.portfolio-toolbar button,
+.holdings-head button,
+.select-wrap select,
+.search-input {
+  min-height: 40px;
+  height: 40px;
+  border-radius: 10px;
+}
+
+.portfolio-metrics {
+  height: auto;
+  min-height: 142px;
+  margin-block: 20px 18px;
+  padding: 0;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 1px;
+  overflow: hidden;
+  border: 1px solid var(--site-rule);
+  border-radius: 18px;
+  background: var(--site-rule);
+  box-shadow: 0 12px 30px rgb(24 64 46 / 4%);
+}
+
+.portfolio-metrics .metric-tab {
+  min-height: 140px;
+  padding: 24px 20px 18px;
+  background: var(--site-panel);
+}
+
+.portfolio-metrics .metric-tab.active,
+.portfolio-metrics .metric-tab:hover {
+  background: var(--site-panel-soft);
+}
+
+.portfolio-chart-section,
+.portfolio-holdings {
+  padding: 24px;
+  border: 1px solid var(--site-rule);
+  border-radius: 18px;
+  background: var(--site-panel);
+  box-shadow: 0 12px 30px rgb(24 64 46 / 4%);
+}
+
+.portfolio-holdings {
+  margin-top: 22px;
+}
+
+.portfolio-main-chart,
+.portfolio-chart-empty {
+  border-top-color: var(--site-rule);
+}
+
+.portfolio-holdings th:first-child,
+.portfolio-holdings td:first-child {
+  background: var(--site-panel);
+}
+
+.supply-chain-toolbar,
+.supply-chain-live-strip,
+.supply-chain-active-bar {
+  border-radius: 16px;
+}
+
+.supply-chain-map-canvas {
+  border-radius: 0 0 16px 16px;
+}
+
+@media (max-width: 1100px) {
+  .cloud-container { width: min(100% - 56px, 1000px); }
+  .app-content { width: min(100% - 56px, 1100px); }
+  .portfolio-metrics { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .portfolio-metrics .metric-tab { min-height: 118px; }
+}
+
+@media (max-width: 860px) {
+  .cloud-container,
+  .app-content { width: min(100% - 36px, 700px); }
+  .md-public-hero { padding-block: 76px 54px; }
+  .md-public-body { padding-bottom: 76px; }
+  .md-public-body aside { position: static; }
+  .md-public-body > div { grid-template-columns: 1fr; }
+  .md-public-body article { min-height: 0; }
+  .md-related { padding-block: 76px 90px; }
+  .app-shell { grid-template-columns: 1fr; }
+  .sidebar { display: none; }
+  .topbar { padding-inline: 18px; }
+  .app-content { padding-block: 26px 72px; }
+  .page-heading { margin-bottom: 24px; }
+  .portfolio-chart-section,
+  .portfolio-holdings { padding: 18px; }
+}
+
+@media (max-width: 520px) {
+  .cloud-container,
+  .app-content { width: calc(100% - 28px); }
+  .md-public-hero { padding-block: 58px 42px; }
+  .md-public-hero h1 { font-size: 45px; }
+  .md-public-body article { padding: 22px; }
+  .md-public-body article h2 { margin-top: 24px; font-size: 22px; }
+  .md-related a { min-height: 0; padding: 22px; }
+  .app-content { padding-block: 22px 60px; }
+  .page-heading { display: grid; gap: 16px; }
+  .page-actions { justify-content: flex-start; }
+  .portfolio-toolbar { padding: 8px; }
+  .portfolio-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .portfolio-metrics .metric-tab { min-height: 104px; padding: 18px 14px 14px; }
+  .portfolio-metrics .metric-tab:last-child { grid-column: 1 / -1; }
+  .portfolio-chart-section,
+  .portfolio-holdings { padding: 14px; border-radius: 16px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .md-related a { transition: none; }
+}
