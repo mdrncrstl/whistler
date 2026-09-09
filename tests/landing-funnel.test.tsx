@@ -6,8 +6,8 @@ describe('Masterdeck public conversion funnel', () => {
   afterEach(cleanup)
   it('renders the complete product, pricing, connections and FAQ journey', () => {
     render(<Landing onDemo={vi.fn()} signedIn onOpenApp={vi.fn()} />)
-    expect(screen.getByRole('heading', { name: /Know what your portfolio is really doing/i })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: /One portfolio. No blind spots/i })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: /Every investment. One clear view/i })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: /More perspective. Less piecing things together/i })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: /Clear pricing. Try it before you pay/i })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: /Bring every portfolio into one history/i })).toBeInTheDocument()
     expect(screen.getAllByRole('link', { name: 'See pricing' }).length).toBeGreaterThan(0)
@@ -32,24 +32,19 @@ describe('Masterdeck public conversion funnel', () => {
     expect(screen.getByText(/named broker formats/)).toBeInTheDocument()
   })
 
-  it('keeps all product panels mounted when navigating the scroll story', () => {
+  it('links each visual feature card to an existing product page', () => {
     render(<Landing onDemo={vi.fn()} signedIn onOpenApp={vi.fn()} />)
-    const performanceTab = within(screen.getByRole('navigation', { name: 'Masterdeck product views' })).getByRole('link', { name: /Performance/i })
-    const panel = document.getElementById('product-performance')!
-    const scrollToPanel = vi.fn()
-    panel.scrollIntoView = scrollToPanel
-    fireEvent.click(performanceTab)
-    expect(performanceTab).toHaveAttribute('aria-current', 'location')
-    expect(scrollToPanel).toHaveBeenCalled()
-    expect(screen.getByRole('heading', { name: /Find what actually drove the return/i })).toBeInTheDocument()
-    expect(screen.getAllByRole('img', { name: /performance report/i })).toHaveLength(3)
-    expect(document.getElementById('product-portfolio')).toBeInTheDocument()
-    expect(document.getElementById('product-tax')).toBeInTheDocument()
+    const features = within(screen.getByRole('region', { name: 'Explore Masterdeck features' }))
+    expect(features.getAllByRole('link')).toHaveLength(4)
+    expect(features.getByRole('link', { name: /Your portfolio, together/ })).toHaveAttribute('href', '/features/portfolio-tracking')
+    expect(features.getByRole('link', { name: /See what drove the return/ })).toHaveAttribute('href', '/features/performance')
+    expect(features.getByRole('link', { name: /Keep the tax detail close/ })).toHaveAttribute('href', '/features/australian-tax')
+    expect(features.getByRole('link', { name: /A benchmark for your progress/ })).toHaveAttribute('href', '/features/performance')
   })
 
   it('shows a real app screenshot with clear demo attribution', () => {
     render(<Landing onDemo={vi.fn()} signedIn onOpenApp={vi.fn()} />)
-    expect(screen.getByRole('img', { name: /Masterdeck portfolio dashboard/ })).toHaveAttribute('src', '/marketing/masterdeck-portfolio-hero.png')
+    expect(screen.getByRole('img', { name: /Actual Masterdeck portfolio with demo holdings/ })).toHaveAttribute('src', '/marketing/masterdeck-portfolio-hero.png')
     expect(screen.getByText('Actual Masterdeck app · Demo portfolio')).toBeInTheDocument()
     expect(screen.getByText('named broker guides', { exact: true })).toBeInTheDocument()
     expect(screen.queryByText('IBKR')).not.toBeInTheDocument()

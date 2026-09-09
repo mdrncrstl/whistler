@@ -13,11 +13,7 @@ import { AnimatePresence, motion, useInView, useMotionValueEvent, useReducedMoti
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react'
 import { annualSavingsPercent, billingPlans, formatAud } from '../lib/billing'
 import { brokers } from '../lib/brokers'
-import { demoBundle } from '../data/demo'
-import { money, percent } from '../lib/format'
-import { summarisePortfolio } from '../lib/portfolio'
 import { authClient } from '../lib/supabase'
-import { HoldingLogo } from './HoldingLogo'
 import { Brand, MotionDialogSurface } from './ui-Wifi-G'
 
 const howItWorks = [
@@ -32,30 +28,6 @@ const proofStats = [
   { value: 'CSV + PDF', label: 'imports from supported exports', icon: FileSpreadsheet },
 ]
 
-const productViews = [
-  {
-    id: 'portfolio',
-    label: 'Portfolio',
-    title: 'See the whole portfolio at once.',
-    copy: 'Holdings, capital gains, income and currency effects stay connected to the records that produced them.',
-    icon: BarChart3,
-  },
-  {
-    id: 'performance',
-    label: 'Performance',
-    title: 'Find what actually drove the return.',
-    copy: 'Compare periods, benchmarks and contribution without flattening the answer into one headline number.',
-    icon: Gauge,
-  },
-  {
-    id: 'tax',
-    label: 'Australian tax',
-    title: 'Keep tax records close to the trades.',
-    copy: 'Review matched disposals, parcel choices, taxable income, valuations and historical cost in one working record.',
-    icon: FileCheck2,
-  },
-] as const
-
 const faqs = [
   ['Is Masterdeck a broker?', 'No. Masterdeck tracks and analyses portfolios. It cannot hold assets, move money or place trades.'],
   ['Which accounts can I connect?', 'Bring records from named broker formats, any broker that exports CSV, and supported PDF statements. Where a direct read-only sync is available, it is optional; every import is reviewed before it is saved.'],
@@ -69,7 +41,6 @@ const principleRows = [
   ['Stay read-only', 'Masterdeck analyses records. It does not hold assets, move money or place trades.', ShieldCheck],
 ] as const
 
-const previewSummary = summarisePortfolio(demoBundle)
 type LandingProps = { onDemo: () => void; signedIn?: boolean; onOpenApp?: () => void; page?: MarketingPage | 'pricing' }
 
 export function Landing({ onDemo, signedIn = false, onOpenApp, page }: LandingProps) {
@@ -103,22 +74,11 @@ export function Landing({ onDemo, signedIn = false, onOpenApp, page }: LandingPr
   const [mobileOpen, setMobileOpen] = useState(false)
   const [annual, setAnnual] = useState(true)
   const [openFaq, setOpenFaq] = useState(0)
-  const [activeView, setActiveView] = useState(0)
   const [headerScrolled, setHeaderScrolled] = useState(false)
   const { scrollY } = useScroll()
 
   useMotionValueEvent(scrollY, 'change', (currentScrollY) => {
     setHeaderScrolled(currentScrollY > 16)
-  })
-
-  useMotionValueEvent(scrollY, 'change', () => {
-    const readingLine = Math.min(220, window.innerHeight * 0.3)
-    let nextView = 0
-    productViews.forEach((view, index) => {
-      const panel = document.getElementById(`product-${view.id}`)
-      if (panel && panel.getBoundingClientRect().top <= readingLine) nextView = index
-    })
-    setActiveView(current => current === nextView ? current : nextView)
   })
 
   const openAuthentication = (mode: 'signin' | 'signup') => {
@@ -242,9 +202,9 @@ export function Landing({ onDemo, signedIn = false, onOpenApp, page }: LandingPr
   const pricingCtaLabel = signedIn ? 'Open Masterdeck' : 'Start free trial'
 
   return (
-    <div className="cloud-page">
+    <div className="cloud-page alpine-site">
       <header
-        className={'cloud-header ' + (headerScrolled || page ? 'is-scrolled' : 'is-at-top')}
+        className="cloud-header is-scrolled"
         data-scroll-state={headerScrolled ? 'scrolled' : 'top'}
         role="banner"
       >
@@ -293,7 +253,8 @@ export function Landing({ onDemo, signedIn = false, onOpenApp, page }: LandingPr
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.54, ease: [0.16, 1, 0.3, 1] }}
           >
-            <h1>Know what your portfolio is <em>really</em> doing.</h1>
+            <span className="alpine-eyebrow">Your investments. A clearer perspective.</span>
+            <h1>Every investment. <br />One clear view.</h1>
             <p>See your shares, ETFs, income and Australian tax records together. Connect a supported account or import your statements to get started.</p>
             <div className="cloud-actions">
               <button className="cloud-button cloud-button-light" onClick={() => openAuthentication('signup')} disabled={redirecting}>
@@ -303,16 +264,11 @@ export function Landing({ onDemo, signedIn = false, onOpenApp, page }: LandingPr
             </div>
             {!signedIn && <p className="cloud-trial-note">14-day free trial · No credit card · No automatic charge</p>}
           </motion.div>
-          <motion.div
-            className="cloud-hero-preview"
-            initial={reduceMotion ? false : { opacity: 0, y: 26, scale: 0.98 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ duration: 0.68, delay: 0.08, ease: [0.16, 1, 0.3, 1] }}
-          >
-            <figure className="cloud-app-screenshot"><img src="/marketing/masterdeck-portfolio-hero.png" width="1366" height="768" alt="Masterdeck portfolio dashboard showing portfolio value, returns, performance chart and holdings" fetchPriority="high" decoding="async" /><figcaption>Actual Masterdeck app · Demo portfolio</figcaption></figure>
-          </motion.div>
+          <figure className="alpine-hero-product"><img src="/marketing/masterdeck-portfolio-hero.png" width="1366" height="768" alt="Masterdeck portfolio dashboard with demo holdings" fetchPriority="high"/></figure>
         </section>
 
+        <section className="alpine-assurance" aria-label="Trial and security"><span><ShieldCheck size={15}/>Read-only by design</span><span><Check size={15}/>14 days free</span><span><LockKeyhole size={15}/>No credit card required</span></section>
+        <section className="alpine-showcase cloud-container"><div><h2>A little clarity goes a long way.</h2><p>Your shares, ETFs, income and tax records, organised in one place.</p></div><figure><img src="/marketing/masterdeck-portfolio-hero.png" width="1366" height="768" alt="Actual Masterdeck portfolio with demo holdings, performance chart and returns" loading="lazy"/><figcaption>Actual Masterdeck app · Demo portfolio</figcaption></figure></section>
         <Reveal className="cloud-region cloud-container">
           <div className="cloud-region-intro">
             <h2>Every portfolio.<br />One clear record.</h2>
@@ -329,34 +285,16 @@ export function Landing({ onDemo, signedIn = false, onOpenApp, page }: LandingPr
           </div>
         </Reveal>
 
-        <section className="cloud-product cloud-container cloud-product-story" id="product">
-          <Reveal className="cloud-section-intro">
-            <h2 aria-label="One portfolio. No blind spots.">One portfolio.<br /><em>No blind spots.</em></h2>
-            <p>Follow the full picture, from your holdings to performance and Australian tax records.</p>
-          </Reveal>
-          <div className="cloud-product-layout">
-            <nav className="cloud-product-rail" aria-label="Masterdeck product views">
-              {productViews.map((view, index) => {
-                const Icon = view.icon
-                return <a key={view.id} href={`#product-${view.id}`} aria-current={activeView === index ? 'location' : undefined}
-                  onClick={event => {
-                    event.preventDefault()
-                    document.getElementById(`product-${view.id}`)?.scrollIntoView({ behavior: reduceMotion ? 'instant' : 'smooth', block: 'start' })
-                    setActiveView(index)
-                  }}>
-                  <Icon /><span className="cloud-product-rail-label"><strong>{view.label}</strong><small>{view.title}</small></span><ArrowRight />
-                </a>
-              })}
-            </nav>
-            <div className="cloud-product-panels">
-              {productViews.map(view => <Reveal key={view.id} id={`product-${view.id}`} className="cloud-product-stage">
-                <div className="cloud-product-copy"><h3>{view.title}</h3><p>{view.copy}</p></div>
-                <ProductModule view={view} />
-              </Reveal>)}
-            </div>
-          </div>
+        <section id="product" className="alpine-feature-grid cloud-container" aria-label="Explore Masterdeck features">
+          <div className="alpine-feature-heading"><h2>More perspective. <br/>Less piecing things together.</h2><p>One home for the details that matter to your portfolio.</p></div>
+          {[
+            { title: 'Your portfolio, together', text: 'Bring your accounts into one clear picture of what you own.', href: '/features/portfolio-tracking', icon: Globe2, image: 'portfolio-focus.png', tone: 'mint' },
+            { title: 'See what drove the return', text: 'Explore performance, compare periods and follow your progress.', href: '/features/performance', icon: TrendingUp, image: 'performance-focus.png', tone: 'sky' },
+            { title: 'Keep the tax detail close', text: 'Review Australian tax records with the transactions behind them.', href: '/features/australian-tax', icon: FileCheck2, image: 'tax-focus.png', tone: 'sky' },
+            { title: 'A benchmark for your progress', text: 'Put your portfolio performance in context with a custom benchmark.', href: '/features/performance', icon: Gauge, image: 'benchmark.png', tone: 'mint' },
+          ].map(({title,text,href,icon: Icon,image,tone}) => <a href={href} className={`alpine-feature-card ${tone}`} key={title}><div className="alpine-feature-art"><span><Icon size={22}/></span><img src={`/marketing/${image}`} alt="" loading="lazy"/></div><h3>{title}</h3><p>{text}</p><ArrowRight size={17}/></a>)}
         </section>
-
+        <section className="alpine-mid-cta cloud-container"><h2>A clearer view starts here.</h2><p>Bring your records. Find your perspective.</p><button className="cloud-button cloud-button-light" onClick={() => openAuthentication('signup')}>{signupLabel}</button></section>
         <Reveal className="cloud-principles">
           <div className="cloud-container cloud-principles-layout">
             <div className="cloud-principles-intro">
@@ -603,41 +541,5 @@ function Reveal({ children, className = '', id }: { children: ReactNode; classNa
     >
       {children}
     </motion.section>
-  )
-}
-
-function ProductModule({ view }: { view: typeof productViews[number] }) {
-  const holdings = demoBundle.holdings.slice(0, 5)
-  const taxRows = demoBundle.transactions.filter((transaction) => transaction.type === 'SELL' || transaction.type === 'DIVIDEND').slice(0, 4)
-  return (
-    <div className="cloud-module" role="img" aria-label={view.label + ' performance report preview'}>
-      <div className="cloud-module-head"><h4>{view.label}</h4></div>
-      {view.id === 'portfolio' && (
-        <>
-          <div className="cloud-module-summary">
-            <div><span>Portfolio value</span><strong>{money(previewSummary.total, 'AUD', 0)}</strong><em className="positive">{percent(previewSummary.returnPct, 1)}</em></div>
-            <div><span>Capital gain</span><strong>{money(previewSummary.unrealised, 'AUD', 0)}</strong><em className="positive">tracked</em></div>
-            <div><span>Income</span><strong>{money(previewSummary.income, 'AUD', 0)}</strong><em>recorded</em></div>
-          </div>
-          <div className="cloud-module-ledger">
-            {holdings.map((holding) => <div key={holding.symbol}><HoldingLogo symbol={holding.symbol} assetClass={holding.asset_class} size={28} /><span><strong>{holding.symbol}</strong><small>{holding.name}</small></span><b>{money(holding.value_aud, 'AUD', 0)}</b><em className="positive">{percent(holding.return_pct, 1)}</em></div>)}
-          </div>
-        </>
-      )}
-      {view.id === 'performance' && (
-        <div className="cloud-module-performance">
-          <div className="cloud-module-performance-chart"><span /><span /><span /><span /><span /><span /><span /><span /></div>
-          <div className="cloud-module-performance-legend"><span><i className="green-dot" />Portfolio return <b>{percent(previewSummary.returnPct, 1)}</b></span><span><i className="soft-dot" />Benchmark <b>+26.4%</b></span></div>
-          <div className="cloud-module-contribution">{holdings.slice(0, 4).map((holding) => <div key={holding.symbol}><HoldingLogo symbol={holding.symbol} assetClass={holding.asset_class} size={26} /><span>{holding.symbol}</span><div><i style={{ width: Math.min(100, Math.max(18, holding.return_pct)) + '%' }} /></div><b>{percent(holding.return_pct, 1)}</b></div>)}</div>
-        </div>
-      )}
-      {view.id === 'tax' && (
-        <div className="cloud-module-tax">
-          <div className="cloud-module-tax-head"><span>Activity record</span><span>Status</span><span>Amount</span></div>
-          {taxRows.map((transaction) => <div key={transaction.provider_external_id}><span><strong>{transaction.symbol}</strong><small>{transaction.type === 'SELL' ? 'Disposal matched to parcels' : 'Income record'}</small></span><em>{transaction.type === 'SELL' ? 'Matched' : 'Recorded'}</em><b>{money(Math.abs(transaction.amount * (transaction.fx_rate || 1)), 'AUD', 0)}</b></div>)}
-          <div className="cloud-module-tax-footer"><FileCheck2 /> Parcel history stays attached to each report.</div>
-        </div>
-      )}
-    </div>
   )
 }
