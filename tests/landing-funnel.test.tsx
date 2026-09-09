@@ -51,7 +51,7 @@ describe('Masterdeck public conversion funnel', () => {
     render(<Landing onDemo={vi.fn()} signedIn onOpenApp={vi.fn()} />)
     expect(screen.getByRole('img', { name: /Masterdeck portfolio dashboard/ })).toHaveAttribute('src', '/marketing/masterdeck-portfolio-hero.png')
     expect(screen.getByText('Actual Masterdeck app · Demo portfolio')).toBeInTheDocument()
-    expect(screen.getByText(/named broker guides \+ any CSV/)).toBeInTheDocument()
+    expect(screen.getByText('named broker guides', { exact: true })).toBeInTheDocument()
     expect(screen.queryByText('IBKR')).not.toBeInTheDocument()
   })
 

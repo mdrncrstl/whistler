@@ -5797,6 +5797,18 @@ body { font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-s
   .cloud-connections h2 { font-size: 43px; }
   .cloud-connections-proof strong { font-size: 48px; }
 }
+
+/* Coverage is a three-point proof block: one row at desktop widths, one
+   column on narrow screens, with no orphaned grid cell. */
+.cloud-stat-table { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.cloud-stat-row { min-height: 166px; padding: 26px; }
+.cloud-stat-row strong { font-size: clamp(38px, 3.6vw, 52px); }
+.cloud-stat-row span { max-width: 18ch; }
+@media (max-width: 640px) {
+  .cloud-stat-table { grid-template-columns: 1fr; }
+  .cloud-stat-row { min-height: 108px; padding: 20px; }
+  .cloud-stat-row strong { font-size: 43px; }
+}
 @media (max-width: 520px) {
   .cloud-product-rail { gap: 6px; }
   .cloud-product-rail button { min-height: 80px; padding: 14px 10px; border-radius: 10px; }

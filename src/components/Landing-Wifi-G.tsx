@@ -5,7 +5,7 @@ import { marketingGroups, marketingPages } from '../lib/marketingPages'
 import { config } from '../lib/config'
 import { GoogleLogin } from '@react-oauth/google'
 import {
-  ArrowLeft, ArrowRight, BarChart3, Calculator, Check, ChevronDown, Database, Eye, EyeOff,
+  ArrowLeft, ArrowRight, BarChart3, Check, ChevronDown, Database, Eye, EyeOff,
   FileCheck2, FileSpreadsheet, Gauge, Globe2, Link2, LockKeyhole, Mail, Menu,
   Network, ShieldCheck, TrendingUp, X,
 } from 'lucide-react'
@@ -27,11 +27,9 @@ const howItWorks = [
 ] as const
 
 const proofStats = [
-  { value: 'Global', label: 'portfolio tracking', icon: Globe2 },
   { value: '1–10', label: 'portfolios per workspace', icon: BarChart3 },
-  { value: `${brokers.filter((broker) => broker.id !== 'other').length}+`, label: 'named broker guides + any CSV', icon: Link2 },
-  { value: '3', label: 'Australian CGT methods', icon: Calculator },
-  { value: 'CSV + PDF', label: 'supported statement imports', icon: FileSpreadsheet },
+  { value: `${brokers.filter((broker) => broker.id !== 'other').length}`, label: 'named broker guides', icon: Link2 },
+  { value: 'CSV + PDF', label: 'imports from supported exports', icon: FileSpreadsheet },
 ]
 
 const productViews = [
@@ -316,8 +314,8 @@ export function Landing({ onDemo, signedIn = false, onOpenApp, page }: LandingPr
 
         <Reveal className="cloud-region cloud-container">
           <div className="cloud-region-intro">
-            <h2>Every account.<br />One record.</h2>
-            <p>The detail stays connected, from the first imported statement to the return you are looking at now.</p>
+            <h2>Every portfolio.<br />One clear record.</h2>
+            <p>Start with one of our named broker guides, or bring a compatible CSV or PDF from another broker. Every holding and trade stays connected to the return you are looking at now.</p>
           </div>
           <div className="cloud-stat-table" aria-label="Masterdeck coverage">
             {proofStats.map(({ value, label, icon: Icon }) => (
