@@ -267,7 +267,7 @@ export function Landing({ onDemo, signedIn = false, onOpenApp, page }: LandingPr
         </section>
 
         <section className="alpine-assurance" aria-label="Trial and security"><span><ShieldCheck size={15}/>Read-only by design</span><span><Check size={15}/>14 days free</span><span><LockKeyhole size={15}/>No credit card required</span></section>
-        <section className="alpine-showcase cloud-container"><div><h2>A little clarity goes a long way.</h2><p>Your shares, ETFs, income and tax records, organised in one place.</p></div><figure><img src="/marketing/masterdeck-portfolio-hero.png" width="1366" height="768" alt="Actual Masterdeck portfolio with demo holdings, performance chart and returns" loading="lazy"/><figcaption>Actual Masterdeck app · Demo portfolio</figcaption></figure></section>
+        <Reveal className="alpine-showcase cloud-container"><div><h2>A little clarity goes a long way.</h2><p>Your shares, ETFs, income and tax records, organised in one place.</p></div><figure><img src="/marketing/masterdeck-portfolio-hero.png" width="1366" height="768" alt="Actual Masterdeck portfolio with demo holdings, performance chart and returns" loading="lazy"/><figcaption>Actual Masterdeck app · Demo portfolio</figcaption></figure></Reveal>
         <Reveal className="cloud-region cloud-container">
           <div className="cloud-region-intro">
             <h2>Every portfolio.<br />One clear record.</h2>
@@ -284,7 +284,7 @@ export function Landing({ onDemo, signedIn = false, onOpenApp, page }: LandingPr
           </div>
         </Reveal>
 
-        <section id="product" className="alpine-feature-grid cloud-container" aria-label="Explore Masterdeck features">
+        <Reveal id="product" className="alpine-feature-grid cloud-container" aria-label="Explore Masterdeck features">
           <div className="alpine-feature-heading"><h2>More perspective. <br/>Less piecing things together.</h2><p>One home for the details that matter to your portfolio.</p></div>
           {[
             { title: 'Your portfolio, together', text: 'Bring your accounts into one clear picture of what you own.', href: '/features/portfolio-tracking', icon: Globe2, image: 'portfolio-focus.png', tone: 'mint' },
@@ -292,7 +292,7 @@ export function Landing({ onDemo, signedIn = false, onOpenApp, page }: LandingPr
             { title: 'Keep the tax detail close', text: 'Review Australian tax records with the transactions behind them.', href: '/features/australian-tax', icon: FileCheck2, image: 'tax-focus.png', tone: 'sky' },
             { title: 'A benchmark for your progress', text: 'Put your portfolio performance in context with a custom benchmark.', href: '/features/performance', icon: Gauge, image: 'benchmark.png', tone: 'mint' },
           ].map(({title,text,href,icon: Icon,image,tone}) => <a href={href} className={`alpine-feature-card ${tone}`} key={title}><div className="alpine-feature-art"><span><Icon size={22}/></span><img src={`/marketing/${image}`} alt="" loading="lazy"/></div><h3>{title}</h3><p>{text}</p><ArrowRight size={17}/></a>)}
-        </section>
+        </Reveal>
         <section className="alpine-mid-cta cloud-container"><h2>A clearer view starts here.</h2><p>Bring your records. Find your perspective.</p><button className="cloud-button cloud-button-light" onClick={() => openAuthentication('signup')}>{signupLabel}</button></section>
         <Reveal className="cloud-principles">
           <div className="cloud-container cloud-principles-layout">
@@ -525,7 +525,7 @@ function NativeGoogleSignIn({ busy, onCredential, onError }: { busy: boolean; on
   </div>
 }
 
-function Reveal({ children, className = '', id }: { children: ReactNode; className?: string; id?: string }) {
+function Reveal({ children, className = '', id, 'aria-label': ariaLabel }: { children: ReactNode; className?: string; id?: string; 'aria-label'?: string }) {
   const reduceMotion = useReducedMotion()
   const revealRef = useRef<HTMLElement>(null)
   const isInView = useInView(revealRef, { once: true, amount: 0.12, margin: '0px 0px -8% 0px' })
@@ -533,10 +533,11 @@ function Reveal({ children, className = '', id }: { children: ReactNode; classNa
     <motion.section
       ref={revealRef}
       id={id}
+      aria-label={ariaLabel}
       className={className}
-      initial={reduceMotion ? false : { opacity: 0, y: 18 }}
-      animate={reduceMotion || isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 18 }}
-      transition={{ duration: reduceMotion ? 0 : 0.6, ease: [0.16, 1, 0.3, 1] }}
+      initial={reduceMotion ? false : { opacity: 0, y: 10 }}
+      animate={reduceMotion || isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
+      transition={{ duration: reduceMotion ? 0 : 0.48, ease: [0.16, 1, 0.3, 1] }}
     >
       {children}
     </motion.section>
