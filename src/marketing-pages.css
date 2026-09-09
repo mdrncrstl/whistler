@@ -2,16 +2,14 @@
 .md-site-menu, .md-menu-group { display: flex; align-items: center; gap: 28px; }
 .md-menu-group > button { display: flex; align-items: center; gap: 6px; padding: 16px 0; border: 0; background: none; color: inherit; font: inherit; font-weight: 600; cursor: pointer; }
 .md-pricing-link { text-decoration: none; color: inherit; }
-.md-menu-panel { position: absolute; top: calc(100% - 1px); right: 0; width: min(900px,calc(100vw - 64px)); display: grid; grid-template-columns: 220px minmax(0,1fr); border: 1px solid #d7e4dd; border-radius: 16px; background: #fcfdfb; color: #102c22; box-shadow: 0 20px 50px rgb(0 30 20 / 14%); overflow: hidden; animation: menu-open 160ms ease-out; }
-.md-menu-intro { padding: 28px; background: #edf4ee; }
-.md-menu-intro span { display: block; font-size: 11px; color: #58776a; margin-bottom: 18px; }
-.md-menu-intro strong { font-size: 25px; line-height: 1.15; letter-spacing: -.04em; }
-.md-menu-links { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 4px; padding: 14px; }
-.md-menu-links a { display: flex; align-items: start; gap: 10px; padding: 15px; border-radius: 8px; color: #102c22 !important; text-decoration: none; }
+.md-menu-panel { position: absolute; top: calc(100% + 8px); right: 0; width: min(640px,calc(100vw - 40px)); padding: 8px; border: 1px solid #d7e4dd; border-radius: 14px; background: #fcfdfb; color: #102c22; box-shadow: 0 14px 34px rgb(0 30 20 / 12%); overflow: hidden; transform-origin: top right; animation: menu-open 160ms cubic-bezier(.16,1,.3,1); }
+.md-menu-links { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 2px; }
+.md-menu-links a { min-width: 0; display: flex; align-items: start; gap: 10px; padding: 12px; border-radius: 9px; color: #102c22 !important; text-decoration: none; transition: background-color 140ms ease, color 140ms ease; }
 .md-menu-links a:hover { background: #eaf4ee; }
 .md-menu-links a > span { flex: 1; min-width: 0; }
-.md-menu-links strong { display: block; font-size: 14px; margin-bottom: 6px; }
-.md-menu-links small { display: block; font-size: 11px; color: #587366; line-height: 1.5; font-weight: 400; }
+.md-menu-links strong { display: block; font-size: 13px; line-height: 1.25; margin-bottom: 4px; }
+.md-menu-links small { display: block; font-size: 10px; color: #587366; line-height: 1.4; font-weight: 400; }
+.md-menu-links a > svg { width: 14px; height: 14px; margin-top: 1px; color: #668276; flex: 0 0 auto; }
 .md-site-menu :focus-visible { outline: 2px solid #10a779; outline-offset: 4px; }
 .md-public-content { color: var(--cloud-ink); background: #fbfcf9; padding-top: 84px; }
 .md-public-hero { padding-block: 90px 68px; }
@@ -59,7 +57,6 @@
   .md-site-menu.is-mobile .md-menu-group { display: flex; flex-direction: column; align-items: stretch; gap: 0; }
   .md-site-menu.is-mobile .md-menu-group > button, .md-site-menu.is-mobile .md-pricing-link { display: flex; justify-content: space-between; width: 100%; padding: 16px 0; font-size: 16px; border-bottom: 1px solid #d8e5dc; }
   .md-site-menu.is-mobile .md-menu-panel { position: static; width: 100%; display: block; border: 0; box-shadow: none; }
-  .md-site-menu.is-mobile .md-menu-intro { display: none; }
   .md-site-menu.is-mobile .md-menu-links { grid-template-columns: 1fr; padding: 4px; }
   .cloud-mobile-nav { max-height: calc(100dvh - 74px); overflow-y: auto; }
   .md-public-hero { padding-block: 48px; }
