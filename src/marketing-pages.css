@@ -1,14 +1,15 @@
 .cloud-nav { position: relative; }
 .md-site-menu, .md-menu-group { display: flex; align-items: center; gap: 28px; }
+.md-menu-group { position: relative; }
 .md-menu-group > button { display: flex; align-items: center; gap: 6px; padding: 16px 0; border: 0; background: none; color: inherit; font: inherit; font-weight: 600; cursor: pointer; }
 .md-pricing-link { text-decoration: none; color: inherit; }
-.md-menu-panel { position: absolute; top: calc(100% + 8px); right: 0; width: min(640px,calc(100vw - 40px)); padding: 8px; border: 1px solid #d7e4dd; border-radius: 14px; background: #fcfdfb; color: #102c22; box-shadow: 0 14px 34px rgb(0 30 20 / 12%); overflow: hidden; transform-origin: top right; animation: menu-open 160ms cubic-bezier(.16,1,.3,1); }
-.md-menu-links { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 2px; }
-.md-menu-links a { min-width: 0; display: flex; align-items: start; gap: 10px; padding: 12px; border-radius: 9px; color: #102c22 !important; text-decoration: none; transition: background-color 140ms ease, color 140ms ease; }
+.md-menu-panel { position: absolute; z-index: 90; top: calc(100% + 10px); left: 50%; width: min(420px,calc(100vw - 32px)); padding: 8px; border: 1px solid #d7e4dd; border-radius: 14px; background: #fcfdfb; color: #102c22; box-shadow: 0 18px 42px rgb(0 30 20 / 14%), 0 2px 8px rgb(0 30 20 / 5%); overflow: hidden; transform-origin: top center; animation: menu-open 160ms cubic-bezier(.16,1,.3,1); }
+.md-menu-links { display: grid; grid-template-columns: 1fr; gap: 2px; }
+.md-menu-links a { min-width: 0; display: flex; align-items: start; gap: 10px; padding: 11px 12px; border-radius: 9px; color: #102c22 !important; text-decoration: none; transition: background-color 140ms ease, color 140ms ease; }
 .md-menu-links a:hover { background: #eaf4ee; }
 .md-menu-links a > span { flex: 1; min-width: 0; }
 .md-menu-links strong { display: block; font-size: 13px; line-height: 1.25; margin-bottom: 4px; }
-.md-menu-links small { display: block; font-size: 10px; color: #587366; line-height: 1.4; font-weight: 400; }
+.md-menu-links small { display: block; max-width: 42ch; font-size: 10px; color: #587366; line-height: 1.4; font-weight: 400; }
 .md-menu-links a > svg { width: 14px; height: 14px; margin-top: 1px; color: #668276; flex: 0 0 auto; }
 .md-site-menu :focus-visible { outline: 2px solid #10a779; outline-offset: 4px; }
 .md-public-content { color: var(--cloud-ink); background: #fbfcf9; padding-top: 84px; }
@@ -50,13 +51,14 @@
 .md-public-plans ul { list-style: none; margin: 12px 0 0; padding: 0; }
 .md-public-plans li { display: flex; gap: 8px; align-items: start; margin: 15px 0; font-size: 13px; }
 .md-price-note { font-size: 12px !important; margin-top: 28px; }
-@keyframes menu-open { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes menu-open { from { opacity: 0; transform: translate(-50%,-5px); } to { opacity: 1; transform: translate(-50%,0); } }
 @media (max-width: 1100px) { .md-site-menu,.md-menu-group { gap: 16px; } .md-menu-group > button { font-size: 12px; } .md-public-plans article { padding: 20px; } }
 @media (max-width: 860px) {
   .md-site-menu.is-mobile { display: grid; gap: 0; width: 100%; }
   .md-site-menu.is-mobile .md-menu-group { display: flex; flex-direction: column; align-items: stretch; gap: 0; }
   .md-site-menu.is-mobile .md-menu-group > button, .md-site-menu.is-mobile .md-pricing-link { display: flex; justify-content: space-between; width: 100%; padding: 16px 0; font-size: 16px; border-bottom: 1px solid #d8e5dc; }
-  .md-site-menu.is-mobile .md-menu-panel { position: static; width: 100%; display: block; border: 0; box-shadow: none; }
+  .md-site-menu.is-mobile .md-menu-group { position: static; }
+  .md-site-menu.is-mobile .md-menu-panel { position: static; width: 100%; display: block; border: 0; box-shadow: none; transform: none; animation: none; }
   .md-site-menu.is-mobile .md-menu-links { grid-template-columns: 1fr; padding: 4px; }
   .cloud-mobile-nav { max-height: calc(100dvh - 74px); overflow-y: auto; }
   .md-public-hero { padding-block: 48px; }

@@ -1,0 +1,29 @@
+# Masterdeck
+
+> Masterdeck is a web app for tracking investment portfolios, understanding performance and organising Australian CGT records.
+
+## Product
+
+- Portfolio tracking for shares, ETFs and other supported holdings across global markets.
+- Performance reporting separates portfolio value, capital gain, recorded income and currency effects.
+- Australian tax records include disposal and parcel history, taxable income organisation and CGT reporting support.
+- Bring records through named broker guides, compatible CSV exports and supported PDF statements. Direct read-only sync is optional where available.
+- Masterdeck is read-only portfolio software. It does not hold assets, move money, place trades or provide personal investment or tax advice.
+- The public demo uses sample data. A 14-day free trial is available without a credit card or automatic charge.
+
+## Public pages
+
+- [Portfolio tracking](https://masterdeck.app/features/portfolio-tracking): holdings, cash and transaction records in one view.
+- [Performance and benchmarks](https://masterdeck.app/features/performance): understand what contributed to a return.
+- [Dividends and income](https://masterdeck.app/features/income): review recorded payments and distributions.
+- [Australian tax records](https://masterdeck.app/features/australian-tax): keep trades, parcels and tax preparation together.
+- [Connections and imports](https://masterdeck.app/features/integrations): choose a supported import path and inspect records before saving.
+- [Portfolio assistant](https://masterdeck.app/features/portfolio-assistant): rules-based summaries calculated from records loaded in the workspace.
+- [Pricing](https://masterdeck.app/pricing): current plans and Australian dollar pricing.
+- [Help centre](https://masterdeck.app/company/help): practical setup and reconciliation guidance.
+
+## Canonical sources
+
+- Website: https://masterdeck.app/
+- Sitemap: https://masterdeck.app/sitemap.xml
+- Contact: https://masterdeck.app/company/contact

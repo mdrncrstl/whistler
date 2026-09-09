@@ -22,11 +22,11 @@ export function MarketingNavigation({ mobile = false, onNavigate }: { mobile?: b
     if (event.key === 'Escape') { setOpen(null); root.current?.querySelector<HTMLButtonElement>(`button[data-group="${open}"]`)?.focus() }
   }} onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget)) setOpen(null) }}
     onPointerLeave={hoverClose} onPointerEnter={() => window.clearTimeout(closeTimer.current)}>
-    {marketingGroups.map(group => <div className="md-menu-group" key={group} onPointerEnter={() => hoverOpen(group)}>
-      {group === 'Company' && <a className="md-pricing-link" href="/pricing" onClick={onNavigate}>Pricing</a>}
-      <button data-group={group} aria-expanded={open === group} aria-controls={`${mobile ? 'mobile' : 'desktop'}-${group.replaceAll(' ','-')}`} onClick={() => setOpen(open === group ? null : group)}>{group}<ChevronDown size={14}/></button>
+      {marketingGroups.map(group => <div className="md-menu-group" key={group} onPointerEnter={() => hoverOpen(group)}>
+        {group === 'Company' && <a className="md-pricing-link" href="/pricing" onClick={onNavigate}>Pricing</a>}
+        <button data-group={group} aria-haspopup="menu" aria-expanded={open === group} aria-controls={`${mobile ? 'mobile' : 'desktop'}-${group.replaceAll(' ','-')}`} onClick={() => setOpen(open === group ? null : group)}>{group}<ChevronDown size={14}/></button>
       {open === group && <div className="md-menu-panel" id={`${mobile ? 'mobile' : 'desktop'}-${group.replaceAll(' ','-')}`}>
-        <div className="md-menu-links">{marketingPages.filter(page => page.group === group).map(page => <a key={page.path} href={page.path} onClick={() => { setOpen(null); onNavigate?.() }}><span><strong>{page.label}</strong><small>{page.description}</small></span><ArrowUpRight size={16}/></a>)}</div>
+        <div className="md-menu-links" role="menu">{marketingPages.filter(page => page.group === group).map(page => <a key={page.path} href={page.path} onClick={() => { setOpen(null); onNavigate?.() }}><span><strong>{page.label}</strong><small>{page.description}</small></span><ArrowUpRight size={16}/></a>)}</div>
       </div>}
     </div>)}
   </div>

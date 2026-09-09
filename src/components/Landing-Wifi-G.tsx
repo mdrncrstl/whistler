@@ -14,6 +14,7 @@ import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'rea
 import { annualSavingsPercent, billingPlans, formatAud } from '../lib/billing'
 import { brokers } from '../lib/brokers'
 import { authClient } from '../lib/supabase'
+import { applySeo } from '../lib/seo'
 import { Brand, MotionDialogSurface } from './ui-Wifi-G'
 
 const howItWorks = [
@@ -35,7 +36,7 @@ const faqs = [
   ['Which accounts can I connect?', 'Bring records from named broker formats, any broker that exports CSV, and supported PDF statements. Where a direct read-only sync is available, it is optional; every import is reviewed before it is saved.'],
   ['Does it work for global portfolios?', 'Track performance, income, currency and allocation for supported global holdings, with dedicated Australian CGT records.'],
   ['Can I try it before paying?', 'Yes. Start a 14-day free trial without a credit card, or explore the demo without creating an account. The trial does not automatically charge you.'],
-]
+] as const
 
 const principleRows = [
   ['Separate the return', 'Capital growth, income and currency effects stay visible as distinct parts of the answer.', TrendingUp],
@@ -47,11 +48,10 @@ type LandingProps = { onDemo: () => void; signedIn?: boolean; onOpenApp?: () => 
 
 export function Landing({ onDemo, signedIn = false, onOpenApp, page }: LandingProps) {
   useEffect(() => {
-    document.title = page ? `${page === 'pricing' ? 'Pricing' : page.label} | Masterdeck` : 'MASTERDECK'
-    const canonical = document.querySelector<HTMLLinkElement>('link[rel="canonical"]')
-    if (canonical) canonical.href = `https://masterdeck.app${page ? page === 'pricing' ? '/pricing' : page.path : '/'}`
-    const description = document.querySelector<HTMLMetaElement>('meta[name="description"]')
-    if (description) description.content = page ? page === 'pricing' ? 'Compare Masterdeck portfolio plans in AUD. Start a 14-day trial without a credit card.' : page.description : 'Track your portfolio, recorded income and Australian tax records in Masterdeck.'
+    const path = page ? page === 'pricing' ? '/pricing' : page.path : '/'
+    const title = page ? page === 'pricing' ? 'Pricing | Masterdeck' : `${page.title} | Masterdeck` : 'Masterdeck | Portfolio tracking with Australian CGT depth'
+    const description = page ? page === 'pricing' ? 'Compare Masterdeck portfolio plans in AUD. Start a 14-day free trial without a credit card or automatic charge.' : page.description : 'Track shares, ETFs, income, performance and Australian CGT records across your portfolios in Masterdeck.'
+    applySeo({ title, description, path, label: page === 'pricing' ? 'Pricing' : page?.label, group: page === 'pricing' ? undefined : page?.group, faqs: page ? undefined : faqs })
   }, [page])
   const reduceMotion = useReducedMotion()
   const [error, setError] = useState('')

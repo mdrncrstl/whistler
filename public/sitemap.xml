@@ -1,21 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://masterdeck.app/</loc>
-    <lastmod>2026-08-28</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>1.0</priority>
-  </url>
-  <url><loc>https://masterdeck.app/features/portfolio-tracking</loc></url>
-  <url><loc>https://masterdeck.app/features/performance</loc></url>
-  <url><loc>https://masterdeck.app/features/income</loc></url>
-  <url><loc>https://masterdeck.app/features/australian-tax</loc></url>
-  <url><loc>https://masterdeck.app/features/integrations</loc></url>
-  <url><loc>https://masterdeck.app/features/portfolio-assistant</loc></url>
-  <url><loc>https://masterdeck.app/for/share-investors</loc></url>
-  <url><loc>https://masterdeck.app/for/etf-investors</loc></url>
-  <url><loc>https://masterdeck.app/for/multiple-portfolios</loc></url>
-  <url><loc>https://masterdeck.app/company/about</loc></url>
-  <url><loc>https://masterdeck.app/company/help</loc></url>
-  <url><loc>https://masterdeck.app/pricing</loc></url>
+  <url><loc>https://masterdeck.app/</loc><lastmod>2026-09-10</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://masterdeck.app/features/portfolio-tracking</loc><lastmod>2026-09-10</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://masterdeck.app/features/performance</loc><lastmod>2026-09-10</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://masterdeck.app/features/income</loc><lastmod>2026-09-10</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://masterdeck.app/features/australian-tax</loc><lastmod>2026-09-10</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://masterdeck.app/features/integrations</loc><lastmod>2026-09-10</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://masterdeck.app/features/portfolio-assistant</loc><lastmod>2026-09-10</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://masterdeck.app/for/share-investors</loc><lastmod>2026-09-10</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://masterdeck.app/for/etf-investors</loc><lastmod>2026-09-10</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://masterdeck.app/for/multiple-portfolios</loc><lastmod>2026-09-10</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://masterdeck.app/company/about</loc><lastmod>2026-09-10</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://masterdeck.app/company/contact</loc><lastmod>2026-09-10</lastmod><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://masterdeck.app/company/help</loc><lastmod>2026-09-10</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://masterdeck.app/pricing</loc><lastmod>2026-09-10</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>
 </urlset>
