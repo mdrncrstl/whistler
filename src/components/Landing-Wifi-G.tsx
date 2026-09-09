@@ -9,7 +9,7 @@ import {
   FileCheck2, FileSpreadsheet, Gauge, Globe2, Link2, LockKeyhole, Mail, Menu,
   Network, ShieldCheck, TrendingUp, X,
 } from 'lucide-react'
-import { AnimatePresence, motion, useInView, useMotionValueEvent, useReducedMotion, useScroll } from 'framer-motion'
+import { AnimatePresence, motion, useMotionValueEvent, useReducedMotion, useScroll } from 'framer-motion'
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react'
 import { annualSavingsPercent, billingPlans, formatAud } from '../lib/billing'
 import { brokers } from '../lib/brokers'
@@ -17,10 +17,12 @@ import { authClient } from '../lib/supabase'
 import { Brand, MotionDialogSurface } from './ui-Wifi-G'
 
 const howItWorks = [
-  ['Bring in your records', 'Bring one or several portfolios through a read-only connection, a CSV export, or a supported statement. Nothing you connect can place a trade or move money.'],
-  ['Check what came in', 'The import preview flags unmapped columns, ambiguous numbers, duplicate rows and missing exchange rates before anything is saved. Reconcile the totals against your broker statement.'],
-  ['Read the reports', 'Performance, income, diversification and Australian tax reports are all built from those records, and every figure keeps a path back to the transaction behind it.'],
+  { title: 'Bring in your records', copy: 'Choose a supported read-only source, upload a CSV or bring a compatible statement. Your broker keeps custody of your money and assets.', icon: Link2 },
+  { title: 'Review the import', copy: 'Check holdings, transactions and any flagged records against your source before they become part of the portfolio history.', icon: FileCheck2 },
+  { title: 'Read the reports', copy: 'See performance, income and Australian tax records with a clear path back to the transaction behind each result.', icon: BarChart3 },
 ] as const
+
+const integrationBrokers = brokers.filter((broker) => broker.id !== 'ibkr' && broker.id !== 'other').slice(0, 10)
 
 const proofStats = [
   { value: '1–10', label: 'portfolios per workspace', icon: BarChart3 },
@@ -267,7 +269,15 @@ export function Landing({ onDemo, signedIn = false, onOpenApp, page }: LandingPr
         </section>
 
         <section className="alpine-assurance" aria-label="Trial and security"><span><ShieldCheck size={15}/>Read-only by design</span><span><Check size={15}/>14 days free</span><span><LockKeyhole size={15}/>No credit card required</span></section>
-        <Reveal className="alpine-showcase cloud-container"><div><h2>A little clarity goes a long way.</h2><p>Your shares, ETFs, income and tax records, organised in one place.</p></div><figure><img src="/marketing/masterdeck-portfolio-hero.png" width="1366" height="768" alt="Actual Masterdeck portfolio with demo holdings, performance chart and returns" loading="lazy"/><figcaption>Actual Masterdeck app · Demo portfolio</figcaption></figure></Reveal>
+        <Reveal className="alpine-showcase cloud-container">
+          <div className="alpine-showcase-copy">
+            <span className="section-label">PORTFOLIO TRACKING</span>
+            <h2>Every account. Every holding. One working view.</h2>
+            <p>Bring shares, ETFs, cash and transaction records together so the headline number always has a useful detail view behind it.</p>
+            <a className="alpine-text-link" href="/features/portfolio-tracking">Explore portfolio tracking <ArrowRight size={16}/></a>
+          </div>
+          <figure><img src="/marketing/masterdeck-portfolio-hero.png" width="1366" height="768" alt="Actual Masterdeck portfolio with demo holdings, performance chart and returns" loading="lazy"/><figcaption>Actual Masterdeck app · Demo portfolio</figcaption></figure>
+        </Reveal>
         <Reveal className="cloud-region cloud-container">
           <div className="cloud-region-intro">
             <h2>Every portfolio.<br />One clear record.</h2>
@@ -293,7 +303,28 @@ export function Landing({ onDemo, signedIn = false, onOpenApp, page }: LandingPr
             { title: 'A benchmark for your progress', text: 'Put your portfolio performance in context with a custom benchmark.', href: '/features/performance', icon: Gauge, image: 'benchmark.png', tone: 'mint' },
           ].map(({title,text,href,icon: Icon,image,tone}) => <a href={href} className={`alpine-feature-card ${tone}`} key={title}><div className="alpine-feature-art"><span><Icon size={22}/></span><img src={`/marketing/${image}`} alt="" loading="lazy"/></div><h3>{title}</h3><p>{text}</p><ArrowRight size={17}/></a>)}
         </Reveal>
-        <section className="alpine-mid-cta cloud-container"><h2>A clearer view starts here.</h2><p>Bring your records. Find your perspective.</p><button className="cloud-button cloud-button-light" onClick={() => openAuthentication('signup')}>{signupLabel}</button></section>
+
+        <Reveal className="alpine-proof-section cloud-container">
+          <div className="alpine-proof-copy">
+            <span className="section-label">PERFORMANCE</span>
+            <h2>Understand what is really driving the result.</h2>
+            <p>Separate capital growth, income and currency effects, then compare the result with a benchmark without losing the records beneath it.</p>
+            <a className="alpine-text-link" href="/features/performance">Explore performance <ArrowRight size={16}/></a>
+          </div>
+          <figure><img src="/marketing/performance-focus.png" width="1366" height="768" alt="Masterdeck performance view showing return components and a benchmark" loading="lazy"/></figure>
+        </Reveal>
+
+        <Reveal className="alpine-proof-section alpine-proof-section-reverse cloud-container">
+          <figure><img src="/marketing/tax-focus.png" width="1366" height="768" alt="Masterdeck Australian tax view with connected investment records" loading="lazy"/></figure>
+          <div className="alpine-proof-copy">
+            <span className="section-label">AUSTRALIAN TAX</span>
+            <h2>Keep the tax detail close to the trades.</h2>
+            <p>Review disposals, parcel history and recorded income in the same workspace as the portfolio that produced them.</p>
+            <a className="alpine-text-link" href="/features/australian-tax">Explore Australian tax records <ArrowRight size={16}/></a>
+          </div>
+        </Reveal>
+
+        <section className="alpine-mid-cta"><div className="alpine-cta-inner"><h2>A clearer view starts here.</h2><p>Bring your records. Find your perspective.</p><button className="cloud-button cloud-button-light" onClick={() => openAuthentication('signup')}>{signupLabel}</button></div></section>
         <Reveal className="cloud-principles">
           <div className="cloud-container cloud-principles-layout">
             <div className="cloud-principles-intro">
@@ -315,14 +346,15 @@ export function Landing({ onDemo, signedIn = false, onOpenApp, page }: LandingPr
 
         <Reveal className="cloud-steps cloud-container" id="how-it-works">
           <div className="cloud-section-intro cloud-steps-intro">
-            <span className="section-label">HOW IT WORKS</span>
-            <h2>Three steps to a portfolio you can trust.</h2>
-            <p>No spreadsheet rebuild, and no number that appears without a record behind it.</p>
+            <span className="section-label">GET STARTED IN JUST MINUTES</span>
+            <h2>How it works</h2>
+            <p>Start with the records you already have, then build a clearer view of the portfolio behind them.</p>
           </div>
           <ol className="cloud-steps-list">
-            {howItWorks.map(([title, copy], index) => (
+            {howItWorks.map(({ title, copy, icon: Icon }, index) => (
               <li key={title}>
-                <span className="cloud-step-index">{index + 1}</span>
+                <div className="alpine-step-icon"><Icon size={21}/></div>
+                <span className="cloud-step-label">{`STEP ${index + 1}`}</span>
                 <h3>{title}</h3>
                 <p>{copy}</p>
               </li>
@@ -330,25 +362,21 @@ export function Landing({ onDemo, signedIn = false, onOpenApp, page }: LandingPr
           </ol>
         </Reveal>
 
-        <Reveal className="cloud-connections cloud-container" id="connections">
-          <div className="cloud-connections-head">
-            <div>
-              <h2 aria-label="Bring every portfolio into one history.">Bring every portfolio<br /><em>into one history.</em></h2>
-            </div>
-            <div className="cloud-connections-proof"><strong>1–10</strong><span>portfolios in one workspace</span></div>
+        <Reveal className="alpine-integrations cloud-container" id="connections">
+          <div className="alpine-integrations-copy">
+            <span className="section-label">CONNECTIONS &amp; IMPORTS</span>
+            <h2 aria-label="Bring every portfolio into one history.">Bring every portfolio<br /><em>into one history.</em></h2>
+            <p>Use a named broker guide, a compatible CSV or a supported PDF statement. Start with the source you already have and keep your broker account separate.</p>
+            <div className="alpine-integrations-proof"><strong>{brokers.filter((broker) => broker.id !== 'other').length}</strong><span>named broker guides<br/>plus compatible CSV imports</span></div>
+            <a className="alpine-text-link" href="/features/integrations">Browse connections &amp; imports <ArrowRight size={16}/></a>
           </div>
-          <div className="cloud-connection-rows">
-            <div className="cloud-connection-row">
-              <span>01</span><Globe2 /><div><strong>Global holdings</strong><p>Track holdings, currencies and returns across the markets you already use.</p></div><ArrowRight />
+          <div className="alpine-integrations-panel">
+            <div className="alpine-integrations-head"><strong>Popular sources</strong><span>CSV · PDF · read-only sync</span></div>
+            <div className="alpine-source-grid">
+              {integrationBrokers.map((broker) => <div key={broker.id} className="alpine-source-item"><span>{broker.name.slice(0, 1)}</span><strong>{broker.name}</strong><small>{broker.region}</small></div>)}
             </div>
-            <div className="cloud-connection-row">
-              <span>02</span><BarChart3 /><div><strong>Multiple portfolios</strong><p>Keep up to ten portfolios together while their records and returns stay distinct.</p></div><ArrowRight />
-            </div>
-            <div className="cloud-connection-row">
-              <span>03</span><FileSpreadsheet /><div><strong>CSV and PDF imports</strong><p>Start with a named broker guide or upload any compatible export for review.</p></div><ArrowRight />
-            </div>
+            <div className="alpine-import-note"><FileSpreadsheet size={18}/><span><strong>Another broker?</strong><small>Any compatible CSV export can get you started.</small></span></div>
           </div>
-          <a className="cloud-button cloud-button-outline-light cloud-connections-cta" href="/pricing">See pricing<ArrowRight /></a>
         </Reveal>
 
         <Reveal className="cloud-pricing cloud-container" id="pricing">
@@ -528,7 +556,7 @@ function NativeGoogleSignIn({ busy, onCredential, onError }: { busy: boolean; on
 function Reveal({ children, className = '', id, 'aria-label': ariaLabel }: { children: ReactNode; className?: string; id?: string; 'aria-label'?: string }) {
   const reduceMotion = useReducedMotion()
   const revealRef = useRef<HTMLElement>(null)
-  const isInView = useInView(revealRef, { once: true, amount: 0.12, margin: '0px 0px -8% 0px' })
+  const [hasEntered, setHasEntered] = useState(false)
   return (
     <motion.section
       ref={revealRef}
@@ -536,7 +564,9 @@ function Reveal({ children, className = '', id, 'aria-label': ariaLabel }: { chi
       aria-label={ariaLabel}
       className={className}
       initial={reduceMotion ? false : { opacity: 0, y: 10 }}
-      animate={reduceMotion || isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
+      onViewportEnter={() => setHasEntered(true)}
+      animate={reduceMotion || hasEntered ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
+      viewport={{ once: true, amount: 0.12, margin: '0px 0px -8% 0px' }}
       transition={{ duration: reduceMotion ? 0 : 0.48, ease: [0.16, 1, 0.3, 1] }}
     >
       {children}
