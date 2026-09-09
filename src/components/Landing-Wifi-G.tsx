@@ -253,7 +253,6 @@ export function Landing({ onDemo, signedIn = false, onOpenApp, page }: LandingPr
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.54, ease: [0.16, 1, 0.3, 1] }}
           >
-            <span className="alpine-eyebrow">Your investments. A clearer perspective.</span>
             <h1>Every investment. <br />One clear view.</h1>
             <p>See your shares, ETFs, income and Australian tax records together. Connect a supported account or import your statements to get started.</p>
             <div className="cloud-actions">
