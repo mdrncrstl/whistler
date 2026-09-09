@@ -1,6 +1,7 @@
-import { AlertTriangle, CheckCircle2, CloudUpload, FileSpreadsheet, KeyRound, Mail, RefreshCw, ShieldCheck, Trash2, Unplug, WalletCards } from 'lucide-react'
-import { useRef, useState } from 'react'
+import { AlertTriangle, Building2, CheckCircle2, CloudUpload, Coins, FileSpreadsheet, KeyRound, Mail, RefreshCw, Search, ShieldCheck, Trash2, Unplug, WalletCards } from 'lucide-react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useGoogleLogin } from '@react-oauth/google'
+import { useSearchParams } from 'react-router-dom'
 import { usePortfolio } from '../context/PortfolioContext'
 import { parseSuperheroFile } from '../lib/superhero'
 import type { BrokerConnection, SuperheroReport } from '../types'
@@ -17,17 +18,51 @@ function providerName(provider: BrokerConnection['provider']) {
 
 export function LegacyConnections() {
   const { bundle, demo, action, connectIbkr, syncIbkr, importSuperhero, connectGmail, syncGmail, disconnect, setNotice } = usePortfolio()
-  const [ibkrOpen, setIbkrOpen] = useState(false)
+  const [searchParams, setSearchParams] = useSearchParams()
+  const requestedSetup = searchParams.get('setup')
+  const [ibkrOpen, setIbkrOpen] = useState(() => requestedSetup === 'ibkr' && !demo)
   const [label, setLabel] = useState('IBKR Main')
   const [token, setToken] = useState('')
   const [queryId, setQueryId] = useState('')
   const [report, setReport] = useState<SuperheroReport | null>(null)
   const [fileName, setFileName] = useState('')
   const [disconnecting, setDisconnecting] = useState<BrokerConnection | null>(null)
+  const [catalogQuery, setCatalogQuery] = useState('')
   const fileInput = useRef<HTMLInputElement>(null)
   const ibkr = bundle.connections.find((item) => item.provider === 'ibkr')
   const superhero = bundle.connections.find((item) => item.provider === 'superhero')
   const gmail = bundle.connections.find((item) => item.provider === 'google_gmail')
+  const ibkrReference = ibkr?.config?.mode === 'reference-portfolio'
+  const superheroReference = superhero?.config?.mode === 'reference-portfolio'
+  const catalog = useMemo(() => [
+    { name: 'Stake', region: 'Australia / US', method: 'Statement import', icon: Building2, status: 'available' },
+    { name: 'CommSec', region: 'Australia', method: 'CSV statement', icon: Building2, status: 'available' },
+    { name: 'CMC Invest', region: 'Australia', method: 'CSV statement', icon: Building2, status: 'available' },
+    { name: 'Pearler', region: 'Australia', method: 'CSV statement', icon: Building2, status: 'available' },
+    { name: 'SelfWealth', region: 'Australia', method: 'CSV statement', icon: Building2, status: 'available' },
+    { name: 'nabtrade', region: 'Australia', method: 'CSV statement', icon: Building2, status: 'available' },
+    { name: 'Coinbase', region: 'Crypto', method: 'Transaction CSV', icon: Coins, status: 'available' },
+    { name: 'Kraken', region: 'Crypto', method: 'Ledger CSV', icon: Coins, status: 'available' },
+    { name: 'Standard portfolio CSV', region: 'Any broker', method: 'Universal importer', icon: FileSpreadsheet, status: 'available' },
+  ].filter((item) => `${item.name} ${item.region} ${item.method}`.toLowerCase().includes(catalogQuery.toLowerCase())), [catalogQuery])
+
+  useEffect(() => {
+    if (requestedSetup === 'import') {
+      window.requestAnimationFrame(() => {
+        const target = document.querySelector<HTMLElement>('[data-setup-provider="superhero"]')
+        if (typeof target?.scrollIntoView === 'function') target.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        target?.querySelector<HTMLButtonElement>('button')?.focus()
+      })
+    }
+  }, [requestedSetup])
+
+  const closeIbkrSetup = () => {
+    setIbkrOpen(false)
+    if (!requestedSetup) return
+    const next = new URLSearchParams(searchParams)
+    next.delete('setup')
+    setSearchParams(next, { replace: true })
+  }
 
   const gmailLogin = useGoogleLogin({
     scope: 'openid email profile https://www.googleapis.com/auth/gmail.readonly',
@@ -55,7 +90,7 @@ export function LegacyConnections() {
     event.preventDefault()
     try {
       await connectIbkr({ label, token, queryId })
-      setIbkrOpen(false); setToken(''); setQueryId('')
+      closeIbkrSetup(); setToken(''); setQueryId('')
     } catch { /* surfaced by context */ }
   }
 
@@ -65,32 +100,38 @@ export function LegacyConnections() {
   }
 
   const connectionCard = (connection: BrokerConnection | undefined, provider: BrokerConnection['provider'], description: string, actions: React.ReactNode) => (
+    <div className={`connection-slot ${requestedSetup === (provider === 'ibkr' ? 'ibkr' : provider === 'superhero' ? 'import' : '') ? 'requested' : ''}`} data-setup-provider={provider}>
     <Card className="connection-card">
       <div className="connection-icon">{provider === 'ibkr' ? <KeyRound /> : provider === 'google_gmail' ? <Mail /> : <FileSpreadsheet />}</div>
       <div className="connection-body">
-        <div className="connection-title"><div><h2>{providerName(provider)}</h2><p>{description}</p></div>{connection ? <Badge tone={connection.status === 'connected' ? 'success' : connection.status === 'error' ? 'error' : 'warning'}>{connection.status}</Badge> : <Badge>Not connected</Badge>}</div>
+        <div className="connection-title"><div><h2>{providerName(provider)}</h2><p>{description}</p></div>{connection?.config?.mode === 'reference-portfolio' ? <Badge>Reference portfolio</Badge> : connection ? <Badge tone={connection.status === 'connected' ? 'success' : connection.status === 'error' ? 'error' : 'warning'}>{connection.status}</Badge> : <Badge>Not connected</Badge>}</div>
         {connection && <div className="connection-meta"><span><strong>{connection.label}</strong> · {relativeDate(connection.last_synced_at)}</span>{connection.last_error && <span className="connection-error"><AlertTriangle size={14} />{connection.last_error}</span>}</div>}
         <div className="connection-actions">{actions}{connection && !demo && <Button variant="ghost" icon={Trash2} onClick={() => setDisconnecting(connection)}>Disconnect</Button>}</div>
       </div>
     </Card>
+    </div>
   )
 
   return (
     <>
-      <PageHeader title="Connections" description="Read-only broker data and optional Superhero document automation." />
+      <PageHeader title="Connections" description="Bring every broker, exchange and portfolio into one read-only workspace." />
+      {!bundle.holdings.length && <section className="connection-onboarding" aria-label="Portfolio setup progress"><div><strong>Add investments in two steps</strong><p>Choose a source below, then review the holdings Masterdeck finds. Your portfolio fills automatically after a successful sync or import.</p></div><ol><li className="active"><span>1</span>Choose a source</li><li><span>2</span>Review and import</li></ol></section>}
       {demo && <div className="demo-banner"><ShieldCheck size={18} /><span>The demo shows connection states but never accepts or sends private broker credentials. Sign in to connect real accounts.</span></div>}
       <div className="connections-grid">
-        {connectionCard(ibkr, 'ibkr', 'Automatic Activity Flex sync for positions, cash and complete account activity.', <>{ibkr ? <Button icon={RefreshCw} busy={action === `sync-${ibkr.id}`} disabled={demo} onClick={() => syncIbkr(ibkr.id)}>Sync IBKR now</Button> : <Button variant="primary" icon={KeyRound} disabled={demo} onClick={() => setIbkrOpen(true)}>Connect IBKR</Button>}<span className="read-only-label"><ShieldCheck size={14} /> Flex Web Service v3 · read only</span></>)}
-        {connectionCard(superhero, 'superhero', 'Upload a Full Portfolio Report, Transaction Statement, Valuation CSV or contract-note PDF.', <Button variant={superhero ? 'secondary' : 'primary'} icon={CloudUpload} onClick={() => fileInput.current?.click()}>{superhero ? 'Import another report' : 'Choose Superhero report'}</Button>)}
+        {connectionCard(ibkr, 'ibkr', 'Automatic Activity Flex sync for positions, cash and complete account activity.', <>{ibkrReference ? <Button variant="primary" icon={KeyRound} disabled={demo} onClick={() => setIbkrOpen(true)}>Connect live IBKR</Button> : ibkr ? <Button icon={RefreshCw} busy={action === `sync-${ibkr.id}`} disabled={demo} onClick={() => syncIbkr(ibkr.id)}>Sync IBKR now</Button> : <Button variant="primary" icon={KeyRound} disabled={demo} onClick={() => setIbkrOpen(true)}>Connect IBKR</Button>}<span className="read-only-label"><ShieldCheck size={14} /> {ibkrReference ? 'Saved reference portfolio · no live broker access' : 'Flex Web Service v3 · read only'}</span></>)}
+        {connectionCard(superhero, 'superhero', 'Upload a Full Portfolio Report, Transaction Statement, Valuation CSV or contract-note PDF.', <Button variant={superhero && !superheroReference ? 'secondary' : 'primary'} icon={CloudUpload} onClick={() => fileInput.current?.click()}>{superheroReference ? 'Replace with a broker report' : superhero ? 'Import another report' : 'Choose Superhero report'}</Button>)}
         {connectionCard(gmail, 'google_gmail', 'Optional separate Gmail read-only authorisation for narrow Superhero contract-note searches.', <>{gmail ? <Button icon={RefreshCw} busy={action === `sync-${gmail.id}`} disabled={demo} onClick={() => syncGmail(gmail.id)}>Scan Gmail now</Button> : <Button icon={Mail} disabled={demo} onClick={() => gmailLogin()}>Connect Gmail read-only</Button>}<span className="read-only-label"><ShieldCheck size={14} /> Requested scope: gmail.readonly</span></>)}
       </div>
+
+      <div className="catalog-heading"><div><span className="section-label">MORE SOURCES</span><h2>Broker & exchange catalogue</h2><p>Import official statements without sharing a trading password.</p></div><label className="catalog-search"><Search size={15}/><input value={catalogQuery} onChange={(event)=>setCatalogQuery(event.target.value)} placeholder="Find a broker…"/></label></div>
+      <div className="integration-catalog">{catalog.map(({name,region,method,icon:Icon})=><Card className="catalog-card" key={name}><span className="catalog-icon"><Icon/></span><div><h3>{name}</h3><p>{region} · {method}</p></div><Button variant="ghost" icon={CloudUpload} onClick={()=>fileInput.current?.click()}>Import</Button></Card>)}</div>
 
       <input ref={fileInput} className="visually-hidden" type="file" accept=".csv,text/csv,.pdf,application/pdf" onChange={(event) => selectFile(event.target.files?.[0])} />
       {(fileName || report) && <Card className="import-review"><div className="import-file"><FileSpreadsheet size={22} /><span><strong>{fileName}</strong><small>Parsed locally in your browser; the raw file is not retained.</small></span></div>{report && <><div className="import-counts"><span><strong>{report.holdings.length}</strong> holdings</span><span><strong>{report.transactions.length}</strong> transactions</span><span><strong>{report.cash.length}</strong> cash rows</span></div>{report.warnings.length > 0 && <div className="import-warnings"><AlertTriangle size={16} /><span>{report.warnings.slice(0, 3).join(' ')}</span></div>}<div className="connection-actions"><Button variant="primary" icon={CloudUpload} busy={action === 'import-superhero'} disabled={demo || (!report.holdings.length && !report.transactions.length && !report.cash.length)} onClick={submitReport}>{demo ? 'Sign in to import' : 'Import parsed rows'}</Button><Button variant="ghost" onClick={() => { setReport(null); setFileName(''); if (fileInput.current) fileInput.current.value = '' }}>Cancel</Button></div></>}</Card>}
 
       <Card className="sync-history"><div className="card-title-row"><div><span className="section-label">ACTIVITY</span><h2>Recent sync runs</h2></div></div>{bundle.syncRuns.length ? <div className="sync-list">{bundle.syncRuns.map((run) => <div key={run.id}><span className={`sync-status ${run.status}`}>{run.status === 'success' ? <CheckCircle2 size={16} /> : run.status === 'error' ? <AlertTriangle size={16} /> : <RefreshCw size={16} />}</span><span><strong>{run.message || `${providerName(run.provider)} sync`}</strong><small>{date(run.started_at, { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' })} · {run.imported_count} rows processed</small></span><Badge tone={run.status === 'success' ? 'success' : run.status === 'error' ? 'error' : 'warning'}>{run.status}</Badge></div>)}</div> : <EmptyState icon={WalletCards} title="No sync history yet" description="Completed broker syncs and report imports will appear here." />}</Card>
 
-      <Modal open={ibkrOpen} title="Connect Interactive Brokers" description="Use an Activity Flex Query with read-only reporting access." onClose={() => setIbkrOpen(false)}>
+      <Modal open={ibkrOpen} title="Connect Interactive Brokers" description="Use an Activity Flex Query with read-only reporting access." onClose={closeIbkrSetup}>
         <form className="form-stack" onSubmit={saveIbkr}>
           <label><span>Account label</span><input value={label} onChange={(event) => setLabel(event.target.value)} maxLength={80} required /></label>
           <label><span>Flex Web Service token</span><input value={token} onChange={(event) => setToken(event.target.value)} type="password" autoComplete="off" inputMode="numeric" placeholder="Private Flex token" required /></label>
