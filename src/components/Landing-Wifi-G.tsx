@@ -532,18 +532,19 @@ export function Landing({ onDemo, signedIn = false, onOpenApp, page }: LandingPr
         <div className="masterdeck-auth-methods" aria-label="Choose a sign-in method">
           <NativeGoogleSignIn busy={redirecting} onCredential={credential => { void finishGoogleSignIn(credential) }} onError={() => { setError('Google sign-in was cancelled or blocked. Please try again.'); setRedirecting(false) }}/>
           {authMethod !== 'email' && <button
-              className="masterdeck-auth-method masterdeck-email-method"
+              className="masterdeck-auth-method"
               type="button"
               disabled={redirecting}
               onClick={() => { setAuthMethod('email'); setError(''); setNotice('') }}
             >
               <span className="masterdeck-auth-method-icon" aria-hidden="true"><Mail /></span>
               <span className="masterdeck-auth-method-text">Continue with email</span>
-              <ArrowRight aria-hidden="true" />
+              <span className="masterdeck-auth-method-spacer" aria-hidden="true" />
             </button>}
           {appleAvailable && <button className="masterdeck-auth-method" type="button" disabled={redirecting} onClick={beginAppleSignIn}>
             <span className="masterdeck-auth-method-icon" aria-hidden="true"><img src="/holding-logos/apple.ico" width="22" height="22" alt=""/></span>
             <span className="masterdeck-auth-method-text">Continue with Apple</span>
+            <span className="masterdeck-auth-method-spacer" aria-hidden="true" />
           </button>}
         </div>
         {authMethod === 'email' && <button className="masterdeck-auth-back" type="button" disabled={redirecting} onClick={() => { setAuthMethod('choice'); setError(''); setNotice('') }}><ArrowLeft /> Choose another method</button>}
@@ -576,7 +577,14 @@ function NativeGoogleSignIn({ busy, onCredential, onError }: { busy: boolean; on
     return () => observer.disconnect()
   }, [])
   return <div ref={host} className="masterdeck-google-native" aria-busy={busy} inert={busy}>
-    <GoogleLogin text="continue_with" theme="outline" size="large" shape="rectangular" width={width} ux_mode="popup" onSuccess={response => onCredential(response.credential)} onError={onError}/>
+    <div className="masterdeck-auth-method masterdeck-google-visual" aria-hidden="true">
+      <span className="masterdeck-auth-method-icon masterdeck-google-icon"><span className="masterdeck-google-letter">G</span></span>
+      <span className="masterdeck-auth-method-text">Continue with Google</span>
+      <span className="masterdeck-auth-method-spacer" aria-hidden="true" />
+    </div>
+    <div className="masterdeck-google-hit-area">
+      <GoogleLogin text="continue_with" theme="outline" size="large" shape="rectangular" width={width} ux_mode="popup" onSuccess={response => onCredential(response.credential)} onError={onError}/>
+    </div>
   </div>
 }
 

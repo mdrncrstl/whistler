@@ -5880,6 +5880,88 @@ body { font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-s
   position: static;
   transform: none;
 }
+
+/* Keep every sign-in choice on one visual track. Google remains the real
+   provider control, layered invisibly over the shared local presentation. */
+.masterdeck-auth-methods { gap: 10px; }
+.masterdeck-auth-method,
+.masterdeck-google-native {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 50px;
+}
+.masterdeck-auth-method {
+  padding: 0 14px;
+  border: 1px solid #cddbd4;
+  border-radius: 12px;
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr) 32px;
+  align-items: center;
+  column-gap: 10px;
+  background: #fff;
+  color: var(--m-ink);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1;
+  text-align: left;
+  cursor: pointer;
+  transition: background .18s ease, border-color .18s ease, box-shadow .18s ease, transform .18s ease;
+}
+.masterdeck-auth-method:hover:not(:disabled),
+.masterdeck-google-native:hover .masterdeck-google-visual {
+  border-color: #86c8a7;
+  background: #f7fcf9;
+  transform: translateY(-1px);
+}
+.masterdeck-auth-method:active:not(:disabled) { transform: translateY(0); }
+.masterdeck-auth-method:disabled,
+.masterdeck-google-native[aria-busy="true"] { opacity: .65; cursor: wait; }
+.masterdeck-auth-method-icon {
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border-radius: 9px;
+  background: #e8f5ee;
+  color: #188d6b;
+}
+.masterdeck-auth-method-icon svg { width: 17px; height: 17px; }
+.masterdeck-auth-method-icon img { width: 21px; height: 21px; object-fit: contain; }
+.masterdeck-auth-method-text {
+  grid-column: 2;
+  min-width: 0;
+  width: 100%;
+  overflow: hidden;
+  color: var(--m-ink);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.masterdeck-auth-method-spacer { grid-column: 3; width: 32px; height: 32px; }
+.masterdeck-google-native { position: relative; padding: 0; }
+.masterdeck-google-visual { position: absolute; inset: 0; pointer-events: none; }
+.masterdeck-google-hit-area { position: absolute; inset: 0; z-index: 1; overflow: hidden; opacity: 0; }
+.masterdeck-google-hit-area > div,
+.masterdeck-google-hit-area iframe { width: 100% !important; height: 100% !important; }
+.masterdeck-google-letter {
+  display: block;
+  font-family: Arial, sans-serif;
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1;
+  background: conic-gradient(from -45deg, #4285f4 0 25%, #34a853 25% 50%, #fbbc05 50% 75%, #ea4335 75% 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+@media (max-width: 520px) {
+  .masterdeck-auth-method,
+  .masterdeck-google-native { min-height: 48px; }
+  .masterdeck-auth-method { padding-inline: 12px; }
+}
 /* Shared chart and navigation polish. */
 html { scrollbar-gutter: stable; }
 .portfolio-switcher-wrap { margin-top: 8px; }
@@ -6051,3 +6133,33 @@ html { scrollbar-gutter: stable; }
 /* Onboarding holds its own background while account access resolves, instead of
    handing the screen to the workspace loading animation. */
 .onboarding-page-waiting { min-height: 100dvh; }
+
+/* Final auth-row normalization: keep provider choices identical in height,
+   geometry and icon alignment. */
+.masterdeck-auth-methods .masterdeck-auth-method,
+.masterdeck-auth-methods .masterdeck-google-native {
+  height: 50px;
+  min-height: 50px;
+  border-radius: 12px;
+}
+.masterdeck-auth-methods .masterdeck-auth-method {
+  grid-template-columns: 32px minmax(0, 1fr) 32px;
+  padding-inline: 14px;
+}
+.masterdeck-auth-methods .masterdeck-auth-method .masterdeck-auth-method-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+}
+.masterdeck-auth-methods .masterdeck-google-native { padding: 0; }
+.masterdeck-auth-methods .masterdeck-google-native .masterdeck-google-visual { height: 50px; }
+.masterdeck-auth-methods .masterdeck-google-native .masterdeck-google-hit-area { height: 50px; }
+@media (max-width: 520px) {
+  .masterdeck-auth-methods .masterdeck-auth-method,
+  .masterdeck-auth-methods .masterdeck-google-native,
+  .masterdeck-auth-methods .masterdeck-google-native .masterdeck-google-visual,
+  .masterdeck-auth-methods .masterdeck-google-native .masterdeck-google-hit-area {
+    height: 48px;
+    min-height: 48px;
+  }
+}
