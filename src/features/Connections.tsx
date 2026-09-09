@@ -7,13 +7,15 @@ import type { BrokerConnection, SuperheroReport } from '../types'
 import { date, relativeDate } from '../lib/format'
 import { Badge, Button, Card, EmptyState, Modal, PageHeader } from '../components/ui'
 
+export { Connections } from './Connections-Wifi-G'
+
 function providerName(provider: BrokerConnection['provider']) {
   if (provider === 'ibkr') return 'Interactive Brokers'
   if (provider === 'google_gmail') return 'Superhero Gmail'
   return 'Superhero'
 }
 
-export function Connections() {
+export function LegacyConnections() {
   const { bundle, demo, action, connectIbkr, syncIbkr, importSuperhero, connectGmail, syncGmail, disconnect, setNotice } = usePortfolio()
   const [ibkrOpen, setIbkrOpen] = useState(false)
   const [label, setLabel] = useState('IBKR Main')

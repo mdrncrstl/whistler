@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://masterdeck.app/</loc>
+    <lastmod>2026-08-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url><loc>https://masterdeck.app/features/portfolio-tracking</loc></url>
+  <url><loc>https://masterdeck.app/features/performance</loc></url>
+  <url><loc>https://masterdeck.app/features/income</loc></url>
+  <url><loc>https://masterdeck.app/features/australian-tax</loc></url>
+  <url><loc>https://masterdeck.app/features/integrations</loc></url>
+  <url><loc>https://masterdeck.app/features/portfolio-assistant</loc></url>
+  <url><loc>https://masterdeck.app/for/share-investors</loc></url>
+  <url><loc>https://masterdeck.app/for/etf-investors</loc></url>
+  <url><loc>https://masterdeck.app/for/multiple-portfolios</loc></url>
+  <url><loc>https://masterdeck.app/company/about</loc></url>
+  <url><loc>https://masterdeck.app/company/help</loc></url>
+  <url><loc>https://masterdeck.app/pricing</loc></url>
+</urlset>

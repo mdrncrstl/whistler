@@ -24,6 +24,15 @@ const activity: Transaction[] = [
 ]
 
 describe('tax lot matching', () => {
+  it('does not consume purchase lots from another account', () => {
+    const rows = [tx({account_name:'One'}), tx({account_name:'Two', type:'SELL', date:'2026-08-01', amount:1000})]
+    expect(matchTaxLots(rows, '2026/27', 'fifo')).toHaveLength(0)
+  })
+  it('requires more than the anniversary date for the discount', () => {
+    const buy = tx({date:'2025-08-01'})
+    expect(matchTaxLots([buy, tx({type:'SELL', date:'2026-08-01'})], '2026/27', 'fifo')[0].discountEligible).toBe(false)
+    expect(matchTaxLots([buy, tx({type:'SELL', date:'2026-08-02'})], '2026/27', 'fifo')[0].discountEligible).toBe(true)
+  })
   it('FIFO matches the oldest parcel and applies fees', () => {
     const [match] = matchTaxLots(activity, '2026/27', 'fifo')
     expect(match.boughtAt).toContain('2024-01-01')
@@ -52,6 +61,6 @@ describe('tax lot matching', () => {
     expect(summary.gains).toBe(100)
     expect(summary.losses).toBe(30)
     expect(summary.net).toBe(70)
-    expect(summary.estimatedDiscountedNet).toBe(20)
+    expect(summary.estimatedDiscountedNet).toBe(35)
   })
 })

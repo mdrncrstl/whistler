@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /app
+Disallow: /auth
+Disallow: /welcome
+
+Sitemap: https://masterdeck.app/sitemap.xml

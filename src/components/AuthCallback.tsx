@@ -9,18 +9,21 @@ export function AuthCallback() {
   const [error, setError] = useState('')
   useEffect(() => {
     let alive = true
-    const finish = async () => {
-      const code = new URL(window.location.href).searchParams.get('code')
-      const current = await authClient.auth.getSession()
-      if (current.data.session) return navigate('/app', { replace: true })
-      if (!code) return setError('Google did not return a sign-in code.')
-      const { error: exchangeError } = await authClient.auth.exchangeCodeForSession(code)
+    const url = new URL(window.location.href)
+    const hash = new URLSearchParams(url.hash.slice(1))
+    const providerError = url.searchParams.get('error_description') || hash.get('error_description')
+    const timeout = window.setTimeout(() => { if (alive) setError('Sign-in took too long. Return to Masterdeck and try again.') }, 15000)
+    // Supabase owns URL detection and the one-time PKCE exchange. Exchanging
+    // again here races client initialization and React StrictMode.
+    void authClient.auth.getSession().then(({ data, error: sessionError }) => {
       if (!alive) return
-      if (exchangeError) setError(exchangeError.message)
-      else navigate('/app', { replace: true })
-    }
-    finish()
-    return () => { alive = false }
+      window.clearTimeout(timeout)
+      if (data.session) navigate('/app', { replace: true })
+      else setError(providerError || sessionError?.message || 'This sign-in link has expired or was cancelled. Please try again.')
+    }).catch(() => {
+      if (alive) { window.clearTimeout(timeout); setError('Unable to finish sign-in. Check your connection and try again.') }
+    })
+    return () => { alive = false; window.clearTimeout(timeout) }
   }, [navigate])
-  return <div className="auth-callback"><Brand />{error ? <><h1>Sign-in could not be completed</h1><p>{error}</p><a href="/">Return to MASTERDECK</a></> : <><LoaderCircle className="spin" /><h1>Finishing secure sign-in</h1><p>This should only take a moment.</p></>}</div>
+  return <div className="auth-callback"><Brand />{error ? <><h1>Sign-in could not be completed</h1><p>{error}</p><a href="/">Return to Masterdeck</a></> : <><LoaderCircle className="spin" /><h1>Finishing secure sign-in</h1><p>This should only take a moment.</p></>}</div>
 }

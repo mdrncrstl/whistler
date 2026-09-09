@@ -10,6 +10,34 @@ export interface PortfolioSummary {
   dayChange: number
   holdingCount: number
   income: number
+  currencyGain: number
+  capitalGain: number
+  currencyGainComplete: boolean
+}
+
+/**
+ * The AUD gain attributable purely to exchange-rate movement on a holding's cost base.
+ *
+ * cost_aud was booked at the exchange rate in force when the position was opened, so
+ * cost_aud / (average_cost * quantity) recovers that rate. Revaluing the same local-currency
+ * cost base at today's rate isolates the currency component of the unrealised gain.
+ *
+ * Returns null when the cost base or rate is missing, because the split cannot be derived
+ * from the recorded data. AUD-denominated holdings correctly return 0.
+ */
+export function holdingCurrencyGain(item: Position): number | null {
+  const costLocal = Number(item.average_cost || 0) * Number(item.quantity || 0)
+  const costAud = Number(item.cost_aud || 0)
+  const currentRate = Number(item.fx_rate || 0)
+  if (!costLocal || !costAud || !currentRate) return null
+  const costRate = costAud / costLocal
+  if (!Number.isFinite(costRate)) return null
+  return costLocal * (currentRate - costRate)
+}
+
+/** Capital gain with the currency component removed, when that component is derivable. */
+export function holdingCapitalGain(item: Position): number {
+  return Number(item.unrealised_gain_aud || 0) - (holdingCurrencyGain(item) || 0)
 }
 
 export function summarisePortfolio(bundle: PortfolioBundle): PortfolioSummary {
@@ -21,6 +49,8 @@ export function summarisePortfolio(bundle: PortfolioBundle): PortfolioSummary {
   const income = bundle.transactions
     .filter((item) => ['DIVIDEND', 'DISTRIBUTION', 'INTEREST'].includes(String(item.type).toUpperCase()))
     .reduce((sum, item) => sum + Math.abs(Number(item.amount || 0) * Number(item.fx_rate || 1)), 0)
+  const currencyGain = bundle.holdings.reduce((sum, item) => sum + (holdingCurrencyGain(item) || 0), 0)
+  const currencyGainComplete = bundle.holdings.every((item) => holdingCurrencyGain(item) !== null)
   return {
     invested,
     cash,
@@ -31,6 +61,9 @@ export function summarisePortfolio(bundle: PortfolioBundle): PortfolioSummary {
     dayChange,
     holdingCount: bundle.holdings.length,
     income,
+    currencyGain,
+    capitalGain: unrealised - currencyGain,
+    currencyGainComplete,
   }
 }
 

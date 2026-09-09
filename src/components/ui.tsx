@@ -2,15 +2,14 @@ import { AlertCircle, Check, ChevronDown, LoaderCircle, Search, X, type LucideIc
 import { useEffect, type ButtonHTMLAttributes, type InputHTMLAttributes, type ReactNode } from 'react'
 import { money } from '../lib/format'
 
+export { MotionDialogSurface, MotionPopover } from './ui-Wifi-G'
+
 export function Brand({ compact = false }: { compact?: boolean }) {
   return (
     <div className="brand" aria-label="MASTERDECK">
-      <span className="brand-mark" aria-hidden="true">
-        <svg viewBox="0 0 32 32" role="img">
-          <path d="M6 24V8h5l5 8 5-8h5v16h-5v-8l-5 8-5-8v8z" />
-        </svg>
-      </span>
-      {!compact && <span className="brand-word">MASTERDECK</span>}
+      {compact
+        ? <span className="brand-mark" aria-hidden="true"><img className="brand-mark-image" src="/brand/masterdeck-favicon.png" alt="" /></span>
+        : <img className="brand-logo-image" src="/brand/masterdeck-logo.png" alt="MASTERDECK" />}
     </div>
   )
 }
@@ -107,6 +106,4 @@ export function PageHeader({ title, description, actions }: { title: string; des
   return <div className="page-heading"><div><h1>{title}</h1><p>{description}</p></div>{actions && <div className="page-actions">{actions}</div>}</div>
 }
 
-export function LoadingScreen() {
-  return <div className="loading-screen"><Brand /><LoaderCircle className="spin" size={24} /><p>Preparing your portfolio…</p></div>
-}
+export { LoadingScreen } from './AppLoading'

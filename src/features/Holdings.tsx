@@ -5,9 +5,11 @@ import { allocationBy, summarisePortfolio } from '../lib/portfolio'
 import { downloadCsv, money, number, percent } from '../lib/format'
 import { Badge, Button, Card, EmptyState, MetricCard, PageHeader, PrivateMoney, SearchInput, Select } from '../components/ui'
 
+export { Holdings } from './Holdings-Wifi-G'
+
 type SortKey = 'value_aud' | 'return_pct' | 'symbol' | 'day_change_aud'
 
-export function Holdings() {
+export function LegacyHoldings() {
   const { bundle } = usePortfolio()
   const [query, setQuery] = useState('')
   const [broker, setBroker] = useState('all')

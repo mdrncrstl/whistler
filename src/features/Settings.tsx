@@ -5,7 +5,9 @@ import { authClient } from '../lib/supabase'
 import type { TaxMethod } from '../types'
 import { Badge, Button, Card, PageHeader, Select } from '../components/ui'
 
-export function Settings({ onExitDemo }: { onExitDemo: () => void }) {
+export { Settings } from './Settings-Wifi-G'
+
+export function LegacySettings({ onExitDemo }: { onExitDemo: () => void }) {
   const { bundle, demo, action, updateProfile } = usePortfolio()
   const profile = bundle.profile
   return <SettingsForm key={`${profile?.id}-${JSON.stringify(profile?.settings || {})}`} profile={profile} demo={demo} action={action} updateProfile={updateProfile} onExitDemo={onExitDemo} />

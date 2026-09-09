@@ -1,0 +1,279 @@
+# MASTERDECK authenticated product parity QA
+
+## Comparison target
+
+- Source visual truth: authenticated Navexa routes captured live on 2026-08-25, the user-supplied `codex-clipboard-30b2e87c-405c-470b-8216-f1813b0802d5.png` AI screen, and the existing authenticated portfolio capture `qa/navexa-live-portfolio-2560.png`.
+- Implementation: `qa/masterdeck-performance-parity-local.png` plus browser-rendered checks of every authenticated local route.
+- Combined comparison input: `qa/navexa-masterdeck-comparison.png` (shared shell, typography and density).
+- State: light theme; populated demo state for equivalent visual density; empty/live states checked separately without importing the user's Navexa data.
+- Desktop evidence: source 2545 x 1214 px at DPR 1 and implementation capture 2880 x 1800 px, normalized to the same 1440 x 900 content region in the combined comparison.
+- Responsive evidence: explicit 390 x 844 CSS viewport at DPR 2. Browser-reported document width was 750-780 physical px depending on the route, with no page-level horizontal overflow.
+
+## Full-view comparison evidence
+
+The combined comparison was opened as one side-by-side image. MASTERDECK preserves the aligned 239 px navigation rail, 48 px header, compact filter bars, horizontal summary strips, full-width report canvas and dense grouped tables. The new report and tax routes use the same hierarchy and visual rhythm as the captured Navexa workspaces while retaining MASTERDECK branding, independent icons, and independent data semantics.
+
+## Focused region evidence
+
+- Reports: all six report routes now include holdings search, period/status/group controls, summary metrics, chart or allocation analysis, detailed ledgers and populated/empty states.
+- Tax: the overview now includes finalisation tasks, assessable-income and capital-gain summaries, six detailed report links and prior-year status. myTax, CGT, taxable-income, valuation, unrealised-gain and historical-cost views expose the source-equivalent field and table depth.
+- Tools: Deck AI matches the captured title/welcome/suggestion/fixed-composer structure and returns deterministic portfolio-grounded answers. Inbox and custom groups now include setup, filtering, creation and empty states.
+- Mobile: the navigation changes to the existing mobile shell; report controls wrap, metric grids reduce to two columns and dense tables remain internally scrollable.
+- Assets: MASTERDECK retains its own mark and Lucide icon set. Security marks now use packaged issuer-source favicon/logo assets for the eight populated holdings; no Navexa identity asset is used.
+
+## Required fidelity surfaces
+
+- Fonts and typography: passed. Bundled Inter 300-700 is used throughout; small UI text, report headings, tabular values and micro-labels keep source-like optical weights and hierarchy.
+- Spacing and layout rhythm: passed. Shared filters, summary strips, cards, grouped table rows and report gaps maintain the compact source density without clipped controls.
+- Colors and visual tokens: passed. Light slate surfaces, blue analytical emphasis, neutral rules and green/red financial states map to MASTERDECK-owned tokens.
+- Image quality and asset fidelity: passed. These screens require interface icons rather than photographic imagery; library vectors remain sharp and no prohibited approximate asset was added.
+- Copy and content: passed. Source-equivalent information architecture and report terminology are present while branding and explanatory language remain independent.
+- Responsiveness: passed. Every tested authenticated route rendered meaningful content at 390 x 844 with no document overflow.
+- Accessibility and interactions: passed. Inputs/selects are labelled, buttons are semantic, focusable controls work, dense tables use headers, and the browser console remained clean.
+
+## Comparison history
+
+### Pass 1 — portfolio shell
+
+- [P1] Wrong typography and unrelated dashboard composition.
+- Fix: bundled Inter and rebuilt the shared shell, filter/metric/chart/table composition.
+- Post-fix evidence: `qa/navexa-masterdeck-comparison.png`.
+
+### Pass 2 — authenticated product depth
+
+- [P1] Reports and tax were shallow single-screen summaries and omitted multiple source routes.
+- [P1] Deck AI, inbox and custom groups exposed placeholder interactions rather than complete primary states.
+- Fix: added six deep report routes, seven tax routes, a tax finalisation workflow, field-level myTax reporting, grouped ledgers, income schedules, deterministic AI conversation, inbox onboarding/search, and custom-group creation/deletion.
+- Post-fix evidence: browser-rendered route audit, `qa/masterdeck-performance-parity-local.png`, and the shared-shell combined comparison.
+- No actionable P0/P1/P2 findings remain.
+
+### Pass 3 — expanded sidebar fidelity (2026-08-26)
+
+- Source visual truth: `C:\Users\moder\AppData\Local\Temp\codex-clipboard-fbe34674-1c18-4ebf-835d-aaa34109fe53.png`, 257 x 1241 px at DPR 1.
+- Implementation: `qa/masterdeck-sidebar-parity-local.png`, browser-rendered at a 1440 x 1241 CSS viewport and cropped to the same 257 x 1241 px sidebar region at DPR 1.
+- Combined full-view and focused-region evidence: `qa/sidebar-parity-comparison.png`; both equal-density sidebar captures are placed side by side without scaling.
+- State: light-theme demo portfolio, Portfolio route active, all report and tax branches expanded, MCP card visible.
+- [P1] The prior sidebar flattened reports and tax into peer routes, omitted the source's parent rows and subgroup labels, and added Holdings and Connections to the primary rail.
+- Fix: recreated the Performance and Tax Reporting parent hierarchy, Income/Tax Reports/Tax Planning subgroup labels, exact child ordering and indentation, source-density link geometry, separator, MCP promo and Feedback footer. Holdings and Connections remain functional through direct routes but no longer alter the reference sidebar IA.
+- Fonts and typography: passed. Inter, 13 px navigation text, 11 px group labels, 10 px subgroup labels and regular optical weight match the reference hierarchy.
+- Spacing and layout rhythm: passed. The 240 px rail, 32 px row height, active-row width, nested offsets, footer card placement and 16 px lower gutter align in the equal-size comparison.
+- Colors and visual tokens: passed. Neutral slate rail, blue-grey labels, dark navigation copy, grey active row and fine separators match the source while retaining Masterdeck's blue mark.
+- Image quality and asset fidelity: passed. The Masterdeck mark remains an independent vector asset; navigation uses the project's sharp library icons and does not copy the Navexa logo.
+- Copy and content: passed. Source labels and hierarchy are preserved with only product-identity substitutions (`Masterdeck AI`, `Masterdeck MCP server`).
+- Interaction evidence: nested links navigate to their existing deep routes; the MCP card dismisses; browser console reported zero warnings or errors.
+- Post-fix comparison found no actionable P0/P1/P2 sidebar differences.
+
+### Pass 4 — portfolio interaction parity and collapsible navigation (2026-08-26)
+
+- Source inspection: live authenticated `https://www.navexa.com/n/portfolio`, including the nested Performance/Tax parents, bottom rail collapse control, portfolio picker, Ctrl+K search, filter builder, time/position menus, chart modes, holding grouping, group collapse, sortable headers, column settings and PDF export.
+- Reference captures: `C:\Users\moder\.codex\tmp\navexa-portfolio-audit-2026-08-26\01-portfolio-main.png`, `02-performance-collapsed.png`, and `03-global-search.png`.
+- Implementation captures: `04-masterdeck-expanded.png` and `05-masterdeck-collapsed.png` in the same temporary audit folder. `06-reference-comparison.png` places source and implementation into one visual comparison input.
+- [P1] Performance and Tax Reporting looked expandable but were inert; the full rail had no collapse control.
+- [P1] Portfolio picker, global search, range, positions, filter, Amount/Percent, Line/Bar, grouping, group rows, columns, sorting and row actions were static or incomplete.
+- Fix: added persisted nested and whole-rail collapse states, a working portfolio menu and command palette, exact source-equivalent range/position choices, multi-filter builder, amount/percent and line/bar chart behavior, D/M/Y bar controls, four grouping modes, collapsible groups, sortable columns, searchable column settings, PDF/CSV export and holding detail/action menus.
+- Browser interaction evidence: 17/17 assertions passed for sidebar sections, rail collapse, filter application, chart mode switching, D/M/Y visibility, group collapse, columns dialog defaults, sector grouping, both export actions, command search and holding details.
+- Visual fidelity: passed for hierarchy, control density, source-like white/slate/blue palette, table rhythm and collapse states. Masterdeck retains independent branding, demo data and icons.
+- Accessibility: passed. Collapse controls expose `aria-expanded`, group toggles expose state, menus/dialogs have roles and labels, sortable headers expose `aria-sort`, and every new input is labelled.
+
+### Pass 5 — public conversion funnel (2026-08-26)
+
+- Source inspection: live `https://www.navexa.com/au` desktop and mobile funnel, including sticky navigation, mobile drawer, feature dropdown, hero, proof, scope boundary, onboarding steps, product-led feature sections, pricing switch, comparison table, integrations, FAQ accordion, repeated CTAs and footer.
+- Reference captures: `C:\Users\moder\.codex\tmp\navexa-home-audit-2026-08-26\desktop-00-hero.png`, desktop and mobile contact sheets, and interaction-state captures.
+- Implementation capture: `C:\Users\moder\.codex\tmp\navexa-home-audit-2026-08-26\masterdeck-home-local-desktop.png`.
+- Combined visual comparison: `C:\Users\moder\.codex\tmp\navexa-home-audit-2026-08-26\homepage-hero-comparison.png`, normalized to equal 1440 x 900 panels.
+- [P1] The previous root route exposed only a single dark hero and capability strip; it did not provide a full marketing journey or let signed-in users inspect the public site.
+- Fix: rebuilt `/` as a complete Masterdeck-owned funnel with independent copy and assets, accurate supported integrations, real Masterdeck product screenshots, shared billing data, accessible interaction states and direct app/auth conversion paths. Signed-in users now see `Open Masterdeck` while the public homepage remains accessible.
+- Visual fidelity: passed. The implementation follows the source's white/slate/blue palette, centered product-led hero, large browser-framed preview, long-form section rhythm, pricing hierarchy and mobile stacking while retaining Masterdeck typography, mark and product imagery.
+- Interaction evidence: desktop feature dropdown exposes three destinations; mobile navigation toggles `aria-expanded`; annual/monthly pricing changes Essential from $14 to $18; FAQ state changes and reveals the selected answer; demo CTA reaches `/app` with populated demo state.
+- Responsive evidence: 1440 x 900 desktop and 390 x 844 mobile CSS viewports passed with no page-level horizontal overflow. All four product images loaded at natural resolution.
+- Console evidence: zero browser warnings or errors after navigation, interaction and responsive checks.
+- Automated evidence: landing tests cover the full section journey, shared pricing state, FAQ state and mobile menu behavior.
+
+### Pass 6 — complete theme surface repair (2026-08-26)
+
+- User reference: `C:\Users\moder\AppData\Local\Temp\codex-clipboard-1c3d470e-174c-4441-ada9-be719477e7e9.png`, showing dark Settings inputs and switch tracks leaking into the light workspace.
+- Implementation capture: `C:\Users\moder\.codex\tmp\masterdeck-light-mode-2026-08-26\settings-after.png` at the same desktop state.
+- Combined comparison input: `C:\Users\moder\.codex\tmp\masterdeck-light-mode-2026-08-26\settings-before-after.png`.
+- [P1] Shared form fields, switch tracks, modal dialogs and toast notifications used hard-coded dark backgrounds in light mode. Mobile navigation also forced a light surface when dark mode was active.
+- Fix: replaced hard-coded surfaces with `--surface`, `--surface-2`, `--surface-3`, line and semantic colour tokens; restored disabled-field contrast; added theme-aware switch geometry; and corrected dark sidebar/topbar/search contrast exposed during the reciprocal theme check.
+- Light desktop evidence: editable input `rgb(255,255,255)`, disabled inputs `rgb(243,245,247)`, switch tracks `rgb(233,237,241)`, toast `rgb(255,255,255)`, no console warnings or errors.
+- Dark desktop evidence: editable input `rgb(13,25,19)`, disabled inputs `rgb(17,31,24)`, toast `rgb(13,25,19)`, readable sidebar links and token-matched topbar/search surfaces.
+- Mobile evidence: 390 x 844 light Settings view, theme-aware bottom navigation, no page-level horizontal overflow and no console warnings or errors.
+- Interaction evidence: privacy switch changed checked state; Save preferences produced a visible token-correct toast; light/dark theme controls updated every audited surface.
+- Automated evidence: eight test files / 25 tests passed, including shared theme-surface regression guards.
+
+### Pass 7 — first portfolio onboarding (2026-08-26)
+
+- Replaced the empty portfolio canvas with a clear first-run setup screen instead of zero-value metrics and vague import copy.
+- Added explicit IBKR connection and Superhero report import choices, a three-step explanation, and read-only safety context.
+- Reused the setup guidance on empty Holdings and Transactions screens.
+- Deep-linked IBKR into its connection form and the import path into the focused Superhero upload action.
+- Browser QA covered desktop and 390 × 844 mobile, the import navigation/focus loop, console health, and a mobile overflow regression found and fixed during testing.
+- Automated regression coverage: 31 tests passed across 9 files; typecheck, lint, build, and `git diff --check` passed.
+
+### Pass 8 — authenticated portfolio persistence (2026-08-26)
+
+- Root cause: authenticated sessions initially rendered the bundled reference portfolio (`$139,854.61`) while the real account bundle loaded, then replaced it with the account's empty server response.
+- Account baseline before the requested copy: 0 positions, 0 transactions, 0 cash balances, 0 snapshots and 0 broker connections.
+- Persistence fix: saved the reference portfolio to the authenticated account as 8 positions, 12 transactions, 2 cash balances and 12 snapshots. The resulting database value is `$139,854.61`.
+- Provenance: the copied rows and two disabled connection records are explicitly labelled as a static reference portfolio; they do not claim live broker access or store broker credentials.
+- Hydration fix: live sessions now begin with an empty private bundle and show the shared loading screen until the authenticated Edge Function response arrives. Demo data is only initialized in explicit demo mode.
+- Connection safety: reference IBKR and Superhero records now offer real connection/import replacement actions instead of a non-functional sync action.
+- Backend repair: Edge Function v4 no longer rewrites an existing profile on every request. It reads first and only inserts when missing, with a race-safe existence check; the first 9 post-deploy POST requests all returned 200.
+- Production browser evidence: a cold Edge start resolved to `$139,854.61` with AAPL present and no error/onboarding fallback. A second full refresh settled in 1.68 seconds with the same value, and Connections exposed the reference labels and replacement actions without the broken live-sync action.
+- Automated regression coverage: 32 tests passed across 10 files, including an authenticated hydration test that proves no AAPL/reference-data flash occurs before the live bundle resolves; typecheck, lint, build and `git diff --check` passed.
+
+### Pass 9 — portfolio density and chart polish (2026-08-26)
+
+- Source visual truth: `C:\Users\moder\AppData\Local\Temp\codex-clipboard-ba218640-c3b2-47d3-9be1-d646c987b35b.png`, Navexa portfolio at 2559 × 1424 px. The app-content comparison crop begins below the 129 px browser chrome.
+- Pre-fix implementation evidence: `C:\Users\moder\AppData\Local\Temp\codex-clipboard-6a401d22-66f3-43a0-82ca-1658b22c0aa6.png`, Masterdeck production at 2559 × 1439 px.
+- Post-fix browser implementation: `C:\Users\moder\AppData\Local\Temp\masterdeck-portfolio-refinement-verified.png`, browser-rendered local demo at a 1280 × 720 CSS viewport, DPR 1.
+- Focused equal-density comparison: `C:\Users\moder\AppData\Local\Temp\navexa-masterdeck-refinement-verified-comparison.png`. The source uses an unscaled 1280 × 720 crop from the left side of the 2559 px source app canvas; the implementation remains unscaled at 1280 × 720. This preserves pixel density and the shared 240 px sidebar geometry, while intentionally comparing only the source's leading desktop region.
+- Full-view comparison: `C:\Users\moder\AppData\Local\Temp\navexa-masterdeck-refinement-comparison.png` records the overall composition; it is used only for hierarchy because the full source was proportionally reduced. The unscaled focused comparison is the fidelity gate.
+- State: light theme, populated portfolio, All Time, Amount, Line, expanded report/tax sidebar branches.
+- [P1] The chart acquired a thick native focus frame and exposed raw `value_aud`/ISO tooltip copy while being inspected.
+- [P2] Masterdeck's 48 px desktop top bar pushed the complete portfolio composition 14 px below the source; 300-weight global typography, over-inset metrics, and two-line holding labels made the page feel softer and busier.
+- Fix: reduced the desktop top bar to 34 px and search to 28 px while preserving the 48 px mobile bar; recalibrated the metric/chart vertical rhythm; moved small UI typography to a supported 400 weight; aligned metric copy to the source edge; removed redundant company-name sublines; and added source-like chart axis, fill, cursor, focus and tooltip treatment.
+- Post-fix geometry at 1280 × 720: sidebar 240 px, top bar 34 px, toolbar y=66, active metric y=130–231, chart y=294–584, holdings section y=664, and no page-level horizontal overflow.
+- Fonts and typography: passed. Inter remains the single bundled family, numeric values use the source-like weight and scale, small body text no longer relies on an underweight 300 face, and chart/table numbers preserve compact scanability.
+- Spacing and layout rhythm: passed for the unscaled leading-region comparison. Filter controls, metric baseline, segmented controls, chart frame and holdings heading align within the expected small optical variance. The supplied Masterdeck Brave screenshot appears at approximately 125% per-origin page zoom (its 240 CSS px rail occupies about 300 screenshot pixels); browser zoom is external to the app CSS.
+- Colors and visual tokens: passed. The white/slate/blue hierarchy, active metric surface, restrained green gains and fine neutral rules match the target without reproducing Navexa branding.
+- Image quality and asset fidelity: no new raster assets occur on this portfolio surface. The existing independent Masterdeck mark remains intentionally different from Navexa; a final generated brand mark is tracked separately because the built-in image generator was unavailable during the preceding branding request.
+- Copy and content: passed. The chart tooltip now formats the date for Australian readers and labels the series `Portfolio` instead of exposing an internal database field.
+- Interaction evidence: Percent hides the incompatible Line/Bar selector, returning to Amount restores it, `$139,854.61` remains present, the browser console reports zero warnings/errors, and no framework overlay is present.
+- Remaining P3: replace generic holding initials with a licensed or provider-backed security-logo source when one is selected.
+
+### Pass 10 — live hover and open-state parity (2026-08-26)
+
+- Source browser audit: authenticated `https://www.navexa.com/n/portfolio`, inspected interactively rather than from a static screenshot. Browser pointer/click settling exposed the source hover help and open states for All time, Filter, All Positions, grouping, Hide Closed, Columns and Export.
+- Source evidence: `qa/navexa-hover-filter.png`, `qa/navexa-hover-closed.png`, `qa/navexa-hover-row.png`, `qa/navexa-columns-dialog.png` and `qa/navexa-export-menu.png`.
+- Implementation evidence: `qa/masterdeck-hover-filter.png`, `qa/masterdeck-filter-builder.png`, `qa/masterdeck-hover-positions.png`, `qa/masterdeck-hover-closed.png`, `qa/masterdeck-hover-row.png` and `qa/masterdeck-columns-dialog.png`.
+- Combined visual comparison: `qa/navexa-masterdeck-columns-comparison.png`, unscaled 600 × 720 component crops for modal hierarchy, sizing and control-density judgement.
+- [P1] Masterdeck's matching controls lacked Navexa's explanatory hover layer, and the filter builder was an inline strip instead of an anchored popover.
+- [P1] Column Settings changed the live table immediately and omitted fixed/visible/hidden status, Reset, Cancel and Apply semantics.
+- Fix: added delayed, source-shaped hover help to date range, filter, positions, grouping, closed-position and column controls; converted the filter builder to a responsive floating popover; rebuilt Column Settings around a pending selection model with fixed symbol modes, visibility badges, drag handles, reset/cancel/apply actions and accessible labels; and matched the holdings ledger's row-hover surface while keeping row actions hidden until hover or keyboard focus.
+- Responsive evidence: the 610 px filter builder is source-aligned on wide screens and right-aligned below 1500 px so the 1280 px browser viewport no longer clips its controls.
+- Interaction evidence: opening Filter exposes the complete Where/field/operator/value/add-filter builder; closing it leaves the `Filter Holdings` hover state; All Positions and Hide Closed expose the audited explanatory copy; Columns supports pending checkbox changes and only updates the table after Apply Changes.
+- Automated evidence: 10 files / 32 tests passed. The portfolio interaction test now asserts the hover-help contracts and proves a hidden column appears only after the settings dialog's Apply action.
+
+### Pass 11 — metric, holding, account and icon interaction parity (2026-08-27)
+
+- Source visual truth: `C:\Users\moder\AppData\Local\Temp\codex-clipboard-aa45b2ff-6c7e-447e-9510-c0c20c17f011.png` for the equal desktop portfolio composition, `C:\Users\moder\AppData\Local\Temp\codex-clipboard-07d285d4-bc6c-4d34-8cbd-5c9bbc5e7f05.png` for the metric hover state, and `C:\Users\moder\AppData\Local\Temp\codex-clipboard-2efa74b8-e592-4a1b-8510-2587771a5e33.png` for the full holding-detail route.
+- Browser-rendered implementation: `qa/masterdeck-interaction-parity-local.png` at a 1280 x 720 CSS viewport and DPR 1; focused hover implementation: `qa/masterdeck-metric-hover-local.png`, 1000 x 165 px.
+- Full-view comparison input: `qa/navexa-masterdeck-interaction-comparison.png`, 2560 x 720 px. The Navexa app region is an unscaled 1280 x 720 crop below browser chrome; the implementation is the same 1280 x 720 CSS state.
+- Focused comparison input: `qa/navexa-masterdeck-metric-hover-comparison.png`, normalized to two 1000 x 165 panels. Both show the portfolio metric selected while the capital-gain tile exposes its value on pointer hover.
+- State: light theme, populated portfolio, All Time, Amount, Line, expanded report/tax branches. Masterdeck intentionally retains its independent portfolio values and product identity.
+- [P1] Summary metrics looked selectable but only Total Return had a hard-coded active surface; there was no hover value layer and selecting a metric did not update the plotted series.
+- [P1] Holding rows opened a small terminal modal instead of a navigable holding workspace; Overview/Trades/Income/Notes, range/position controls, performance comparison, key stats and private notes were absent.
+- [P1] The top-right identity mark was inert, notifications had no open state, and ticker rows used generic initial discs even when issuer marks were known.
+- Fix: converted the five summary metrics into semantic tabs with selected state, hover/focus values and metric-specific chart data; added `/app/holdings/:symbol` with four working tabs and responsive ledgers; added account and notification menus with functional navigation/theme/referral/logout actions; packaged and rendered issuer-source marks for AAPL, AMZN, MSFT, NVDA, BHP, CBA, VAS and VGS.
+- Post-fix interaction evidence: physical pointer movement produced hover opacity `1`; Capital Gain changed `aria-selected` to `true`; VAS navigated to `/app/holdings/VAS`; Trades and Notes displayed their state; the account menu exposed billing and referral actions; all eight packaged marks loaded with non-zero natural width and no fallback; desktop console warnings/errors were empty.
+- Responsive evidence: portfolio and VAS detail both reported `scrollWidth === clientWidth` at the browser's 375 px effective mobile viewport. Dense ledgers remain internally scrollable.
+- Fonts and typography: passed. Inter hierarchy and compact financial number treatment remain aligned with the source comparison.
+- Spacing and layout rhythm: passed. Metric cards, chart controls and holding-detail summary use source-equivalent vertical rhythm without changing the 240 px rail.
+- Colors and visual tokens: passed. Hover, selected and menu surfaces use the established light/dark tokens and blue/green/red semantic states.
+- Image quality and asset fidelity: passed. The eight populated securities use packaged issuer-source assets with non-zero rendered dimensions; no initial fallback remains in the verified state.
+- Copy and content: passed. Tabs, ledgers, notes and menus use standalone Masterdeck language while matching the source information anatomy.
+- Automated evidence: 10 files / 35 tests passed; typecheck, lint and production build passed.
+- Post-fix comparison found no actionable P0/P1/P2 differences in the requested metric, icon, holding-detail and account interaction scope.
+
+### Pass 12 — portfolio selector overlap repair (2026-08-27)
+
+- Source bug evidence: `C:\Users\moder\AppData\Local\Temp\codex-clipboard-a386c105-a71f-49f7-9080-17449f9b0480.png` (open) and `C:\Users\moder\AppData\Local\Temp\codex-clipboard-bedf106d-0130-48cb-a2fd-c0a94c61a5d4.png` (closed), both supplied as focused desktop sidebar crops.
+- Browser-rendered implementation: `C:\Users\moder\AppData\Local\Temp\masterdeck-switcher-open-fixed.png` and `C:\Users\moder\AppData\Local\Temp\masterdeck-switcher-closed-fixed.png`, captured at the same focused 305 px sidebar width and DPR 1.
+- Combined comparison input: `C:\Users\moder\AppData\Local\Temp\masterdeck-switcher-comparison.png`, with the supplied open-state defect and the repaired browser state placed side by side without scaling.
+- [P1] The portfolio selector wrapper was allowed to shrink to zero height inside the overflowing flex sidebar. The Portfolio group label and its icons therefore rendered beneath the selector and remained visible around the open menu.
+- Fix: made both the brand and selector rows non-shrinking flex items, preserving their intended 34 px and 38 px geometry; retained the opaque menu surface, full-width anchor, chevron state and outside-click dismissal.
+- Post-fix geometry: brand y=0–34, selector row y=34–72, first navigation group y=78; the formerly overlapping Portfolio label now begins below both the closed trigger and open menu anchor.
+- Typography, spacing, colours and icons: passed. The repair uses the existing Inter hierarchy, slate sidebar tokens, Lucide icons and 240 px rail without introducing a new visual language.
+- Interaction evidence: trigger toggled `aria-expanded`; the named menu became visible; clicking the holdings filter outside dismissed it; Manage portfolios navigated to `/app/settings`, removed the menu and preserved return navigation.
+- Post-fix comparison found no remaining selector/nav overlap or exposed underlying labels in either supplied state.
+
+### Pass 13 — account onboarding and no-card trial (2026-08-27)
+
+- Source visual truth: `C:\Users\moder\AppData\Local\Temp\codex-clipboard-8e07abb8-7bf7-41d4-bab2-7f9a5270db90.png` through `codex-clipboard-ea4f9b3f-91b8-4552-a3ac-1f6cbf29e273.png`, covering the three setup questions, final referral question, empty-account handoff, plan page and comparison details.
+- Browser-rendered implementation: `qa/onboarding-step-1.png`, `qa/onboarding-step-4.png` and `qa/onboarding-mobile.png`.
+- Combined comparison input: `qa/onboarding-comparison.png`, with the supplied first step and Masterdeck implementation reviewed side by side.
+- Fidelity: retained the source's four-step, narrow centred flow, logo-only header, progress line, icon-backed answer rows, Back/Skip controls and light neutral canvas while keeping Masterdeck branding and language.
+- Intentional improvements: made the working area larger and easier to scan, made selected state and keyboard focus explicit, added a visible Continue action to every step, saved partial answers, and explained the no-card/no-auto-renew contract directly beside the final CTA.
+- Functional evidence: physically selected, advanced, reversed and re-advanced through steps; toggled a multi-select asset on and off; selected the final referral answer; and completed the flow to `/app?welcome=1` with meaningful portfolio DOM and zero browser warnings/errors.
+- Responsive evidence: 390 x 844 reported no horizontal overflow; the 358 px card remained inside the viewport and the complete first-step action set was visible without scrolling.
+- Persistence and entitlement: Supabase `account_access` is live with RLS, browser-column restrictions, a server-issued 14-day window and an auth-user trigger. The existing account was safely backfilled as completed/grandfathered, so this launch does not interrupt it.
+- Trial UX: the public funnel, app sidebar, Settings and Billing now distinguish full-access trial, remaining days, expired trial and paid subscription. Checkout remains a deliberate upgrade action rather than collecting a card during signup.
+- Post-fix comparison found no actionable P0/P1/P2 difference in the requested onboarding anatomy; the larger type and explicit action affordances are deliberate usability improvements over the supplied source.
+
+### Pass 14 — per-asset holding detail parity (2026-08-28)
+
+- Source visual truth: `C:\Users\moder\AppData\Local\Temp\codex-clipboard-de426654-5af6-400b-9841-4ed9dbbaf7b6.png`, the supplied Navexa GOLD holding-detail screen at 2559 x 1439 px including browser chrome.
+- Browser-rendered implementation: `qa/masterdeck-holding-detail-local.png`, captured at a 1280 x 720 CSS viewport and DPR 1 after entering the populated local demo.
+- Comparison state: light theme, BHP holding, Overview tab, All time, All Positions and Percent mode. The source and implementation were opened together for visual comparison; the app content region was judged separately from browser chrome.
+- [P1] The previous holding route exposed a generic header, a single wide chart and an empty Position card, so it did not carry Navexa's per-asset detail hierarchy or density.
+- Fix: rebuilt `HoldingDetail.tsx` around the source anatomy: breadcrumb, asset logo and metadata row, tabs, aligned date/position controls, five-metric strip, dual-series performance chart, explicit legend, icon-led Key Stats and a second per-asset Price chart with selectable ranges.
+- Data fidelity: the selected symbol now drives the heading, logo, account, market, daily move, metrics, trade/income ledgers and price history. Recorded trade prices are used when available; holdings without recorded prices are labelled `Indicative history`.
+- Fonts and typography: passed. Existing bundled Inter and the app's compact numeric hierarchy are retained; the asset title, metadata, metric labels and stats values now have the same clear levels as the source.
+- Spacing and layout rhythm: passed. The detail content is centered to a focused 1080 px canvas on desktop, with the source-like top identity block, tab rule, metric row, chart baseline and balanced lower two-column region.
+- Colors and visual tokens: passed. The detail route now uses Masterdeck green for selected/positive analytical states and keeps neutral slate rules and surfaces; the prior blue accent is removed from this page.
+- Image quality and asset fidelity: passed. Holding identity uses the existing provider/source-backed `HoldingLogo` assets and the lower stats use library icons rather than initials or CSS approximations.
+- Copy and content: passed. The page has an explicit per-asset name, ticker/market, account, asset class, current price, daily movement, benchmark legend, tax cost base and portfolio weighting.
+- Responsive evidence: 390 x 844 reported `scrollWidth === clientWidth` at an effective 375 px layout width; the holding metrics collapsed into a readable two-column grid and the lower detail stack reduced to one column.
+- Interaction evidence: Trades, Income and Notes tabs rendered their own states; the Overview mode changed; date/position selectors remained semantic; and each Price range button updated the selected state. Browser console diagnostics contained no errors.
+- Production evidence: `https://masterdeck-eosin.vercel.app/app/holdings/BHP` rendered BHP with five metrics and the Price chart; AAPL rendered its own identity and `Recorded trades` history; live Trades and Notes states worked; desktop and 390 x 844 mobile checks reported no page overflow and no browser errors.
+- Post-fix comparison found no actionable P0/P1/P2 findings in the requested holding-detail scope. Remaining difference is intentional: Masterdeck keeps its own green identity and demo/account data rather than copying Navexa branding or private source values.
+
+### Pass 15 — concise onboarding redesign (2026-08-28)
+
+- Reference patterns reviewed: AllInvestView, TrackMyShares, Navexa AU and TaxTallee. Masterdeck keeps its own green identity, product language and four-field data model; the references informed the concise one-task-at-a-time flow, three-part product framing and trust-led import/tax reassurance.
+- Browser-rendered implementation: `qa/onboarding-desktop-redesign.png`, `qa/onboarding-mobile-redesign.png` and `qa/onboarding-mobile-redesign-step-4.png`.
+- [P1] The previous onboarding used a narrow blue generic-form treatment with long option descriptions and little relationship to the portfolio workflow.
+- Fix: introduced a green-led responsive workspace setup with a focused left rail on desktop, a compact progress header, one question per view, real Lucide icons for every choice, explicit selected and multi-select states, and a two-column referral grid on mobile.
+- Copy: shortened each choice to the decision a new investor needs to make. Removed filler, kept Australian CGT and global portfolio context concrete, and avoided em dashes and generic growth language.
+- Motion: added restrained step crossfades/slides, selected-icon feedback, progress movement and tactile button states. Reduced-motion CSS and `useReducedMotion` keep the flow usable without motion.
+- Functional evidence: desktop and mobile Playwright flows selected Both, Multiple portfolios, Stocks and ETFs plus Crypto, showed the live `2 selected` state, advanced to referral, selected a friend referral and displayed the no-card/no-auto-renew reassurance.
+- Responsive evidence: 1280 x 720 and 390 x 844 both reported no horizontal overflow. The mobile initial and final states fit the viewport width; the final referral grid remained readable without the earlier forced scroll.
+- Browser diagnostics: isolated desktop and mobile runs completed with zero console errors or page errors. `npm.cmd test -- --run` passed with 14 files / 44 tests; typecheck, lint, build and `git diff --check` passed.
+- Post-fix comparison found no actionable P0/P1/P2 issue in the onboarding scope. The remaining differences from the reference products are intentional brand, data-model and trial-flow choices.
+
+### Pass 16 - landing product screenshot scale (2026-08-29)
+
+- Source review: the previous performance and benchmark marketing captures contained a large unused canvas, which made the dashboard UI unreadable when placed inside the landing-page frames.
+- Fix: replaced the feature sources with focused in-app captures at `public/marketing/portfolio-focus.png`, `public/marketing/performance-focus.png` and `public/marketing/tax-focus.png`. The tax preview is a real Australian capital gains tax parcel-matching state from the current demo flow.
+- Framing: `ProductShot` now accepts a per-preview zoom value. The hero uses a larger, proportionally cropped portfolio view; feature previews use their own scale so the sidebar, metrics, report controls and CGT detail remain legible instead of inheriting one global crop.
+- Responsive evidence: `qa/landing-final-desktop.png` and `qa/landing-final-mobile.png` were captured at 1440 x 1000 and 390 x 844. Three feature preview states were separately captured at both widths; all images loaded, stayed within the frame and reported `scrollWidth === clientWidth`.
+- Browser diagnostics: the landing-page desktop and mobile runs completed with zero console errors or page errors. Tests, typecheck, lint, build and `git diff --check` passed after the screenshot update.
+- Post-fix comparison found the previews materially clearer at both widths while preserving the existing product-shot shell, green brand treatment and reduced-motion behavior.
+
+### Pass 17 - landing hierarchy, proof interaction and workflow polish (2026-08-29)
+
+- Reference direction: the supplied onboarding/landing feedback asked for a quieter tech-pattern backdrop, fewer hero elements, emphasized 60+ markets / 200+ brokers / Australian CGT / read-only proof, icon-led boundaries and a more tactile three-step workflow.
+- Fix: removed the redundant hero benefit checklist and retained one concise trial reassurance; removed the `A focused job` and `How it works` preheaders; added a restrained green grid/radial texture behind the hero; and kept the green-led identity throughout.
+- Proof interaction: the four coverage stats are now animated buttons with real Lucide icons, selected-state underline, hover/tap feedback and a matching detail panel. The active detail changes between Global coverage, Connection paths, Parcel methods and Read-only by design.
+- Boundary section: `What Masterdeck does` and `What Masterdeck does not do` now use icon-backed rows, distinct boundary styling and concise supporting copy instead of a flat text list.
+- Workflow section: the three cards are now selectable step controls with icon, short label, active state and a larger animated explanation panel; the content remains concise and preserves the broker-files-to-answer story.
+- Screenshot framing: hero and all three feature previews use a 150% in-window image scale with responsive crop containment. Desktop and mobile preview frames remain within the page canvas with no page-level horizontal overflow.
+- Navigation: document scrolling is smooth by default, respects reduced-motion preferences, and all section targets use a sticky-header offset so desktop and mobile nav links land cleanly.
+- Local browser evidence: 1440 x 1000 and 390 x 844 runs showed the updated hero, proof band, boundary block and workflow selector; the mobile stats remained readable and no page-level overflow was detected. Desktop/mobile console diagnostics were empty.
+- Automated evidence: 14 test files / 44 tests passed; typecheck, lint, build and `git diff --check` passed.
+- Production evidence: deployment `dpl_AUZ4wd54wu6KkqLXRxzwdaeSkEkM` reported READY and the stable alias `https://masterdeck-eosin.vercel.app` rendered the updated hero, four interactive stats, icon-led boundary section, selectable workflow and enlarged previews. Desktop and 390 x 844 mobile production checks reported no page-level overflow and zero browser warnings/errors.
+
+## Functional evidence
+
+- `npm.cmd run typecheck`: passed.
+- `npm.cmd run lint`: passed.
+- `npm.cmd test`: 14 files / 44 tests passed.
+- `npm.cmd run build`: passed.
+- Desktop browser audit: 21/21 authenticated routes had meaningful DOM, zero page-level overflow and zero console errors.
+- Mobile browser audit: 21/21 authenticated routes settled at 390 x 844 with meaningful DOM and zero page-level overflow.
+- Production audit: all 16 rebuilt report, tax and tool routes rendered at `https://masterdeck-eosin.vercel.app` under the signed-in account, preserved their deep links, showed no demo portfolio state and had zero page-level overflow.
+- Interactions: report holding filter, sale-allocation selector, Deck AI suggestion/response, custom-group creation, nested/full sidebar collapse, command search, portfolio filters, chart modes, group/sort/column controls, exports, holding details and route navigation passed.
+- Latest holding-detail browser verification: BHP and AAPL rendered their own asset identity and metrics; Overview, Trades, Income and Notes states passed; the Price 5D control updated selection; desktop and mobile console diagnostics remained clean.
+- Latest deployment: Vercel production deployment `dpl_AUZ4wd54wu6KkqLXRxzwdaeSkEkM` reported READY and aliased to `https://masterdeck-eosin.vercel.app`.
+
+## Findings
+
+- No actionable P0/P1/P2 findings remain.
+- No actionable P0/P1/P2 findings remain in the interaction and icon scope covered by Pass 11.
+- [P3] Projected income dates are clearly marked indicative because connected broker data does not expose forward company guidance.
+
+## Final result
+
+final result: passed

@@ -1,4 +1,4 @@
-import { differenceInCalendarDays } from 'date-fns'
+import { addYears, differenceInCalendarDays } from 'date-fns'
 import type { TaxMatch, TaxMethod, Transaction } from '../types'
 import { financialYearBounds } from './portfolio'
 
@@ -25,23 +25,24 @@ export function matchTaxLots(transactions: Transaction[], financialYear: string,
 
   activity.forEach((transaction) => {
     const symbol = String(transaction.symbol).toUpperCase()
+    const lotKey = JSON.stringify([transaction.provider, transaction.provider_account_id || transaction.account_name || '', symbol])
     const quantity = Math.abs(Number(transaction.quantity || 0))
     if (!quantity) return
     if (String(transaction.type).toUpperCase() === 'BUY') {
       const fees = Math.abs(Number(transaction.fees || 0) * Number(transaction.fx_rate || 1))
-      const lots = bySymbol.get(symbol) || []
+      const lots = bySymbol.get(lotKey) || []
       lots.push({
         id: transaction.provider_external_id,
         date: transaction.date,
         quantity,
         unitCostAud: (audValue(transaction) + fees) / quantity,
       })
-      bySymbol.set(symbol, lots)
+      bySymbol.set(lotKey, lots)
       return
     }
 
     let remaining = quantity
-    const lots = bySymbol.get(symbol) || []
+    const lots = bySymbol.get(lotKey) || []
     const sellDate = new Date(transaction.date)
     const proceedsTotal = Math.max(0, audValue(transaction) - Math.abs(Number(transaction.fees || 0) * Number(transaction.fx_rate || 1)))
     while (remaining > 0 && lots.some((lot) => lot.quantity > 0)) {
@@ -65,7 +66,7 @@ export function matchTaxLots(transactions: Transaction[], financialYear: string,
           proceedsAud,
           costBaseAud,
           gainAud: proceedsAud - costBaseAud,
-          discountEligible: holdingDays >= 365,
+          discountEligible: sellDate > addYears(new Date(lot.date), 1),
           holdingDays,
         })
       }
@@ -83,6 +84,9 @@ export function taxSummary(matches: TaxMatch[]) {
     .filter((item) => item.gainAud > 0 && item.discountEligible)
     .reduce((sum, item) => sum + item.gainAud, 0)
   const net = gains - losses
-  const estimatedDiscountedNet = Math.max(0, net - Math.min(discountEligibleGains * 0.5, Math.max(0, net)))
+  const nonDiscountGains = gains - discountEligibleGains
+  const remainingNonDiscount = Math.max(0, nonDiscountGains - losses)
+  const remainingDiscount = Math.max(0, discountEligibleGains - Math.max(0, losses - nonDiscountGains))
+  const estimatedDiscountedNet = remainingNonDiscount + remainingDiscount * 0.5
   return { gains, losses, net, discountEligibleGains, estimatedDiscountedNet }
 }

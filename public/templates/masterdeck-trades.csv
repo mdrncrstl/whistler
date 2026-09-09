@@ -1,0 +1,2 @@
+transaction_id,date,type,symbol,quantity,price,fees
+example-001,2026-01-15,BUY,VAS,10,90,5

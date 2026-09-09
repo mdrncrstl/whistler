@@ -354,14 +354,14 @@ td small { display: block; margin-top: 4px; color: var(--muted-2); font-size: 8.
 
 /* Modal and toast */
 .modal-backdrop { position: fixed; inset: 0; padding: 22px; background: rgb(0 0 0 / 72%); backdrop-filter: blur(8px); display: grid; place-items: center; z-index: 100; }
-.modal-dialog { width: min(520px, 100%); max-height: min(720px, calc(100vh - 44px)); padding: 20px; border: 1px solid var(--line-strong); border-radius: 16px; overflow: auto; background: #0d1913; box-shadow: var(--shadow); }
+.modal-dialog { width: min(520px, 100%); max-height: min(720px, calc(100vh - 44px)); padding: 20px; border: 1px solid var(--line-strong); border-radius: 16px; overflow: auto; background: var(--surface); box-shadow: var(--shadow); }
 .modal-head { margin-bottom: 18px; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
 .modal-head h2 { margin-bottom: 5px; font-size: 17px; letter-spacing: -.02em; }
 .modal-head p { margin: 0; color: var(--muted); font-size: 9.5px; line-height: 1.5; }
 .modal-actions { margin-top: 16px; display: flex; justify-content: flex-end; gap: 8px; }
 .disconnect-warning { padding: 14px; border: 1px solid rgb(255 118 118 / 22%); border-radius: 10px; background: rgb(255 118 118 / 5%); color: var(--red); display: flex; align-items: flex-start; gap: 10px; }
 .disconnect-warning p { margin: 0; color: var(--muted); font-size: 9px; line-height: 1.55; }
-.toast { position: fixed; right: 20px; bottom: 20px; width: min(390px, calc(100vw - 40px)); min-height: 50px; padding: 10px 10px 10px 13px; border: 1px solid var(--line-strong); border-radius: 11px; background: #112019; box-shadow: var(--shadow); display: grid; grid-template-columns: 18px minmax(0, 1fr) 32px; align-items: center; gap: 9px; color: var(--muted); font-size: 10px; z-index: 120; }
+.toast { position: fixed; right: 20px; bottom: 20px; width: min(390px, calc(100vw - 40px)); min-height: 50px; padding: 10px 10px 10px 13px; border: 1px solid var(--line-strong); border-radius: 11px; background: var(--surface); box-shadow: var(--shadow); display: grid; grid-template-columns: 18px minmax(0, 1fr) 32px; align-items: center; gap: 9px; color: var(--muted); font-size: 10px; z-index: 120; }
 .toast-success > svg { color: var(--green); }
 .toast-error > svg { color: var(--red); }
 
@@ -391,7 +391,7 @@ td small { display: block; margin-top: 4px; color: var(--muted-2); font-size: 8.
   .drawer-panel { width: min(280px, calc(100% - 44px)); height: 100%; padding: 22px 15px; background: var(--bg); display: flex; flex-direction: column; box-shadow: var(--shadow); }
   .drawer-panel .sidebar-foot { margin-top: auto; }
   .drawer-dismiss { position: absolute; top: 17px; right: 12px; width: 36px; height: 36px; border: 0; border-radius: 9px; background: var(--surface); display: grid; place-items: center; }
-  .mobile-nav { position: fixed; left: 0; right: 0; bottom: 0; min-height: 64px; padding: 6px max(8px, env(safe-area-inset-right)) max(6px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left)); border-top: 1px solid var(--line); background: rgb(7 17 13 / 94%); backdrop-filter: blur(16px); display: grid; grid-template-columns: repeat(5, 1fr); z-index: 50; }
+  .mobile-nav { position: fixed; left: 0; right: 0; bottom: 0; min-height: 64px; padding: 6px max(8px, env(safe-area-inset-right)) max(6px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left)); border-top: 1px solid var(--line); background: var(--surface); backdrop-filter: blur(16px); display: grid; grid-template-columns: repeat(5, 1fr); z-index: 50; }
   .mobile-nav a { min-width: 0; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; color: var(--muted-2); font-size: 8px; }
   .mobile-nav a.active { color: var(--green); background: rgb(110 231 168 / 5%); }
   .dashboard-grid, .income-grid { grid-template-columns: 1fr; }
@@ -469,3 +469,8 @@ td small { display: block; margin-top: 4px; color: var(--muted-2); font-size: 8.
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
+
+/* Shared surface tokens kept here for older imports and third-party embeds. */
+.settings-field input { background: var(--surface); }
+.settings-static-value { background: var(--surface-2); }
+.settings-control-row > i { background: var(--surface-3); }

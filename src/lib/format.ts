@@ -6,6 +6,13 @@ export const number = (value: number, maximumFractionDigits = 2) =>
 
 export const percent = (value: number, digits = 2) => `${value >= 0 ? '+' : ''}${Number(value || 0).toFixed(digits)}%`
 
+/**
+ * A percentage that is a share of a whole rather than a change: a weighting, a
+ * concentration, progress toward a target. These carry no sign - "+21.65% of the
+ * portfolio" reads as a gain that is not there.
+ */
+export const share = (value: number, digits = 2) => `${Number(value || 0).toFixed(digits)}%`
+
 export const date = (value?: string | null, options: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short', year: 'numeric' }) => {
   if (!value) return 'Never'
   const parsed = new Date(value)

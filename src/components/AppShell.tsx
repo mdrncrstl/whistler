@@ -5,6 +5,10 @@ import { authClient } from '../lib/supabase'
 import { usePortfolio } from '../context/PortfolioContext'
 import { Brand, Button, IconButton, Toast } from './ui'
 
+// The feature-rich shell is the canonical app chrome. The legacy implementation
+// remains below for source compatibility with older imports.
+export { AppShell } from './AppShell-Wifi-G'
+
 const navigation = [
   { to: '/app', label: 'Overview', icon: BarChart3, end: true },
   { to: '/app/holdings', label: 'Holdings', icon: BriefcaseBusiness },
@@ -15,7 +19,7 @@ const navigation = [
   { to: '/app/settings', label: 'Settings', icon: Settings },
 ]
 
-export function AppShell({ children, onExitDemo }: { children: ReactNode; onExitDemo: () => void }) {
+export function LegacyAppShell({ children, onExitDemo }: { children: ReactNode; onExitDemo: () => void }) {
   const { bundle, demo, action, notice, setNotice, refreshQuotes } = usePortfolio()
   const [mobileOpen, setMobileOpen] = useState(false)
   const location = useLocation()

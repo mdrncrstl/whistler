@@ -7,12 +7,14 @@ import type { TaxMethod } from '../types'
 import { date, downloadCsv, money, number } from '../lib/format'
 import { Badge, Button, Card, EmptyState, MetricCard, PageHeader, PrivateMoney, Select } from '../components/ui'
 
+export { TaxCentre } from './TaxCentre-Wifi-G'
+
 function fyOptions() {
   const current = Number(financialYearFor().split('/')[0])
   return Array.from({ length: 7 }, (_, index) => `${current - index}/${String(current - index + 1).slice(-2)}`)
 }
 
-export function TaxCentre() {
+export function LegacyTaxCentre() {
   const { bundle } = usePortfolio()
   const [fy, setFy] = useState(financialYearFor())
   const [method, setMethod] = useState<TaxMethod>(bundle.profile?.settings?.defaultTaxMethod || 'fifo')

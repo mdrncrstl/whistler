@@ -1,18 +1,23 @@
 import { ArrowDownRight, ArrowUpRight, BriefcaseBusiness, CircleDollarSign, Landmark, RefreshCw, TrendingUp, WalletCards } from 'lucide-react'
-import { useMemo, useState } from 'react'
-import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import { useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
+import { Area, AreaChart, CartesianGrid, ResponsiveContainer, XAxis, YAxis } from 'recharts'
 import { usePortfolio } from '../context/PortfolioContext'
 import { allocationBy, summarisePortfolio } from '../lib/portfolio'
 import { date, money, percent } from '../lib/format'
 import { Badge, Button, Card, EmptyState, MetricCard, PageHeader, PrivateMoney, Select } from '../components/ui'
 
+// The Navexa-depth overview owns the canonical portfolio controls and ledger.
+export { Overview } from './Overview-Wifi-G'
+
 const periods: Record<string, number> = { '1M': 31, '3M': 93, '6M': 186, YTD: 366, '1Y': 366, '3Y': 1096, ALL: Infinity }
 const palette = ['#6ee7a8', '#8b7cff', '#d6b56b', '#58a6ff', '#ff9d6c', '#bdc7c1']
 
-export function Overview() {
+export function LegacyOverview() {
   const { bundle, action, refreshQuotes } = usePortfolio()
   const [period, setPeriod] = useState('1Y')
   const [allocationKey, setAllocationKey] = useState<'asset_class' | 'provider' | 'sector'>('asset_class')
+  const mainChartRef = useRef<HTMLDivElement>(null)
+  const [hoveredChartIndex, setHoveredChartIndex] = useState<number | null>(null)
   const summary = useMemo(() => summarisePortfolio(bundle), [bundle])
   const allocation = useMemo(() => allocationBy(bundle.holdings, allocationKey), [allocationKey, bundle.holdings])
   const chartData = useMemo(() => {
@@ -21,6 +26,31 @@ export function Overview() {
     return bundle.snapshots.filter((item) => days === Infinity || new Date(item.date).getTime() >= latest - days * 86_400_000)
   }, [bundle.snapshots, period])
   const movers = [...bundle.holdings].sort((a, b) => Math.abs(b.day_change_aud) - Math.abs(a.day_change_aud)).slice(0, 5)
+  const updateChartPointer = (event: ReactPointerEvent<HTMLDivElement>) => {
+    const chart = mainChartRef.current
+    if (!chart || chartData.length < 2) return
+    const rect = chart.getBoundingClientRect()
+    const x = Math.min(Math.max(0, event.clientX - rect.left), rect.width)
+    const y = Math.min(Math.max(0, event.clientY - rect.top), rect.height)
+    const plotLeft = 50
+    const plotRight = 10
+    const plotWidth = Math.max(1, rect.width - plotLeft - plotRight)
+    const ratio = Math.min(1, Math.max(0, (x - plotLeft) / plotWidth))
+    const index = Math.round(ratio * (chartData.length - 1))
+    chart.style.setProperty('--overview-pointer-x', `${x}px`)
+    chart.style.setProperty('--overview-pointer-y', `${y}px`)
+    chart.dataset.pointerVisible = 'true'
+    chart.dataset.pointerSide = x > rect.width - 190 ? 'left' : 'right'
+    if (index !== hoveredChartIndex) setHoveredChartIndex(index)
+  }
+  const hideChartPointer = () => {
+    const chart = mainChartRef.current
+    if (!chart) return
+    chart.dataset.pointerVisible = 'false'
+    delete chart.dataset.pointerSide
+    setHoveredChartIndex(null)
+  }
+  const hoveredChartPoint = hoveredChartIndex === null ? undefined : chartData[hoveredChartIndex]
 
   return (
     <>
@@ -45,20 +75,27 @@ export function Overview() {
             </div>
           </div>
           {chartData.length > 1 ? (
-            <div className="main-chart">
+            <div ref={mainChartRef} className="main-chart" onPointerMove={updateChartPointer} onPointerLeave={hideChartPointer}>
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={chartData} margin={{ top: 18, right: 10, left: 2, bottom: 0 }}>
                   <defs>
                     <linearGradient id="portfolio-fill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#6ee7a8" stopOpacity={0.24} /><stop offset="1" stopColor="#6ee7a8" stopOpacity={0} /></linearGradient>
                   </defs>
-                  <CartesianGrid stroke="#203429" strokeDasharray="3 5" vertical={false} />
+                  <CartesianGrid stroke="var(--line)" vertical={false} />
                   <XAxis dataKey="date" tickFormatter={(value) => date(value, { month: 'short' })} axisLine={false} tickLine={false} tick={{ fill: '#789087', fontSize: 11 }} />
                   <YAxis tickFormatter={(value) => `$${Math.round(Number(value) / 1000)}k`} axisLine={false} tickLine={false} width={48} tick={{ fill: '#789087', fontSize: 11 }} />
-                  <Tooltip contentStyle={{ background: '#0d1913', border: '1px solid #294335', borderRadius: 10 }} labelFormatter={(value) => date(String(value))} formatter={(value, name) => [money(Number(value)), name]} />
                   <Area name="Portfolio" type="monotone" dataKey="value_aud" stroke="#6ee7a8" strokeWidth={2.5} fill="url(#portfolio-fill)" dot={false} activeDot={{ r: 4, fill: '#6ee7a8', stroke: '#07110d', strokeWidth: 2 }} isAnimationActive={false} />
                   {chartData.some((item) => item.benchmark_value_aud != null) && <Area name="Benchmark" type="monotone" dataKey="benchmark_value_aud" stroke="#8b7cff" strokeWidth={1.5} strokeDasharray="5 5" fill="transparent" dot={false} isAnimationActive={false} />}
                 </AreaChart>
               </ResponsiveContainer>
+              {hoveredChartPoint && <>
+                <span className="main-chart-pointer-line" aria-hidden="true" />
+                <div className="main-chart-pointer-tooltip" role="status">
+                  <strong>{date(hoveredChartPoint.date, { day: '2-digit', month: 'short', year: 'numeric' })}</strong>
+                  <span><i className="portfolio" />Portfolio <b>{money(hoveredChartPoint.value_aud)}</b></span>
+                  {hoveredChartPoint.benchmark_value_aud != null && <span><i className="benchmark" />Benchmark <b>{money(hoveredChartPoint.benchmark_value_aud)}</b></span>}
+                </div>
+              </>}
             </div>
           ) : <EmptyState icon={TrendingUp} title="Performance history begins after your first sync" description="Daily snapshots will build an accurate portfolio chart over time." />}
           <div className="chart-legend"><span><i className="legend-line portfolio" />Portfolio</span>{chartData.some((item) => item.benchmark_value_aud != null) && <span><i className="legend-line benchmark" />Benchmark</span>}<span className="chart-asof">Last portfolio point {date(chartData.at(-1)?.date)}</span></div>

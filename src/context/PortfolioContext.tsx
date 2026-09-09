@@ -2,7 +2,9 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 import type { Session } from '@supabase/supabase-js'
 import { demoBundle } from '../data/demo'
+import { LoadingScreen } from '../components/ui'
 import { portfolioApi } from '../lib/api'
+import type { MarketDataState } from '../lib/marketDataApi'
 import type { PortfolioBundle, Profile, SuperheroReport } from '../types'
 
 interface Notice {
@@ -17,6 +19,7 @@ interface PortfolioContextValue {
   loading: boolean
   action: string | null
   notice: Notice | null
+  marketData: MarketDataState
   setNotice: (notice: Notice | null) => void
   refresh: () => Promise<void>
   connectIbkr: (input: { label: string; token: string; queryId: string }) => Promise<void>
@@ -31,11 +34,15 @@ interface PortfolioContextValue {
 
 const PortfolioContext = createContext<PortfolioContextValue | null>(null)
 
+const idleMarketData: MarketDataState = { status: 'idle', source: null, generatedAt: null, updated: 0, failed: 0, message: null }
+
 export function PortfolioProvider({ session, demo, children }: { session: Session | null; demo: boolean; children: ReactNode }) {
   const [bundle, setBundle] = useState<PortfolioBundle>(() => structuredClone(demoBundle))
   const [loading, setLoading] = useState(!demo)
   const [action, setAction] = useState<string | null>(null)
   const [notice, setNotice] = useState<Notice | null>(null)
+  const [marketData] = useState<MarketDataState>(idleMarketData)
+  const [hasHydrated, setHasHydrated] = useState(demo)
 
   const requireSession = useCallback(() => {
     if (!session) throw new Error('Sign in to use a live connection.')
@@ -45,6 +52,7 @@ export function PortfolioProvider({ session, demo, children }: { session: Sessio
   const refresh = useCallback(async () => {
     if (demo) {
       setBundle((current) => ({ ...current, demo: true }))
+      setHasHydrated(true)
       setLoading(false)
       return
     }
@@ -55,6 +63,7 @@ export function PortfolioProvider({ session, demo, children }: { session: Sessio
       setNotice({ tone: 'error', message: error instanceof Error ? error.message : 'Could not load the portfolio.' })
       throw error
     } finally {
+      setHasHydrated(true)
       setLoading(false)
     }
   }, [demo, requireSession])
@@ -84,6 +93,7 @@ export function PortfolioProvider({ session, demo, children }: { session: Sessio
     loading,
     action,
     notice,
+    marketData,
     setNotice,
     refresh,
     connectIbkr: (input) => run('connect-ibkr', () => portfolioApi.connectIbkr(requireSession(), input)),
@@ -101,9 +111,9 @@ export function PortfolioProvider({ session, demo, children }: { session: Sessio
           return { message: 'Demo preferences updated for this session.' }
         })
       : run('save-profile', () => portfolioApi.updateProfile(requireSession(), profile)),
-  }), [action, bundle, demo, loading, notice, refresh, requireSession, run, session])
+  }), [action, bundle, demo, loading, marketData, notice, refresh, requireSession, run, session])
 
-  return <PortfolioContext.Provider value={value}>{children}</PortfolioContext.Provider>
+  return <PortfolioContext.Provider value={value}>{loading && !hasHydrated ? <LoadingScreen /> : children}</PortfolioContext.Provider>
 }
 
 export function usePortfolio() {

@@ -1,0 +1,27 @@
+import { chromium } from '@playwright/test'
+const base = 'http://127.0.0.1:4173'
+const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' })
+const p = await (await b.newContext({ viewport: { width: 1440, height: 940 }, deviceScaleFactor: 2 })).newPage()
+await p.goto(base, { waitUntil: 'domcontentloaded' })
+await p.evaluate(() => sessionStorage.setItem('masterdeck-demo','true'))
+await p.goto(base + '/app', { waitUntil: 'networkidle' })
+await p.waitForSelector('.portfolio-main-chart svg')
+await p.waitForTimeout(1200)
+const box = await p.locator('.portfolio-main-chart').boundingBox()
+const y = box.y + box.height * 0.5
+await p.mouse.move(box.x + box.width * 0.25, y)
+await p.mouse.down()
+for (let i = 25; i <= 68; i += 6) { await p.mouse.move(box.x + box.width * (i / 100), y); await p.waitForTimeout(45) }
+await p.waitForTimeout(250)
+console.log('DURING DRAG :', (await p.locator('.chart-range-readout').innerText()).replace(/\n/g, ' | '))
+await p.screenshot({ path: '/home/claude/md/audit/drag-during.png', clip: { x: 300, y: 60, width: 1140, height: 640 } })
+await p.mouse.up()
+await p.waitForTimeout(400)
+console.log('AFTER RELEASE:', (await p.locator('.chart-range-readout').innerText()).replace(/\n/g, ' | '))
+await p.screenshot({ path: '/home/claude/md/audit/drag-after.png', clip: { x: 300, y: 60, width: 1140, height: 640 } })
+const band = await p.locator('.recharts-reference-area').count()
+console.log('BAND ELEMENTS:', band)
+await p.keyboard.press('Escape')
+await p.waitForTimeout(300)
+console.log('AFTER ESC   :', await p.locator('.chart-range-readout').count(), 'readouts;', await p.locator('.recharts-reference-area').count(), 'bands')
+await b.close()

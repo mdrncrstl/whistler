@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { authClient } from '../lib/supabase'
 import { Brand, Button } from './ui'
 
-export function Landing({ onDemo }: { onDemo: () => void }) {
+export function LegacyLanding({ onDemo }: { onDemo: () => void }) {
   const [error, setError] = useState('')
   const [redirecting, setRedirecting] = useState(false)
 
@@ -77,3 +77,5 @@ export function Landing({ onDemo }: { onDemo: () => void }) {
     </div>
   )
 }
+
+export { Landing } from './Landing-Wifi-G'

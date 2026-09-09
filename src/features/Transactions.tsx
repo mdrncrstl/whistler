@@ -4,6 +4,8 @@ import { usePortfolio } from '../context/PortfolioContext'
 import { date, downloadCsv, money, number } from '../lib/format'
 import { Badge, Button, Card, EmptyState, PageHeader, SearchInput, Select } from '../components/ui'
 
+export { Transactions } from './Transactions-Wifi-G'
+
 const PAGE_SIZE = 25
 
 function toneForType(type: string) {
@@ -14,7 +16,7 @@ function toneForType(type: string) {
   return 'neutral' as const
 }
 
-export function Transactions() {
+export function LegacyTransactions() {
   const { bundle } = usePortfolio()
   const [query, setQuery] = useState('')
   const [type, setType] = useState('all')
