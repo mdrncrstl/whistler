@@ -85,6 +85,9 @@ function AppContent() {
   const location = useLocation()
   const [session, setSession] = useState<Session | null | undefined>(undefined)
   const [demo, setDemo] = useState(() => window.sessionStorage.getItem('masterdeck-demo') === 'true')
+  const publicMarketingPath = location.pathname === '/'
+    || location.pathname === '/pricing'
+    || marketingPages.some(page => page.path === location.pathname)
 
   useEffect(() => {
     let mounted = true
@@ -111,7 +114,7 @@ function AppContent() {
   if (session === undefined && location.pathname === '/auth/callback') return <AuthCallback />
   // Same reasoning as the account-access gate below: the onboarding route keeps its own
   // surface while the session resolves rather than borrowing the workspace loader.
-  if (session === undefined) return location.pathname === '/welcome'
+  if (session === undefined && !publicMarketingPath) return location.pathname === '/welcome'
     ? <main className="onboarding-page onboarding-page-waiting" aria-busy="true" />
     : <LoadingScreen />
   const authenticated = Boolean(session || demo)
