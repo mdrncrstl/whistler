@@ -239,6 +239,7 @@ export function Landing({ onDemo, signedIn = false, onOpenApp, page }: LandingPr
   }
 
   const signupLabel = signedIn ? 'Open Masterdeck' : redirecting ? 'Finishing sign-in...' : 'Try Masterdeck free'
+  const pricingCtaLabel = signedIn ? 'Open Masterdeck' : 'Start free trial'
 
   return (
     <div className="cloud-page">
@@ -419,7 +420,7 @@ export function Landing({ onDemo, signedIn = false, onOpenApp, page }: LandingPr
               <h2 aria-label="Clear pricing. Try it before you pay.">Clear pricing.<br /><em>Try it before you pay.</em></h2>
             </div>
             <div className="cloud-pricing-copy">
-              <p>Create your workspace free. No card is required.</p>
+              <p><strong>Try every plan free for 14 days.</strong><br />No card required. Cancel anytime.</p>
               <div className="cloud-billing-toggle" aria-label="Billing period">
                 <button aria-pressed={!annual} className={!annual ? 'active' : ''} onClick={() => setAnnual(false)}>Monthly</button>
                 <button aria-pressed={annual} className={annual ? 'active' : ''} onClick={() => setAnnual(true)}>Annual <span>save 26%</span></button>
@@ -459,7 +460,7 @@ export function Landing({ onDemo, signedIn = false, onOpenApp, page }: LandingPr
                     {annual ? '$' + formatAud(plan.annualTotal) + ' billed annually, save ' + annualSavingsPercent(plan) + '%' : 'Billed monthly. Cancel anytime.'}
                   </motion.small>
                 </AnimatePresence>
-                <button className="cloud-button cloud-button-price" onClick={() => openAuthentication('signup')}>{signupLabel}</button>
+                <button className="cloud-button cloud-button-price" onClick={() => openAuthentication('signup')}>{pricingCtaLabel}</button>
                 <ul>{plan.features.slice(0, 4).map((item) => <li key={item}><Check />{item}</li>)}</ul>
               </article>
             ))}
