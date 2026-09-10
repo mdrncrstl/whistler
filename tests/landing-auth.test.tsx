@@ -2,10 +2,7 @@ import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/re
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { Landing } from '../src/components/Landing-Wifi-G'
 
-vi.mock('@react-oauth/google', () => ({ GoogleLogin: ({ onSuccess }: { onSuccess: (value: { credential: string }) => void }) => <button onClick={() => onSuccess({ credential: 'test-google-id-token' })}>Continue with Google</button> }))
-
 const authMocks = vi.hoisted(() => ({
-  signInWithIdToken: vi.fn().mockResolvedValue({ data: { session: { access_token: 'test' } }, error: null }),
   signInWithOAuth: vi.fn().mockResolvedValue({ data: { provider: 'google', url: 'https://accounts.google.com/' }, error: null }),
   signInWithPassword: vi.fn().mockResolvedValue({ error: null }),
   signUp: vi.fn().mockResolvedValue({ data: { session: null }, error: null }),
@@ -13,7 +10,6 @@ const authMocks = vi.hoisted(() => ({
 
 vi.mock('../src/lib/supabase', () => ({
   authClient: { auth: {
-    signInWithIdToken: authMocks.signInWithIdToken,
     signInWithOAuth: authMocks.signInWithOAuth,
     signInWithPassword: authMocks.signInWithPassword,
     signUp: authMocks.signUp,
@@ -39,16 +35,20 @@ describe('Masterdeck authentication', () => {
     authMocks.signUp.mockResolvedValue({ data: { session: null }, error: null })
   })
 
-  it('exchanges the Google identity token and opens the app', async () => {
-    const onOpenApp = vi.fn()
-    render(<Landing onDemo={vi.fn()} onOpenApp={onOpenApp} />)
+  it('starts Google OAuth with the app callback', async () => {
+    render(<Landing onDemo={vi.fn()} onOpenApp={vi.fn()} />)
 
     fireEvent.click(screen.getAllByRole('button', { name: /try masterdeck free/i })[0])
     expect(await screen.findByRole('dialog', { name: 'Continue to Masterdeck' })).toBeInTheDocument()
 
     fireEvent.click(screen.getByRole('button', { name: 'Continue with Google' }))
-    await waitFor(() => expect(authMocks.signInWithIdToken).toHaveBeenCalledWith({ provider: 'google', token: 'test-google-id-token' }))
-    expect(onOpenApp).toHaveBeenCalledOnce()
+    await waitFor(() => expect(authMocks.signInWithOAuth).toHaveBeenCalledWith({
+      provider: 'google',
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+        queryParams: { prompt: 'select_account' },
+      },
+    }))
   })
 
   it('signs an existing user in with email and password', async () => {

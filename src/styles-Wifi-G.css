@@ -5881,8 +5881,7 @@ body { font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-s
   transform: none;
 }
 
-/* Keep every sign-in choice on one visual track. Google remains the real
-   provider control, layered invisibly over the shared local presentation. */
+/* Keep every sign-in choice on one visual track. */
 .masterdeck-auth-methods { gap: 10px; }
 .masterdeck-auth-method,
 .masterdeck-google-native {
@@ -5908,14 +5907,13 @@ body { font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-s
   transition: background .18s ease, border-color .18s ease, box-shadow .18s ease, transform .18s ease;
 }
 .masterdeck-auth-method:hover:not(:disabled),
-.masterdeck-google-native:hover .masterdeck-google-visual {
+.masterdeck-google-native:hover:not(:disabled) {
   border-color: #86c8a7;
   background: #f7fcf9;
   transform: translateY(-1px);
 }
 .masterdeck-auth-method:active:not(:disabled) { transform: translateY(0); }
-.masterdeck-auth-method:disabled,
-.masterdeck-google-native[aria-busy="true"] { opacity: .65; cursor: wait; }
+.masterdeck-auth-method:disabled { opacity: .65; cursor: wait; }
 .masterdeck-auth-method-icon {
   width: 32px;
   height: 32px;
@@ -5942,10 +5940,6 @@ body { font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-s
 }
 .masterdeck-auth-method-spacer { grid-column: 3; width: 32px; height: 32px; }
 .masterdeck-google-native { position: relative; padding: 0; }
-.masterdeck-google-visual { position: absolute; inset: 0; pointer-events: none; }
-.masterdeck-google-hit-area { position: absolute; inset: 0; z-index: 1; overflow: hidden; opacity: 0; }
-.masterdeck-google-hit-area > div,
-.masterdeck-google-hit-area iframe { width: 100% !important; height: 100% !important; }
 .masterdeck-google-letter {
   display: block;
   font-family: Arial, sans-serif;
@@ -6152,13 +6146,9 @@ html { scrollbar-gutter: stable; }
   border-radius: 9px;
 }
 .masterdeck-auth-methods .masterdeck-google-native { padding: 0; }
-.masterdeck-auth-methods .masterdeck-google-native .masterdeck-google-visual { height: 50px; }
-.masterdeck-auth-methods .masterdeck-google-native .masterdeck-google-hit-area { height: 50px; }
 @media (max-width: 520px) {
   .masterdeck-auth-methods .masterdeck-auth-method,
-  .masterdeck-auth-methods .masterdeck-google-native,
-  .masterdeck-auth-methods .masterdeck-google-native .masterdeck-google-visual,
-  .masterdeck-auth-methods .masterdeck-google-native .masterdeck-google-hit-area {
+  .masterdeck-auth-methods .masterdeck-google-native {
     height: 48px;
     min-height: 48px;
   }
