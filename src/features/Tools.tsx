@@ -1,4 +1,4 @@
-import { ArrowUpRight, Mic, Plus, Send, Square, Tags, Trash2 } from 'lucide-react'
+import { ArrowUpRight, Plus, Send, Square, Tags, Trash2 } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import { Link, Navigate } from 'react-router-dom'
 import { Badge, Button, Card, EmptyState, IconButton, PageHeader } from '../components/ui'
@@ -6,7 +6,6 @@ import { usePortfolio } from '../context/PortfolioContext'
 import { portfolioAnswer, type PortfolioAnswer } from '../lib/portfolioAssistant'
 import { BorderBeam } from 'border-beam'
 import { ThinkingOrb } from 'thinking-orbs'
-import { Liquid } from 'liquid-gooey'
 import { questionGroups, researchAnswer, stockQuery } from '../lib/assistantResearch'
 import { MetalButtonEffect } from '../components/MetalButtonEffect'
 import { useReducedMotion } from 'framer-motion'
@@ -15,18 +14,6 @@ import { StockResearchChart } from '../components/StockResearchChart'
 
 type Message = { role: 'assistant' | 'user'; text: string; answer?: PortfolioAnswer }
 type Group = { id: number; name: string; description: string; symbols: string[] }
-type SpeechRecognitionLike = {
-  continuous: boolean
-  interimResults: boolean
-  lang: string
-  start: () => void
-  stop: () => void
-  onresult: ((event: { results: ArrayLike<ArrayLike<{ transcript: string }>> }) => void) | null
-  onerror: (() => void) | null
-  onend: (() => void) | null
-}
-type SpeechRecognitionConstructor = new () => SpeechRecognitionLike
-
 export function Tools() {
   const tool = window.location.pathname.split('/').filter(Boolean).at(-1) || 'assistant'
   if (tool === 'inbox') return <Navigate to="/app/connections" replace />
@@ -35,14 +22,11 @@ export function Tools() {
 }
 
 function DeckAI() {
-  const { bundle, setNotice } = usePortfolio()
+  const { bundle } = usePortfolio()
   const [messages, setMessages] = useState<Message[]>([])
   const [prompt, setPrompt] = useState('')
-  const [listening, setListening] = useState(false)
-  const recognitionRef = useRef<SpeechRecognitionLike | null>(null)
   const reducedMotion = useReducedMotion()
   const [focused, setFocused] = useState(false)
-  const [quickOpen, setQuickOpen] = useState(false)
   const [preparing, setPreparing] = useState(false)
   const [category, setCategory] = useState<keyof typeof questionGroups>('Portfolio')
   const [researching, setResearching] = useState(false)
@@ -75,9 +59,6 @@ function DeckAI() {
     const controller = new AbortController()
     requestRef.current = controller
     const remote = query ? researchAnswer(query, controller.signal).catch(error => ({ title: 'Stock lookup unavailable', text: error instanceof Error ? error.message : 'Please retry your search.' })) : null
-    recognitionRef.current?.stop()
-    setListening(false)
-    setQuickOpen(false)
     setMessages((current) => [...current, { role: 'user', text: question }])
     setPreparing(true)
     replyTimer.current = setTimeout(async () => {
@@ -93,44 +74,19 @@ function DeckAI() {
   useEffect(() => () => {
     requestRef.current?.abort()
     generation.current += 1
-    recognitionRef.current?.stop()
     if (replyTimer.current !== null) clearTimeout(replyTimer.current)
   }, [])
-  const toggleVoice = () => {
-    if (listening) {
-      recognitionRef.current?.stop()
-      setListening(false)
-      return
-    }
-    const speechWindow = window as Window & { SpeechRecognition?: SpeechRecognitionConstructor; webkitSpeechRecognition?: SpeechRecognitionConstructor }
-    const Recognition = speechWindow.SpeechRecognition || speechWindow.webkitSpeechRecognition
-    if (!Recognition) {
-      setNotice({ tone: 'info', message: 'Voice input is not supported in this browser. Type your question instead.' })
-      return
-    }
-    const recognition = new Recognition()
-    recognition.lang = 'en-AU'
-    recognition.continuous = false
-    recognition.interimResults = true
-    recognition.onresult = (event) => setPrompt(Array.from(event.results).map((result) => result[0]?.transcript || '').join(''))
-    recognition.onerror = () => { setListening(false); setNotice({ tone: 'error', message: 'Voice input stopped. Please try again or type your question.' }) }
-    recognition.onend = () => { setListening(false); recognitionRef.current = null }
-    recognitionRef.current = recognition
-    setListening(true)
-    try { recognition.start() } catch { setListening(false); recognitionRef.current = null; setNotice({ tone: 'error', message: 'Microphone could not start. Type your question or retry voice input.' }) }
-  }
   return <div className="ai-workspace ai-engine">
     <h1 className="visually-hidden">Masterdeck AI portfolio assistant</h1>
-    <div className="ai-titlebar"><div><strong>Masterdeck AI</strong><small>Portfolio insights & stock research</small></div><Button icon={Plus} onClick={() => { cancelReply(); recognitionRef.current?.stop(); setListening(false); setMessages([]); setPrompt(''); setQuickOpen(false) }}>New chat</Button></div>
+    <div className="ai-titlebar"><div><strong>Masterdeck AI</strong><small>Portfolio insights & stock research</small></div><Button icon={Plus} onClick={() => { cancelReply(); setMessages([]); setPrompt('') }}>New chat</Button></div>
     <div className="ai-conversation" ref={conversationRef}>
-      {!messages.length ? <div className="ai-engine-welcome"><ThinkingOrb state={listening ? 'listening' : 'breathing'} size={64} paused={!!reducedMotion} aria-hidden="true"/><span className="section-label">A LITTLE MORE CLARITY</span><h2>Your next question.<br/><em>A clearer answer.</em></h2><p>Explore your investments or look up a company by name or ticker. Start with a question below.</p><div className="ai-question-tabs" aria-label="Question categories">{(Object.keys(questionGroups) as (keyof typeof questionGroups)[]).map(group => <button key={group} aria-pressed={category === group} onClick={() => setCategory(group)}>{group}</button>)}</div><div className="ai-suggestion-grid" key={category}>{suggestions.map((item, index) => <button key={item} onClick={() => send(item)}><small>0{index + 1}</small><span>{item}</span><ArrowUpRight size={17}/></button>)}</div></div> : <div className="ai-messages" role="log" aria-label="Portfolio conversation" aria-live="polite">{messages.map((message,index) => <div className={`ai-message ${message.role}`} key={index}><span className={`ai-message-avatar ${message.role === 'user' ? 'is-user' : ''}`}>{message.role === 'assistant' ? <ThinkingOrb state="shaping" size={20} paused aria-hidden="true"/> : null}</span><article>{message.answer && <div className="ai-answer-heading">{message.answer.symbol && <HoldingLogo symbol={message.answer.symbol} size={34}/>}<h2>{message.answer.title}</h2></div>}<p>{message.text}</p>{message.answer?.metrics && <div className="ai-answer-metrics">{message.answer.metrics.map((metric, i) => <div key={`${metric.label}-${i}`}><small>{metric.label}</small><strong>{metric.value}</strong></div>)}</div>}{message.answer?.points?.length ? <StockResearchChart points={message.answer.points} symbol={message.answer.symbol || message.answer.title} currency={message.answer.currency || 'AUD'}/> : null}{message.answer?.source && <a className="ai-source-link" href={message.answer.source.url} target="_blank" rel="noreferrer">{message.answer.source.label} · {message.answer.source.asOf ? new Date(message.answer.source.asOf).toLocaleString('en-AU') : 'Quote time unavailable'} · May be delayed<ArrowUpRight size={13}/></a>}{!!message.answer?.alternatives?.length && <div className="ai-alternatives"><small>Other matching listings</small>{message.answer.alternatives.map(item => <button key={item.symbol} disabled={preparing} onClick={() => send(`Look up ${item.symbol}`)}>{item.symbol} · {item.name}<ArrowUpRight size={12}/></button>)}</div>}{message.answer?.href && <Link to={message.answer.href}>{message.answer.link}<ArrowUpRight size={14}/></Link>}</article></div>)}<div role="status" className="ai-preparing" aria-live="polite">{preparing && <><ThinkingOrb state={researching ? 'searching' : 'solving'} size={20} paused={!!reducedMotion} aria-hidden="true"/><div><strong>{researching ? 'Looking up that stock' : 'Preparing your answer'}</strong><span>{researching ? 'Checking current market data' : 'Calculating from your portfolio records'}</span></div></>}</div><div className="ai-conversation-end" aria-hidden="true"/></div>}
+      {!messages.length ? <div className="ai-engine-welcome"><ThinkingOrb state="breathing" size={64} paused={!!reducedMotion} aria-hidden="true"/><span className="section-label">A LITTLE MORE CLARITY</span><h2>Your next question.<br/><em>A clearer answer.</em></h2><p>Explore your investments or look up a company by name or ticker. Start with a question below.</p><div className="ai-question-tabs" aria-label="Question categories">{(Object.keys(questionGroups) as (keyof typeof questionGroups)[]).map(group => <button key={group} aria-pressed={category === group} onClick={() => setCategory(group)}>{group}</button>)}</div><div className="ai-suggestion-grid" key={category}>{suggestions.map((item, index) => <button key={item} onClick={() => send(item)}><small>0{index + 1}</small><span>{item}</span><ArrowUpRight size={17}/></button>)}</div></div> : <div className="ai-messages" role="log" aria-label="Portfolio conversation" aria-live="polite">{messages.map((message,index) => <div className={`ai-message ${message.role}`} key={index}><span className={`ai-message-avatar ${message.role === 'user' ? 'is-user' : ''}`}>{message.role === 'assistant' ? <ThinkingOrb state="shaping" size={20} paused aria-hidden="true"/> : null}</span><article>{message.answer && <div className="ai-answer-heading">{message.answer.symbol && <HoldingLogo symbol={message.answer.symbol} size={34}/>}<h2>{message.answer.title}</h2></div>}<p>{message.text}</p>{message.answer?.metrics && <div className="ai-answer-metrics">{message.answer.metrics.map((metric, i) => <div key={`${metric.label}-${i}`}><small>{metric.label}</small><strong>{metric.value}</strong></div>)}</div>}{message.answer?.points?.length ? <StockResearchChart points={message.answer.points} symbol={message.answer.symbol || message.answer.title} currency={message.answer.currency || 'AUD'}/> : null}{message.answer?.source && <a className="ai-source-link" href={message.answer.source.url} target="_blank" rel="noreferrer">{message.answer.source.label} · {message.answer.source.asOf ? new Date(message.answer.source.asOf).toLocaleString('en-AU') : 'Quote time unavailable'} · May be delayed<ArrowUpRight size={13}/></a>}{!!message.answer?.alternatives?.length && <div className="ai-alternatives"><small>Other matching listings</small>{message.answer.alternatives.map(item => <button key={item.symbol} disabled={preparing} onClick={() => send(`Look up ${item.symbol}`)}>{item.symbol} · {item.name}<ArrowUpRight size={12}/></button>)}</div>}{message.answer?.href && <Link to={message.answer.href}>{message.answer.link}<ArrowUpRight size={14}/></Link>}</article></div>)}<div role="status" className="ai-preparing" aria-live="polite">{preparing && <><ThinkingOrb state={researching ? 'searching' : 'solving'} size={20} paused={!!reducedMotion} aria-hidden="true"/><div><strong>{researching ? 'Looking up that stock' : 'Preparing your answer'}</strong><span>{researching ? 'Checking current market data' : 'Calculating from your portfolio records'}</span></div></>}</div><div className="ai-conversation-end" aria-hidden="true"/></div>}
     </div>
     <div className="ai-composer-area">
-      {quickOpen && <div className="ai-quick-menu" id="portfolio-quick-actions">{suggestions.map(item => <button key={item} onClick={() => send(item)}>{item}<ArrowUpRight size={14}/></button>)}</div>}
       <BorderBeam size="line" colorVariant="ocean" strength={0.35} active={(focused || preparing) && !reducedMotion} theme="light" borderRadius={20} className="ai-composer-beam">
         <form className="ai-source-compose" onFocus={() => setFocused(true)} onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget)) setFocused(false) }} onSubmit={event => { event.preventDefault(); send() }}>
-          <input value={prompt} maxLength={1000} onChange={event => setPrompt(event.target.value)} placeholder={listening ? 'Listening…' : 'Ask about your portfolio or look up a stock…'} aria-label="Ask Masterdeck AI"/>
-          <div className="ai-compose-actions"><Liquid blur={5} contrast={18} fill="var(--surface-2)" className="ai-liquid-actions"><Liquid.Item x={0} y={0} transition={reducedMotion ? { duration: 0 } : 'snappy'}><button type="button" className="ai-round-action" aria-label="Quick questions" aria-expanded={quickOpen} aria-controls="portfolio-quick-actions" onClick={() => setQuickOpen(value => !value)}><Plus size={18}/></button></Liquid.Item><Liquid.Item x={0} y={0} transition={reducedMotion ? { duration: 0 } : 'snappy'}><button type="button" className={`ai-round-action ${listening ? 'is-listening' : ''}`} aria-label={listening ? 'Stop voice input' : 'Voice input'} aria-pressed={listening} onClick={toggleVoice}><Mic size={17}/></button></Liquid.Item></Liquid><span className="ai-record-label">{preparing ? 'Preparing answer…' : listening ? 'Listening' : 'Records + market data'}</span><MetalButtonEffect paused={!!reducedMotion || (!focused && !preparing)}>{preparing ? <button className="ai-send" type="button" aria-label="Stop response" onClick={cancelReply}><Square size={14} fill="currentColor"/></button> : <button className="ai-send" type="submit" aria-label="Send question" disabled={!prompt.trim()}><Send size={17}/></button>}</MetalButtonEffect></div>
+          <input value={prompt} maxLength={1000} onChange={event => setPrompt(event.target.value)} placeholder="Ask about your portfolio or look up a stock…" aria-label="Ask Masterdeck AI"/>
+          <div className="ai-compose-actions"><span className="ai-record-label">{preparing ? 'Preparing answer…' : 'Records + market data'}</span><MetalButtonEffect paused={!!reducedMotion || (!focused && !preparing)}>{preparing ? <button className="ai-send" type="button" aria-label="Stop response" onClick={cancelReply}><Square size={14} fill="currentColor"/></button> : <button className="ai-send" type="submit" aria-label="Send question" disabled={!prompt.trim()}><Send size={17}/></button>}</MetalButtonEffect></div>
         </form>
       </BorderBeam>
       <p className="ai-disclaimer">Rules-based research and calculations. Market coverage varies. Not financial or tax advice.</p>
