@@ -265,7 +265,10 @@ export function Landing({ onDemo, signedIn = false, onOpenApp, page }: LandingPr
             </div>
             {!signedIn && <p className="cloud-trial-note">14-day free trial · No credit card · No automatic charge</p>}
           </motion.div>
-          <figure className="alpine-hero-product"><img src="/marketing/masterdeck-portfolio-hero.png" width="1366" height="768" alt="Masterdeck portfolio dashboard with demo holdings" fetchPriority="high"/></figure>
+          <figure className="alpine-hero-product">
+            <div className="alpine-browser-bar" aria-hidden="true"><span className="alpine-browser-dots"><i/><i/><i/></span><span className="alpine-browser-address">masterdeck.app</span></div>
+            <img src="/marketing/masterdeck-portfolio-hero.png" width="1585" height="900" alt="Masterdeck portfolio dashboard with demo holdings" fetchPriority="high"/>
+          </figure>
         </section>
 
         <section className="alpine-assurance" aria-label="Trial and security"><span><ShieldCheck size={15}/>Read-only by design</span><span><Check size={15}/>14 days free</span><span><LockKeyhole size={15}/>No credit card required</span></section>
@@ -276,7 +279,7 @@ export function Landing({ onDemo, signedIn = false, onOpenApp, page }: LandingPr
             <p>Bring shares, ETFs, cash and transaction records together so the headline number always has a useful detail view behind it.</p>
             <a className="alpine-text-link" href="/features/portfolio-tracking">Explore portfolio tracking <ArrowRight size={16}/></a>
           </div>
-          <figure><img src="/marketing/masterdeck-portfolio-hero.png" width="1366" height="768" alt="Actual Masterdeck portfolio with demo holdings, performance chart and returns" loading="lazy"/><figcaption>Actual Masterdeck app · Demo portfolio</figcaption></figure>
+          <figure><img src="/marketing/masterdeck-portfolio-hero.png" width="1585" height="900" alt="Actual Masterdeck portfolio with demo holdings, performance chart and returns" loading="lazy"/><figcaption>Actual Masterdeck app · Demo portfolio</figcaption></figure>
         </Reveal>
         <Reveal className="cloud-region cloud-container">
           <div className="cloud-region-intro">
@@ -311,11 +314,11 @@ export function Landing({ onDemo, signedIn = false, onOpenApp, page }: LandingPr
             <p>Separate capital growth, income and currency effects, then compare the result with a benchmark without losing the records beneath it.</p>
             <a className="alpine-text-link" href="/features/performance">Explore performance <ArrowRight size={16}/></a>
           </div>
-          <figure><img src="/marketing/performance-focus.png" width="1366" height="768" alt="Masterdeck performance view showing return components and a benchmark" loading="lazy"/></figure>
+          <figure><img src="/marketing/performance-focus.png" width="2754" height="1400" alt="Masterdeck performance view showing return components and a benchmark" loading="lazy"/></figure>
         </Reveal>
 
         <Reveal className="alpine-proof-section alpine-proof-section-reverse cloud-container">
-          <figure><img src="/marketing/tax-focus.png" width="1366" height="768" alt="Masterdeck Australian tax view with connected investment records" loading="lazy"/></figure>
+          <figure><img src="/marketing/tax-focus.png" width="2754" height="1300" alt="Masterdeck Australian tax view with connected investment records" loading="lazy"/></figure>
           <div className="alpine-proof-copy">
             <span className="section-label">AUSTRALIAN TAX</span>
             <h2>Keep the tax detail close to the trades.</h2>
