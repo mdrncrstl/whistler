@@ -9,7 +9,7 @@ const logoDomains: Record<string, string> = {
   TSM: 'tsmc.com', AVGO: 'broadcom.com', SONY: 'sony.com', QCOM: 'qualcomm.com',
   GOOGL: 'google.com', GOOG: 'google.com', BBY: 'bestbuy.com', WMT: 'walmart.com',
   AMKR: 'amkor.com', GLW: 'corning.com', CRUS: 'cirrus.com', GFS: 'gf.com', TXN: 'ti.com', AMAT: 'appliedmaterials.com', COHR: 'coherent.com', '005930': 'samsung.com',
-  AMD: 'amd.com', INTC: 'intel.com', MU: 'micron.com',
+  AMD: 'amd.com', INTC: 'intel.com', MU: 'micron.com', AXT: 'axt.com',
 }
 
 const logoSources: Record<string, string> = {

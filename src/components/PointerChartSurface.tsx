@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 
 const chartSelector = [
   '.main-chart',
+  '.ai-stock-plot',
   '.portfolio-main-chart',
   '.income-chart',
   '.report-chart',

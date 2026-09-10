@@ -5318,6 +5318,10 @@ body { font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-s
 .donut-chart .recharts-wrapper:focus-visible,
 .donut-chart .recharts-surface:focus,
 .donut-chart .recharts-surface:focus-visible,
+.holding-chart-surface .recharts-wrapper:focus,
+.holding-chart-surface .recharts-wrapper:focus-visible,
+.holding-chart-surface .recharts-surface:focus,
+.holding-chart-surface .recharts-surface:focus-visible,
 .advanced-chart-canvas canvas:focus-visible {
   outline: none !important;
 }
@@ -5331,6 +5335,7 @@ body { font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-s
 .report-chart [tabindex="-1"]:focus,
 .holding-performance [tabindex="-1"]:focus,
 .holding-price-performance [tabindex="-1"]:focus,
+.holding-chart-surface [tabindex="-1"]:focus,
 .donut-chart [tabindex="-1"]:focus {
   outline: none !important;
 }
@@ -5975,7 +5980,7 @@ html { scrollbar-gutter: stable; }
 .price-summary > p { max-width: 950px; color: var(--muted); line-height: 1.8; font-size: 13px; }
 .price-summary-sources { display: flex; flex-wrap: wrap; gap: 8px 16px; color: var(--muted-2); font-size: 11px; }
 .price-summary-sources a { max-width: 320px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.holding-chart-surface .recharts-default-tooltip { background: var(--surface) !important; border: 1px solid var(--line) !important; border-radius: 6px; padding: 12px !important; box-shadow: 0 5px 18px #142b4512; }
+.holding-chart-surface .recharts-default-tooltip { background: color-mix(in srgb, var(--surface) 96%, transparent) !important; border: 1px solid var(--line) !important; border-radius: 11px; padding: 9px 11px !important; box-shadow: 0 10px 24px rgb(15 44 33 / 12%); backdrop-filter: blur(10px); }
 [data-chart-pointer-visible="true"] .recharts-tooltip-wrapper { top: var(--chart-pointer-y) !important; left: var(--chart-pointer-x) !important; transform: translate(14px, -50%) !important; transition: none !important; pointer-events: none !important; }
 [data-chart-pointer-side="left"] .recharts-tooltip-wrapper { transform: translate(calc(-100% - 14px), -50%) !important; }
 .command-backdrop { animation: command-backdrop-in 140ms ease-out both; }
@@ -6107,7 +6112,7 @@ html { scrollbar-gutter: stable; }
 .recharts-legend-wrapper { padding-right: 4px; }
 
 /* Press-and-drag range measurement on charts. */
-.portfolio-main-chart .recharts-surface,.holding-chart-surface .recharts-surface { cursor: crosshair; }
+.portfolio-main-chart .recharts-surface,.holding-chart-surface .recharts-surface,.report-chart .recharts-surface,.income-chart .recharts-surface,.ai-stock-plot .recharts-surface { cursor: crosshair; }
 .chart-range-hint { margin: 0 0 0 auto; color: var(--muted-2); font-size: 11px; opacity: 0; transition: opacity .15s ease; }
 .chart-mode-row:hover .chart-range-hint,.holding-simple-chart:hover .chart-range-hint { opacity: 1; }
 .chart-range-readout { min-height: 28px; margin: 0 0 0 auto; padding: 0 4px 0 10px; border: 1px solid var(--accent-line); border-radius: 7px; display: inline-flex; align-items: center; gap: 9px; background: var(--accent-tint); font-size: 11px; font-variant-numeric: tabular-nums; }

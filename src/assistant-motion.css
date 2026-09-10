@@ -25,7 +25,24 @@
 .ai-answer-metrics small { display: block; font-size: 10px; color: var(--muted); margin-bottom: 8px; }
 .ai-answer-metrics strong { font-size: 18px; letter-spacing: -.03em; }
 .ai-stock-chart { margin: 18px 0; min-width: 0; }
-.ai-stock-chart > span { font-size: 10px; color: var(--muted); }
+.ai-stock-chart-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 28px; }
+.ai-stock-chart-heading > span { color: var(--muted); font-size: 10px; }
+.ai-stock-plot { position: relative; min-width: 0; border-radius: 14px; overflow: hidden; touch-action: none; cursor: crosshair; --chart-pointer-x: 0px; --chart-pointer-y: 0px; }
+.ai-stock-plot:focus, .ai-stock-plot:focus-visible, .ai-stock-plot .recharts-wrapper:focus, .ai-stock-plot .recharts-surface:focus { outline: none !important; }
+.ai-stock-plot .recharts-tooltip-wrapper { transition: none !important; animation: none !important; pointer-events: none !important; z-index: 4 !important; }
+.ai-stock-plot[data-chart-pointer-visible="true"] .recharts-tooltip-wrapper { top: var(--chart-pointer-y) !important; left: var(--chart-pointer-x) !important; right: auto !important; transform: translate3d(14px, -50%, 0) !important; }
+.ai-stock-plot[data-chart-pointer-side="left"] .recharts-tooltip-wrapper { transform: translate3d(calc(-100% - 14px), -50%, 0) !important; }
+.ai-stock-plot[data-chart-pointer-visible="true"]::after { content: ''; position: absolute; z-index: 2; top: 12px; bottom: 28px; left: var(--chart-pointer-x); width: 1px; pointer-events: none; background: repeating-linear-gradient(to bottom, color-mix(in srgb, var(--muted-2) 72%, transparent) 0 4px, transparent 4px 8px); transform: translateX(-.5px); }
+.stock-chart-tooltip { display: grid; gap: 3px; min-width: 126px; padding: 9px 11px; border: 1px solid var(--line); border-radius: 11px; background: color-mix(in srgb, var(--surface) 96%, transparent); box-shadow: 0 10px 24px rgb(15 44 33 / 12%); color: var(--text); font-size: 10px; line-height: 1.25; backdrop-filter: blur(10px); }
+.stock-chart-tooltip span { color: var(--muted); font-size: 9px; }
+.stock-chart-tooltip strong { font-size: 13px; letter-spacing: -.02em; }
+.stock-chart-tooltip small { color: var(--muted); font-size: 9px; }
+.stock-chart-tooltip small.positive { color: var(--chart-up); }
+.stock-chart-tooltip small.negative { color: var(--chart-down); }
+.ai-stock-chart-empty { padding: 30px 0; color: var(--muted); font-size: 11px; }
+.ai-answer-heading { display: flex; align-items: center; gap: 10px; }
+.ai-answer-heading .holding-logo { flex: 0 0 auto; }
+.ai-answer-heading h2 { margin: 0; }
 .ai-source-link { font-size: 10px !important; display: flex; gap: 5px; align-items: center; flex-wrap: wrap; }
 .ai-alternatives { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 18px; }
 .ai-alternatives > small { width: 100%; color: var(--muted); font-size: 10px; }

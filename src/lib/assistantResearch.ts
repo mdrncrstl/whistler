@@ -28,6 +28,8 @@ export async function researchAnswer(query: string, signal: AbortSignal): Promis
   const period = first?.price > 0 && last ? ` Across the available three-month daily history, the price moved ${((last.price / first.price - 1) * 100).toFixed(2)}%. This price change excludes dividends and currency effects.` : ''
   return {
     title: data.name,
+    symbol: data.symbol,
+    currency: data.currency,
     text: `${data.symbol} · ${data.exchange} · ${data.type === 'ETF' ? 'Exchange-traded fund' : data.type === 'EQUITY' ? 'Listed company' : data.type}. ${[data.sector, data.industry].filter(Boolean).join(' · ')}${data.sector ? '.' : ''} Prices are quoted in ${data.currency}.${period}`,
     metrics: [{ label: 'Latest price', value: amount(data.price) }, { label: '52-week low', value: amount(data.low) }, { label: '52-week high', value: amount(data.high) }],
     points: data.points,
