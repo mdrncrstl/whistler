@@ -336,3 +336,38 @@ html:has(.alpine-site) { overflow-x:clip; }
   .alpine-hero-product img { height:calc(100% - 25px); }
   .alpine-site .alpine-showcase figure,.alpine-proof-section figure { padding:12px 12px 0; border-radius:15px; }
 }
+
+/* Trust proof: a compact Navexa-style rating block with replaceable launch copy. */
+.alpine-trustpilot {
+  display:grid;
+  grid-template-columns:minmax(230px,.72fr) minmax(0,1.28fr);
+  gap:56px;
+  align-items:start;
+  padding:82px 0;
+  border-top:1px solid #dce8e1;
+  border-bottom:1px solid #dce8e1;
+}
+.alpine-trustpilot-summary { max-width:360px; }
+.alpine-trustpilot-summary h2 { margin:16px 0 14px; font-size:clamp(30px,3.2vw,44px); line-height:1.04; }
+.alpine-trustpilot-summary p { margin:0; }
+.alpine-trustpilot-rating { display:grid; grid-template-columns:auto 1fr; align-items:center; gap:5px 10px; margin:24px 0 16px; color:#087c5e; }
+.alpine-trustpilot-rating strong { font-size:52px; line-height:.9; letter-spacing:-.065em; }
+.alpine-trustpilot-rating > span:last-child { grid-column:2; color:#6f8d80; font-size:11px; }
+.alpine-star-row,.alpine-review-stars { display:inline-flex; gap:3px; color:#12a978; }
+.alpine-trustpilot-note { display:inline-flex; margin-top:18px; padding:7px 10px; border:1px solid #c8e7d8; border-radius:999px; background:#eef9f3; color:#087c5e; font-size:9px; font-weight:750; letter-spacing:.08em; }
+.alpine-trustpilot-reviews { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
+.alpine-trustpilot-reviews article { min-width:0; padding:22px; border:1px solid #dce8e1; border-radius:16px; background:#fff; box-shadow:0 12px 28px rgb(24 64 46 / 6%); transition:transform .22s ease, box-shadow .22s ease, border-color .22s ease; }
+.alpine-trustpilot-reviews article:hover { transform:translateY(-3px); border-color:#a9d4be; box-shadow:0 18px 34px rgb(24 64 46 / 10%); }
+.alpine-review-card-top { display:flex; justify-content:space-between; align-items:center; gap:12px; }
+.alpine-review-card-top > span:first-child { color:#7a9a8b; font-size:9px; font-weight:750; letter-spacing:.08em; text-transform:uppercase; }
+.alpine-trustpilot-reviews blockquote { margin:20px 0 22px; color:#183c2d; font-size:14px; line-height:1.55; }
+.alpine-trustpilot-reviews cite { color:#718b7f; font-size:10px; font-style:normal; line-height:1.4; }
+@media(max-width:900px) {
+  .alpine-trustpilot { grid-template-columns:1fr; gap:36px; }
+  .alpine-trustpilot-summary { max-width:620px; }
+}
+@media(max-width:640px) {
+  .alpine-trustpilot { padding:62px 0; }
+  .alpine-trustpilot-reviews { grid-template-columns:1fr; }
+  .alpine-trustpilot-reviews article { padding:19px; }
+}

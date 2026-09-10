@@ -7,7 +7,7 @@ import { GoogleLogin } from '@react-oauth/google'
 import {
   ArrowLeft, ArrowRight, BarChart3, Check, ChevronDown, Database, Eye, EyeOff,
   FileCheck2, FileSpreadsheet, Gauge, Globe2, Link2, LockKeyhole, Mail, Menu,
-  Network, ShieldCheck, TrendingUp, X,
+  Network, ShieldCheck, Star, TrendingUp, X,
 } from 'lucide-react'
 import { AnimatePresence, motion, useMotionValueEvent, useReducedMotion, useScroll } from 'framer-motion'
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react'
@@ -42,6 +42,12 @@ const principleRows = [
   ['Separate the return', 'Capital growth, income and currency effects stay visible as distinct parts of the answer.', TrendingUp],
   ['Keep the source close', 'Every report stays connected to the holdings, transactions and statements beneath it.', Database],
   ['Stay read-only', 'Masterdeck analyses records. It does not hold assets, move money or place trades.', ShieldCheck],
+] as const
+
+const placeholderReviews = [
+  '“Finally, one place to see performance, income and tax records without rebuilding the story in a spreadsheet.”',
+  '“The portfolio view made it much easier to understand what was driving my result.”',
+  '“I could see the detail behind every number and keep my broker accounts separate.”',
 ] as const
 
 type LandingProps = { onDemo: () => void; signedIn?: boolean; onOpenApp?: () => void; page?: MarketingPage | 'pricing' }
@@ -272,6 +278,28 @@ export function Landing({ onDemo, signedIn = false, onOpenApp, page }: LandingPr
         </section>
 
         <section className="alpine-assurance" aria-label="Trial and security"><span><ShieldCheck size={15}/>Read-only by design</span><span><Check size={15}/>14 days free</span><span><LockKeyhole size={15}/>No credit card required</span></section>
+        <Reveal className="alpine-trustpilot cloud-container" aria-labelledby="trustpilot-heading">
+          <div className="alpine-trustpilot-summary">
+            <span className="section-label">TRUSTPILOT</span>
+            <div className="alpine-trustpilot-rating" aria-label="4.7 out of 5 stars, placeholder rating">
+              <strong>4.7</strong>
+              <span className="alpine-star-row" aria-hidden="true">{Array.from({ length: 5 }, (_, index) => <Star key={index} size={16} fill="currentColor" />)}</span>
+              <span>out of 5 · placeholder rating</span>
+            </div>
+            <h2 id="trustpilot-heading">A clearer view, backed by real investors.</h2>
+            <p>Placeholder review content for the launch page. Replace these with verified Trustpilot reviews before publishing ads.</p>
+            <span className="alpine-trustpilot-note">PLACEHOLDER REVIEWS · REPLACE BEFORE LAUNCH</span>
+          </div>
+          <div className="alpine-trustpilot-reviews">
+            {placeholderReviews.map((quote) => (
+              <article key={quote}>
+                <div className="alpine-review-card-top"><span>Placeholder review</span><span className="alpine-review-stars" aria-hidden="true">{Array.from({ length: 5 }, (_, index) => <Star key={index} size={13} fill="currentColor" />)}</span></div>
+                <blockquote>{quote}</blockquote>
+                <cite>— Placeholder investor · Trustpilot placeholder</cite>
+              </article>
+            ))}
+          </div>
+        </Reveal>
         <Reveal className="alpine-showcase cloud-container">
           <div className="alpine-showcase-copy">
             <span className="section-label">PORTFOLIO TRACKING</span>
