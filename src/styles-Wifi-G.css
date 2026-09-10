@@ -6153,3 +6153,11 @@ html { scrollbar-gutter: stable; }
     min-height: 48px;
   }
 }
+
+/* Keep light CTAs light when the Alpine marketing hover treatment runs. */
+.alpine-site .cloud-button-light:hover:not(:disabled) {
+  border-color: #f2fffa;
+  background: #f2fffa;
+  color: #087c5e;
+  box-shadow: 0 10px 24px rgb(4 122 95 / 16%);
+}
