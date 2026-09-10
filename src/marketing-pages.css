@@ -1,15 +1,15 @@
 .cloud-nav { position: relative; }
 .md-site-menu, .md-menu-group { display: flex; align-items: center; gap: 28px; }
-.md-menu-group { position: relative; }
+.md-menu-group { position: static; }
 .md-menu-group > button { display: flex; align-items: center; gap: 6px; padding: 16px 0; border: 0; background: none; color: inherit; font: inherit; font-weight: 600; cursor: pointer; }
 .md-pricing-link { text-decoration: none; color: inherit; }
-.md-menu-panel { position: absolute; z-index: 90; top: calc(100% + 10px); left: 50%; width: min(420px,calc(100vw - 32px)); padding: 8px; border: 1px solid #d7e4dd; border-radius: 14px; background: #fcfdfb; color: #102c22; box-shadow: 0 18px 42px rgb(0 30 20 / 14%), 0 2px 8px rgb(0 30 20 / 5%); overflow: hidden; transform-origin: top center; animation: menu-open 160ms cubic-bezier(.16,1,.3,1); }
+.md-menu-panel { position: absolute; z-index: 90; top: calc(100% + 10px); left: 50%; width: min(560px,calc(100vw - 32px)); padding: 8px; border: 1px solid #d7e4dd; border-radius: 14px; background: #fcfdfb; color: #102c22; box-shadow: 0 18px 42px rgb(0 30 20 / 14%), 0 2px 8px rgb(0 30 20 / 5%); overflow: hidden; transform: translateX(-50%); transform-origin: top center; animation: menu-open 160ms cubic-bezier(.16,1,.3,1) both; }
 .md-menu-links { display: grid; grid-template-columns: 1fr; gap: 2px; }
 .md-menu-links a { min-width: 0; display: flex; align-items: start; gap: 10px; padding: 11px 12px; border-radius: 9px; color: #102c22 !important; text-decoration: none; transition: background-color 140ms ease, color 140ms ease; }
 .md-menu-links a:hover { background: #eaf4ee; }
 .md-menu-links a > span { flex: 1; min-width: 0; }
 .md-menu-links strong { display: block; font-size: 13px; line-height: 1.25; margin-bottom: 4px; }
-.md-menu-links small { display: block; max-width: 42ch; font-size: 10px; color: #587366; line-height: 1.4; font-weight: 400; }
+.md-menu-links small { display: block; max-width: 42ch; overflow: hidden; font-size: 10px; color: #587366; line-height: 1.4; font-weight: 400; text-overflow: ellipsis; white-space: nowrap; }
 .md-menu-links a > svg { width: 14px; height: 14px; margin-top: 1px; color: #668276; flex: 0 0 auto; }
 .md-site-menu :focus-visible { outline: 2px solid #10a779; outline-offset: 4px; }
 .md-public-content { color: var(--cloud-ink); background: #fbfcf9; padding-top: 84px; }
