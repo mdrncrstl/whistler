@@ -110,7 +110,7 @@ html:has(.alpine-site) { overflow-x:clip; }
 .alpine-site .cloud-final { width:min(1060px,calc(100% - 80px)); margin:0 auto 85px; }
 .alpine-site .cloud-final-inner { padding:0; width:100%; }
 .alpine-site .cloud-final-inner>svg { display:none; }
-.alpine-site .cloud-footer { margin:0; padding:50px 32px 20px; border-radius:22px; background:linear-gradient(135deg,#07372c,#10563f); }
+.alpine-site .cloud-footer { margin:0; padding:50px 32px 20px; border-radius:22px 22px 0 0; background:linear-gradient(135deg,#07372c,#10563f); }
 .alpine-site .cloud-footer-grid { width:100%; gap:28px; padding-bottom:50px; }
 .alpine-site .cloud-footer strong,.alpine-site .cloud-footer a,.alpine-site .cloud-footer button,.alpine-site .cloud-footer p,.alpine-site .cloud-footer span { color:white; }
 .alpine-site .cloud-footer strong { letter-spacing:0; text-transform:none; font-size:14px; }
