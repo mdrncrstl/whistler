@@ -51,3 +51,119 @@
 .nav-parent[aria-expanded="true"] .section-chevron { transform: rotate(180deg); }
 @media (min-width:761px) { .app-shell { transition: grid-template-columns 240ms cubic-bezier(.22,1,.36,1); } .app-shell > .sidebar { transition: width 240ms cubic-bezier(.22,1,.36,1); } }
 @media (prefers-reduced-motion:reduce) { .nav-branch, .nav-parent .section-chevron, .app-shell, .app-shell > .sidebar { transition: none; } }
+
+/* The assistant is an app surface, so its thread owns scrolling instead of the document. */
+html:has(.ai-engine),
+body:has(.ai-engine),
+#root:has(.ai-engine) { height: 100dvh; overflow: hidden; }
+
+.app-shell:has(.ai-engine) { height: 100dvh; min-height: 0; overflow: hidden; }
+.app-main:has(.ai-engine) { display: flex; flex-direction: column; height: 100dvh; min-height: 0; overflow: hidden; }
+.app-content:has(.ai-engine) { flex: 1 1 auto; min-height: 0; height: auto; padding: 0; overflow: hidden; }
+.app-page-transition:has(.ai-engine) { height: 100%; min-height: 0; overflow: hidden; }
+
+.ai-engine {
+  height: 100%;
+  min-height: 0;
+  margin: 0;
+  grid-template-rows: 64px minmax(0, 1fr) auto;
+  overflow: hidden;
+}
+
+.ai-engine .ai-titlebar { min-height: 64px; }
+.ai-engine .ai-conversation {
+  min-height: 0;
+  padding: 20px 28px 16px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  display: block;
+}
+
+.ai-engine .ai-engine-welcome {
+  box-sizing: border-box;
+  min-height: 100%;
+  max-width: 760px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 16px 12px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.ai-engine .ai-engine-welcome > canvas { flex: 0 0 auto; margin: 0 auto 8px; }
+.ai-engine .ai-engine-welcome > h2 { margin: 10px 0; font-size: clamp(28px, 3vw, 40px); }
+.ai-engine .ai-engine-welcome > p { margin: 0 auto 16px; }
+.ai-engine .ai-question-tabs { margin: 2px 0 12px; }
+.ai-engine .ai-suggestion-grid { margin-top: 0; }
+
+.ai-engine .ai-messages {
+  box-sizing: border-box;
+  min-height: 100%;
+  max-width: 860px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 12px 0 24px;
+}
+.ai-engine .ai-message { align-items: flex-end; margin: 18px 0; gap: 12px; }
+.ai-engine .ai-message-avatar { width: 24px; min-width: 24px; height: 24px; padding: 0; display: grid; place-items: center; }
+.ai-engine .ai-message-avatar.is-user { display: none; }
+.ai-engine .ai-message.assistant article { width: min(720px, calc(100% - 38px)); max-width: none; }
+.ai-engine .ai-message.user article { max-width: min(560px, 72%); }
+.ai-engine .ai-message.user { padding-left: 36px; }
+
+.ai-engine .ai-preparing {
+  width: fit-content;
+  min-height: 0;
+  margin: 10px 0 20px 36px;
+  padding: 8px 13px 8px 9px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  box-shadow: 0 5px 18px rgb(10 45 36 / 5%);
+}
+.ai-engine .ai-preparing > canvas { width: 20px !important; height: 20px !important; }
+.ai-engine .ai-preparing > div { gap: 1px; }
+.ai-engine .ai-preparing strong { font-size: 11px; }
+.ai-engine .ai-preparing span { font-size: 10px; }
+
+.ai-engine .ai-composer-area {
+  box-sizing: border-box;
+  position: relative;
+  z-index: 4;
+  flex: 0 0 auto;
+  width: min(860px, calc(100% - 56px));
+  max-width: none;
+  margin: 0 auto 16px;
+}
+.ai-engine .ai-composer-beam { display: block; width: 100%; }
+.ai-engine .ai-source-compose { box-sizing: border-box; border-radius: 20px; }
+.ai-engine .ai-liquid-actions { min-width: 72px; margin-right: 0; align-items: center; justify-content: flex-start; gap: 2px; }
+.ai-engine .ai-liquid-actions button { flex: 0 0 34px; }
+.ai-engine .ai-compose-actions { min-height: 38px; }
+
+@media (max-width: 760px) {
+  .ai-engine { grid-template-rows: 56px minmax(0, 1fr) auto; }
+  .ai-engine .ai-titlebar { min-height: 56px; }
+  .ai-engine .ai-conversation { padding: 14px 14px 12px; }
+  .ai-engine .ai-engine-welcome { justify-content: flex-start; padding: 18px 0 24px; }
+  .ai-engine .ai-engine-welcome > h2 { font-size: clamp(28px, 8vw, 38px); }
+  .ai-engine .ai-suggestion-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ai-engine .ai-suggestion-grid > button { min-height: 58px; padding: 12px; gap: 7px; }
+  .ai-engine .ai-suggestion-grid > button span { font-size: 11px; line-height: 1.35; }
+  .ai-engine .ai-message.assistant article { width: calc(100% - 34px); padding: 16px; }
+  .ai-engine .ai-message.user { padding-left: 10px; }
+  .ai-engine .ai-message.user article { max-width: 86%; }
+  .ai-engine .ai-preparing { margin-left: 0; }
+  .ai-engine .ai-composer-area { width: calc(100% - 24px); margin-bottom: 10px; }
+}
+
+@media (max-width: 359px) {
+  .ai-engine .ai-suggestion-grid { grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ai-engine .ai-conversation { scroll-behavior: auto; }
+}
