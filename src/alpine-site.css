@@ -116,19 +116,19 @@ html:has(.alpine-site) { overflow-x:clip; }
 .alpine-site .cloud-footer strong { letter-spacing:0; text-transform:none; font-size:14px; }
 .alpine-site .cloud-footer a,.alpine-site .cloud-footer p { font-size:12px; }
 .alpine-site .cloud-legal { width:100%; border-color:#ffffff55; padding-top:20px; }
-.alpine-site .md-public-content { background:white; }
-.alpine-site .md-public-hero { text-align:center; padding:75px 36px; margin:0 auto 65px; border-radius:22px; background:linear-gradient(#e8f5ed,#f8fcf9); }
+.alpine-site .md-public-content { padding-top:36px; background:white; }
+.alpine-site .md-public-hero { text-align:center; padding:54px 36px 48px; margin:0 auto 44px; border-radius:22px; background:linear-gradient(#e8f5ed,#f8fcf9); }
 .alpine-site .md-public-hero h1 { margin:20px auto; max-width:760px; font-size:clamp(36px,4.5vw,56px); font-weight:500; line-height:1.05; }
 .alpine-site .md-public-hero>p { margin:0 auto 24px; max-width:590px; }
-.alpine-site .md-public-body { padding:0 0 70px; gap:32px; }
-.alpine-site .md-public-body aside { background:#e0efe7; border:0; box-shadow:none; }
-.alpine-site .md-public-body article { background:#fff; box-shadow:0 10px 28px #203c5010; border-color:#edf1f3; min-height:210px; padding:26px; }
+.alpine-site .md-public-body { padding:0 0 50px; gap:32px; }
+.alpine-site .md-public-body aside { padding:22px; background:#e0efe7; border:0; box-shadow:none; }
+.alpine-site .md-public-body article { background:#fff; box-shadow:0 10px 28px #203c5010; border-color:#edf1f3; min-height:180px; padding:22px; }
 .alpine-site .md-public-body article>span { display:none; }
-.alpine-site .md-public-body h2 { font-size:25px; }
-.alpine-site .md-public-image { background:#e5f2ec; padding:30px; border-radius:22px; }
-.alpine-site .md-related { padding:70px 0; }
+.alpine-site .md-public-body h2 { margin:22px 0 10px; font-size:25px; }
+.alpine-site .md-public-image { background:#e5f2ec; padding:20px; border-radius:22px; }
+.alpine-site .md-related { padding:52px 0 64px; }
 .alpine-site .md-related h2 { font-size:29px; }
-.alpine-site .md-related a { background:#f3f8f5; border:0; }
+.alpine-site .md-related a { min-height:130px; padding:20px; background:#f3f8f5; border:0; }
 .alpine-site .md-price-toggle { margin:20px auto 35px; }
 .alpine-site .md-public-plans { text-align:left; gap:16px; }
 .alpine-site .md-public-plans article { display:flex; flex-direction:column; padding:23px; }
@@ -140,7 +140,7 @@ html:has(.alpine-site) { overflow-x:clip; }
 .alpine-site .md-public-plans .is-featured>.cloud-button { background:white; color:#087c5e; }
 .alpine-site .md-public-plans .is-featured>span { color:#e2f6ec; }
 .alpine-site .md-public-hero h1 em { color:#10a77c; }
-.alpine-site .md-public-hero:not(:has(.md-public-plans)) { background:radial-gradient(ellipse at 100% 100%,#239c7170,transparent 70%),linear-gradient(140deg,#073d2f,#10583f); padding-bottom:105px; }
+.alpine-site .md-public-hero:not(:has(.md-public-plans)) { background:radial-gradient(ellipse at 100% 100%,#239c7170,transparent 70%),linear-gradient(140deg,#073d2f,#10583f); padding-bottom:54px; }
 .alpine-site .md-public-hero:not(:has(.md-public-plans)) h1,.alpine-site .md-public-hero:not(:has(.md-public-plans)) p,.alpine-site .md-public-hero:not(:has(.md-public-plans)) .md-breadcrumb { color:#fff; }
 .alpine-site .md-public-hero .md-demo-button { background:#fff; color:#087c5e; }
 .alpine-site .cloud-nav button { white-space:nowrap; }
@@ -148,7 +148,7 @@ html:has(.alpine-site) { overflow-x:clip; }
 @media(min-width:641px) and (max-width:1050px) { .alpine-site .cloud-nav { gap:16px; } .alpine-site .cloud-nav-actions { gap:10px; } .alpine-site .cloud-home .brand-logo-image { width:145px; } .alpine-site .md-menu-group>button { font-size:11px; gap:4px; } .alpine-site .md-site-menu { gap:10px; } }
 .alpine-site .md-public-plans .is-featured h2,.alpine-site .md-public-plans .is-featured strong,.alpine-site .md-public-plans .is-featured p,.alpine-site .md-public-plans .is-featured li { color:white; }
 @media(max-width:1000px) { .alpine-site .cloud-container { width:calc(100% - 48px); } .alpine-site .cloud-product-panels { grid-template-columns:1fr; } .alpine-site .cloud-product-stage { display:grid; grid-template-columns:1fr 1.4fr; gap:25px; } .alpine-site .cloud-hero.cloud-container { width:100%; } .alpine-feature-art { height:190px; } .alpine-site .cloud-footer-grid { grid-template-columns:repeat(3,1fr); } }
-@media(max-width:640px) { .alpine-site .cloud-container { width:calc(100% - 32px); } .alpine-site .cloud-nav { width:calc(100% - 24px); height:62px; } .alpine-site .cloud-hero.cloud-container { width:100%; padding:54px 18px 220px; min-height:550px; } .alpine-site .cloud-hero h1 { font-size:40px; } .alpine-assurance { gap:14px; font-size:10px; padding:24px 8px; } .alpine-showcase { padding:35px 0 55px; } .alpine-showcase figure { padding:25px 12px 0; } .alpine-feature-grid { grid-template-columns:1fr; gap:18px; padding-bottom:55px; } .alpine-feature-art { height:220px; } .alpine-site .cloud-region { display:block; padding-bottom:50px; } .alpine-site .cloud-stat-table { margin-top:22px; } .alpine-site .cloud-product-rail a { padding:9px; font-size:11px; } .alpine-site .cloud-product-rail a>svg { display:none; } .alpine-site .cloud-product-stage { display:block; } .alpine-site .cloud-principles-layout { display:block; } .alpine-site .cloud-principles { padding:55px 0; } .alpine-site .cloud-pricing { padding:60px 0; } .alpine-site .cloud-final { width:calc(100% - 32px); margin-bottom:55px; } .alpine-site .cloud-footer { padding:32px 20px 15px; } .alpine-site .cloud-footer-grid { grid-template-columns:1fr 1fr; } .alpine-site .md-public-hero { padding:40px 18px; margin-bottom:40px; } .alpine-site .md-public-body { grid-template-columns:1fr; } .alpine-site .md-public-body>div { grid-template-columns:1fr; } }
+@media(max-width:640px) { .alpine-site .cloud-container { width:calc(100% - 32px); } .alpine-site .cloud-nav { width:calc(100% - 24px); height:62px; } .alpine-site .cloud-hero.cloud-container { width:100%; padding:54px 18px 220px; min-height:550px; } .alpine-site .cloud-hero h1 { font-size:40px; } .alpine-assurance { gap:14px; font-size:10px; padding:24px 8px; } .alpine-showcase { padding:35px 0 55px; } .alpine-showcase figure { padding:25px 12px 0; } .alpine-feature-grid { grid-template-columns:1fr; gap:18px; padding-bottom:55px; } .alpine-feature-art { height:220px; } .alpine-site .cloud-region { display:block; padding-bottom:50px; } .alpine-site .cloud-stat-table { margin-top:22px; } .alpine-site .cloud-product-rail a { padding:9px; font-size:11px; } .alpine-site .cloud-product-rail a>svg { display:none; } .alpine-site .cloud-product-stage { display:block; } .alpine-site .cloud-principles-layout { display:block; } .alpine-site .cloud-principles { padding:55px 0; } .alpine-site .cloud-pricing { padding:60px 0; } .alpine-site .cloud-final { width:calc(100% - 32px); margin-bottom:55px; } .alpine-site .cloud-footer { padding:32px 20px 15px; } .alpine-site .cloud-footer-grid { grid-template-columns:1fr 1fr; } .alpine-site .md-public-content { padding-top:22px; } .alpine-site .md-public-hero { padding:40px 18px; margin-bottom:40px; } .alpine-site .md-public-body { grid-template-columns:1fr; } .alpine-site .md-public-body>div { grid-template-columns:1fr; } }
 @media(prefers-reduced-motion:reduce) { .alpine-feature-card { transition:none; } .alpine-feature-card:hover,.alpine-site .cloud-button:hover { transform:none; } }
 
 /* Brand-correct finishing: the reference informs composition, Masterdeck owns the identity. */
