@@ -6,7 +6,7 @@ import { config } from '../lib/config'
 import {
   ArrowLeft, ArrowRight, BarChart3, Check, ChevronDown, Database, Eye, EyeOff,
   FileCheck2, FileSpreadsheet, Gauge, Globe2, Link2, LockKeyhole, Mail, Menu,
-  Network, ShieldCheck, Star, TrendingUp, X,
+  ShieldCheck, TrendingUp, X,
 } from 'lucide-react'
 import { AnimatePresence, motion, useMotionValueEvent, useReducedMotion, useScroll } from 'framer-motion'
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react'
@@ -17,9 +17,9 @@ import { applySeo } from '../lib/seo'
 import { Brand, MotionDialogSurface } from './ui-Wifi-G'
 
 const howItWorks = [
-  { title: 'Bring in your records', copy: 'Choose a supported read-only source, upload a CSV or bring a compatible statement. Your broker keeps custody of your money and assets.', icon: Link2 },
-  { title: 'Review the import', copy: 'Check holdings, transactions and any flagged records against your source before they become part of the portfolio history.', icon: FileCheck2 },
-  { title: 'Read the reports', copy: 'See performance, income and Australian tax records with a clear path back to the transaction behind each result.', icon: BarChart3 },
+  { title: 'Bring in your records', copy: 'Connect a supported source or upload your broker statement.', icon: Link2 },
+  { title: 'Review the import', copy: 'Check your holdings and trades, then confirm the import.', icon: FileCheck2 },
+  { title: 'Read the reports', copy: 'Explore your returns, income and Australian tax records.', icon: BarChart3 },
 ] as const
 
 const integrationBrokers = brokers.filter((broker) => broker.id !== 'ibkr' && broker.id !== 'other').slice(0, 10)
@@ -283,22 +283,18 @@ export function Landing({ onDemo, signedIn = false, onOpenApp, page }: LandingPr
         <section className="alpine-assurance" aria-label="Trial and security"><span><ShieldCheck size={15}/>Read-only by design</span><span><Check size={15}/>14 days free</span><span><LockKeyhole size={15}/>No credit card required</span></section>
         <Reveal className="alpine-trustpilot cloud-container" aria-labelledby="trustpilot-heading">
           <div className="alpine-trustpilot-summary">
-            <span className="section-label">TRUSTPILOT</span>
-            <div className="alpine-trustpilot-rating" aria-label="4.7 out of 5 stars, placeholder rating">
-              <strong>4.7</strong>
-              <span className="alpine-star-row" aria-hidden="true">{Array.from({ length: 5 }, (_, index) => <Star key={index} size={16} fill="currentColor" />)}</span>
-              <span>out of 5 · placeholder rating</span>
-            </div>
-            <h2 id="trustpilot-heading">A clearer view, backed by real investors.</h2>
-            <p>Placeholder review content for the launch page. Replace these with verified Trustpilot reviews before publishing ads.</p>
-            <span className="alpine-trustpilot-note">PLACEHOLDER REVIEWS · REPLACE BEFORE LAUNCH</span>
+            <img className="trustpilot-wordmark" src="https://cdn.trustpilot.net/brand-assets/4.1.0/logo-black.svg" alt="Trustpilot" width="130" height="32"/>
+            <h2 id="trustpilot-heading">Investor perspectives</h2>
+            <p className="review-preview-note">Design preview · Sample reviews and 4.7 rating, not verified customer feedback.</p>
+            <div className="alpine-trustpilot-rating"><strong>4.7 <small>/ 5</small></strong><img src="https://cdn.trustpilot.net/brand-assets/4.1.0/stars/stars-5.svg" alt="Sample five-star review graphic" width="120" height="23"/></div>
           </div>
           <div className="alpine-trustpilot-reviews">
-            {placeholderReviews.map((quote) => (
+            {placeholderReviews.map((quote, index) => (
               <article key={quote}>
-                <div className="alpine-review-card-top"><span>Placeholder review</span><span className="alpine-review-stars" aria-hidden="true">{Array.from({ length: 5 }, (_, index) => <Star key={index} size={13} fill="currentColor" />)}</span></div>
+                <img src="https://cdn.trustpilot.net/brand-assets/4.1.0/stars/stars-5.svg" alt="Sample five-star review" width="100" height="19"/>
+                <h3>{['Everything in one place', 'Understand your returns', 'See the detail'][index]}</h3>
                 <blockquote>{quote}</blockquote>
-                <cite>— Placeholder investor · Trustpilot placeholder</cite>
+                <cite>Sample review</cite>
               </article>
             ))}
           </div>
@@ -340,7 +336,7 @@ export function Landing({ onDemo, signedIn = false, onOpenApp, page }: LandingPr
 
         <Reveal className="alpine-proof-section cloud-container">
           <div className="alpine-proof-copy">
-            <span className="section-label">PERFORMANCE</span>
+
             <h2>Understand what is really driving the result.</h2>
             <p>Separate capital growth, income and currency effects, then compare the result with a benchmark without losing the records beneath it.</p>
             <a className="alpine-text-link" href="/features/performance">Explore performance <ArrowRight size={16}/></a>
@@ -351,7 +347,7 @@ export function Landing({ onDemo, signedIn = false, onOpenApp, page }: LandingPr
         <Reveal className="alpine-proof-section alpine-proof-section-reverse cloud-container">
           <figure><img src="/marketing/tax-focus.png" width="2754" height="1300" alt="Masterdeck Australian tax view with connected investment records" loading="lazy"/></figure>
           <div className="alpine-proof-copy">
-            <span className="section-label">AUSTRALIAN TAX</span>
+
             <h2>Keep the tax detail close to the trades.</h2>
             <p>Review disposals, parcel history and recorded income in the same workspace as the portfolio that produced them.</p>
             <a className="alpine-text-link" href="/features/australian-tax">Explore Australian tax records <ArrowRight size={16}/></a>
@@ -362,8 +358,8 @@ export function Landing({ onDemo, signedIn = false, onOpenApp, page }: LandingPr
         <Reveal className="cloud-principles">
           <div className="cloud-container cloud-principles-layout">
             <div className="cloud-principles-intro">
-              <h2>Designed for the part no dashboard can hide.</h2>
-              <p>Investing is a stack of accounts, currencies, transactions and decisions. The interface should make that stack legible.</p>
+              <h2>The full picture. Down to the detail.</h2>
+              <p>Understand your returns, trace the records and keep your accounts in your control.</p>
             </div>
             <div className="cloud-principles-list">
               {principleRows.map(([title, copy, Icon], index) => (
@@ -382,7 +378,7 @@ export function Landing({ onDemo, signedIn = false, onOpenApp, page }: LandingPr
           <div className="cloud-section-intro cloud-steps-intro">
             <span className="section-label">GET STARTED IN JUST MINUTES</span>
             <h2>How it works</h2>
-            <p>Start with the records you already have, then build a clearer view of the portfolio behind them.</p>
+            <p>From broker records to portfolio insights in three steps.</p>
           </div>
           <ol className="cloud-steps-list">
             {howItWorks.map(({ title, copy, icon: Icon }, index) => (
@@ -495,14 +491,14 @@ export function Landing({ onDemo, signedIn = false, onOpenApp, page }: LandingPr
           </div>
         </Reveal>
 
-        <Reveal className="cloud-final">
+        <Reveal className={`cloud-final${signedIn ? ' is-signed-in' : ''}`}>
           <div className="cloud-container cloud-final-inner">
-            <Network />
-            <h2>Your portfolio should make sense.</h2>
-            <p>Give Masterdeck the records. Get back the full picture.</p>
+
+            <h2>{signedIn ? 'Your portfolio is ready.' : 'Your portfolio should make sense.'}</h2>
+            <p>{signedIn ? 'Pick up where you left off.' : 'Give Masterdeck the records. Get back the full picture.'}</p>
             <div className="cloud-actions">
               <button className="cloud-button cloud-button-light" onClick={() => openAuthentication('signup')} disabled={redirecting}>{signupLabel}<ArrowRight /></button>
-              <a className="cloud-button cloud-button-outline-light" href="/pricing">See pricing</a>
+              {!signedIn && <a className="cloud-button cloud-button-outline-light" href="/pricing">See pricing</a>}
             </div>
           </div>
         </Reveal>

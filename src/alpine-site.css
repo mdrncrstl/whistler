@@ -372,3 +372,68 @@ html:has(.alpine-site) { overflow-x:clip; }
   .alpine-trustpilot-reviews { grid-template-columns:1fr; }
   .alpine-trustpilot-reviews article { padding:19px; }
 }
+/* Landing sections: aligned content, restrained density, explicit review preview. */
+.alpine-site .alpine-trustpilot { grid-template-columns:240px minmax(0,1fr); gap:32px; padding:48px 0; border:0; align-items:center; }
+.alpine-site .trustpilot-wordmark { display:block; width:130px; height:32px; object-fit:contain; }
+.alpine-site .alpine-trustpilot-summary h2 { font-size:25px; line-height:1.15; margin:20px 0 10px; }
+.alpine-site .review-preview-note { font-size:12px; line-height:1.6; color:#60766d; }
+.alpine-site .alpine-trustpilot-rating { display:flex; flex-wrap:wrap; gap:14px; margin:20px 0 0; }
+.alpine-site .alpine-trustpilot-rating strong { font-size:32px; letter-spacing:-.04em; color:#123d30; }
+.alpine-site .alpine-trustpilot-rating strong small { font-size:14px; font-weight:400; letter-spacing:0; color:#60766d; }
+.alpine-site .alpine-trustpilot-reviews { gap:14px; }
+.alpine-site .alpine-trustpilot-reviews article { display:flex; flex-direction:column; padding:24px 20px; border-radius:14px; background:#f6f9f7; border:0; box-shadow:none; }
+.alpine-site .alpine-trustpilot-reviews article:hover { transform:none; box-shadow:none; }
+.alpine-site .alpine-trustpilot-reviews h3 { font-size:15px; line-height:1.4; margin:20px 0 8px; }
+.alpine-site .alpine-trustpilot-reviews blockquote { margin:0 0 20px; font-size:13px; line-height:1.6; }
+.alpine-site .alpine-trustpilot-reviews cite { margin-top:auto; font-size:11px; }
+.alpine-site .alpine-proof-section { padding-top:48px; padding-bottom:48px; }
+.alpine-site .cloud-principles { padding:64px 0; }
+.alpine-site .cloud-principles-layout { display:block; }
+.alpine-site .cloud-principles-intro { max-width:650px; margin:0 0 28px; }
+.alpine-site .cloud-principles-intro h2 { max-width:22ch; font-size:34px; line-height:1.13; margin:0 0 12px; }
+.alpine-site .cloud-principles-intro p { max-width:54ch; margin:0; font-size:14px; }
+.alpine-site .cloud-principles-list { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:18px; border:0; }
+.alpine-site .cloud-principle-row { display:grid; grid-template-columns:1fr auto; align-content:start; align-items:start; gap:22px; padding:26px; background:#eff7f2; border-radius:18px; }
+.alpine-site .cloud-principle-row:nth-child(2) { background:#f3f5f8; }
+.alpine-site .cloud-principle-row:nth-child(3) { background:#0c4b39; }
+.alpine-site .cloud-principle-index { display:block; font-size:12px; color:#628575; font-weight:600; }
+.alpine-site .cloud-principle-row > svg { width:24px; height:24px; color:#09996d; }
+.alpine-site .cloud-principle-row > div { grid-column:1/-1; }
+.alpine-site .cloud-principle-row h3 { margin:0 0 10px; font-size:20px; }
+.alpine-site .cloud-principle-row p { margin:0; font-size:14px; line-height:1.65; }
+.alpine-site .cloud-principle-row:last-child h3 { color:#fff; }
+.alpine-site .cloud-principle-row:last-child p,.alpine-site .cloud-principle-row:last-child .cloud-principle-index,.alpine-site .cloud-principle-row:last-child > svg { color:#bce3d0; }
+.alpine-site .cloud-steps { padding:48px 0 64px; }
+.alpine-site .cloud-steps-intro { display:block; max-width:650px; margin:0 auto; text-align:center; }
+.alpine-site .cloud-steps-intro h2 { max-width:none; width:auto; text-align:center; font-size:36px; margin:0 0 12px; }
+.alpine-site .cloud-steps-intro .section-label { display:none; }
+.alpine-site .cloud-steps-intro p { font-size:15px; max-width:none; }
+.alpine-site .cloud-steps-list { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:20px; margin:32px 0 0; padding:0; list-style:none; }
+.alpine-site .cloud-steps-list li { padding:24px; text-align:left; border:0; border-radius:16px; background:#f6f9f7; }
+.alpine-site .cloud-steps-list li + li { border:0; }
+.alpine-site .cloud-steps-list li::after { display:none; }
+.alpine-site .alpine-step-icon { margin:0 0 18px; width:44px; height:44px; border:0; box-shadow:none; background:#e0f1e7; border-radius:12px; }
+.alpine-site .cloud-step-label { font-size:10px; margin-bottom:10px; }
+.alpine-site .cloud-steps-list h3 { font-size:19px; }
+.alpine-site .cloud-steps-list p { margin:0; max-width:32ch; font-size:14px; }
+.alpine-site .cloud-final { padding:40px 32px; margin-bottom:48px; }
+.alpine-site .cloud-final-inner { display:flex; flex-direction:column; align-items:center; gap:12px; }
+.alpine-site .cloud-final h2 { margin:0; font-size:32px; }
+.alpine-site .cloud-final p { margin:0; }
+.alpine-site .cloud-final .cloud-actions { margin:8px 0 0; }
+.alpine-site .cloud-final.is-signed-in .cloud-final-inner { display:grid; grid-template-columns:1fr auto; column-gap:32px; text-align:left; }
+.alpine-site .cloud-final.is-signed-in h2 { grid-column:1; max-width:none; font-size:30px; }
+.alpine-site .cloud-final.is-signed-in p { grid-column:1; }
+.alpine-site .cloud-final.is-signed-in .cloud-actions { grid-column:2; grid-row:1/3; margin:0; }
+@media(max-width:1000px) {
+  .alpine-site .alpine-trustpilot { grid-template-columns:1fr; gap:24px; }
+  .alpine-site .alpine-trustpilot-summary { max-width:600px; }
+}
+@media(max-width:700px) {
+  .alpine-site .alpine-trustpilot-reviews,.alpine-site .cloud-principles-list,.alpine-site .cloud-steps-list { grid-template-columns:1fr; }
+  .alpine-site .cloud-principles-intro h2 { font-size:28px; }
+  .alpine-site .cloud-principles,.alpine-site .cloud-steps { padding:36px 0; }
+  .alpine-site .cloud-final.is-signed-in .cloud-final-inner { display:flex; text-align:center; }
+  .alpine-site .cloud-final.is-signed-in .cloud-actions { margin-top:8px; }
+  .alpine-site .cloud-final { padding:28px 20px; }
+}
