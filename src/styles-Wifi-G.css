@@ -6166,3 +6166,9 @@ html { scrollbar-gutter: stable; }
   color: #087c5e;
   box-shadow: 0 10px 24px rgb(4 122 95 / 16%);
 }
+
+/* Range measurements stay within the plot, alongside both selected endpoints. */
+.chart-range-measure-label { display:inline-flex; flex-wrap:wrap; align-items:center; gap:4px 8px; max-width:100%; padding:5px 8px; border-radius:6px; background:var(--surface); color:var(--muted); font-size:12px; line-height:1.5; font-variant-numeric:tabular-nums; box-shadow:0 1px 4px #0000000a; }
+.chart-range-measure-label strong { font-size:14px; font-weight:650; }
+.portfolio-main-chart,.holding-chart-surface,.ai-stock-plot { user-select:none; }
+.portfolio-main-chart:has(.chart-range-measurement)::after,.holding-chart-surface:has(.chart-range-measurement)::after,.ai-stock-plot:has(.chart-range-measurement)::after { display:none; }

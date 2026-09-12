@@ -1,4 +1,4 @@
-import { Area, AreaChart, CartesianGrid, ReferenceArea, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { useMemo } from 'react'
 import { ChartRangeReadout } from './ChartRangeSelection'
 import { useChartRange } from '../lib/chartRange'
@@ -29,7 +29,7 @@ export function StockResearchChart({ points, symbol, currency }: { points: Stock
   if (points.length < 2) return <div className="ai-stock-chart-empty">More price history is required to inspect this period.</div>
 
   return <div className="ai-stock-chart" aria-label={`${symbol} price history`}>
-    <div className="ai-stock-chart-heading"><span>Price history · quoted currency</span><ChartRangeReadout summary={chartRange.summary} dragging={chartRange.dragging} onClear={chartRange.clear} formatValue={(value) => money(value, currency, 2)} formatLabel={(label) => date(label, { day: 'numeric', month: 'short', year: 'numeric' })}/></div>
+    <div className="ai-stock-chart-heading"><span>Price history · quoted currency</span></div>
     <div className={`ai-stock-plot ${chartRange.dragging ? 'is-selecting' : ''}`}>
       <ResponsiveContainer width="100%" height={190}>
         <AreaChart data={points} margin={{ top: 18, right: 12, bottom: 8, left: 2 }} {...chartRange.chartProps}>
@@ -37,10 +37,10 @@ export function StockResearchChart({ points, symbol, currency }: { points: Stock
           <CartesianGrid vertical={false} stroke="var(--line)" strokeOpacity={.7}/>
           <XAxis dataKey="date" tickFormatter={(value) => date(String(value), { month: 'short' })} minTickGap={48} axisLine={false} tickLine={false} tickMargin={10}/>
           <YAxis orientation="right" width={58} domain={['auto', 'auto']} tickFormatter={(value) => money(Number(value), currency, 0)} axisLine={false} tickLine={false}/>
-          <Tooltip cursor={false} isAnimationActive={false} content={<StockChartTooltip baseline={baseline} currency={currency}/>}/>
-          {chartRange.active && <ReferenceArea x1={chartRange.active.from} x2={chartRange.active.to} strokeOpacity={0} fill="var(--green)" fillOpacity={.11}/>} 
-          <Area type="monotone" dataKey="price" stroke="var(--green)" strokeWidth={2} fill={`url(#stock-fill-${symbol.replace(/[^a-z0-9]/gi, '-')})`} dot={false} activeDot={{ r: 4, fill: 'var(--green)', stroke: 'var(--surface)', strokeWidth: 2 }} isAnimationActive={false}/>
-        </AreaChart>
+          <Tooltip active={chartRange.active ? false : undefined} cursor={false} isAnimationActive={false} content={<StockChartTooltip baseline={baseline} currency={currency}/>}/>
+           
+          <Area type="monotone" dataKey="price" stroke="var(--green)" strokeWidth={2} fill={`url(#stock-fill-${symbol.replace(/[^a-z0-9]/gi, '-')})`} dot={false} activeDot={chartRange.active ? false : { r: 4, fill: 'var(--green)', stroke: 'var(--surface)', strokeWidth: 2 }} isAnimationActive={false}/>
+        <ChartRangeReadout summary={chartRange.summary} dragging={chartRange.dragging} onClear={chartRange.clear} formatValue={(value) => money(value, currency, 2)} formatLabel={(label) => date(label, { day: 'numeric', month: 'short', year: 'numeric' })}/></AreaChart>
       </ResponsiveContainer>
     </div>
   </div>

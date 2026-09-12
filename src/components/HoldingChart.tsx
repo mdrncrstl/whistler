@@ -1,5 +1,5 @@
 import { useId, useMemo, useState } from 'react'
-import { Area, Bar, CartesianGrid, ComposedChart, ReferenceArea, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import { Area, Bar, CartesianGrid, ComposedChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { filterPerformancePoints, type AdvancedPerformancePoint, type PerformancePeriod } from './AdvancedPerformanceChart'
 import { date, money } from '../lib/format'
 import { ChartRangeReadout } from './ChartRangeSelection'
@@ -41,16 +41,16 @@ export function HoldingChart({ points, symbol, currency = 'AUD', price = false, 
     <div className="chart-mode-row">
       {!price && <><div>{(['Amount', 'Percent'] as const).map(value => <button key={value} aria-pressed={mode === value} className={mode === value ? 'active' : ''} onClick={() => onModeChange?.(value)}>{value}</button>)}</div><div>{(['Line', 'Bar'] as const).map(value => <button key={value} aria-pressed={style === value} className={style === value ? 'active' : ''} onClick={() => setStyle(value)}>{value}</button>)}</div></>}
       <div className="holding-periods">{(['5D', '1M', '6M', 'YTD', '1Y', '3Y', '5Y', 'MAX'] as const).map(value => <button key={value} aria-pressed={period.preset === value} className={period.preset === value ? 'active' : ''} onClick={() => onPeriodChange({ preset: value })}>{value === 'MAX' ? 'All' : value}</button>)}</div>
-      <ChartRangeReadout summary={chartRange.summary} dragging={chartRange.dragging} onClear={chartRange.clear} formatValue={(value) => !price && mode === 'Percent' ? `${value.toFixed(2)} pts` : money(value, currency, 2)} formatLabel={(label) => date(label, { day: 'numeric', month: 'short', year: 'numeric' })}/>
+      
     </div>
     {data.length > 1 ? <div className="holding-chart-surface"><ResponsiveContainer width="100%" height="100%"><ComposedChart data={data} margin={{ top: 18, right: 8, bottom: 8, left: 4 }} {...chartRange.chartProps}>
       <defs><linearGradient id={id} x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="var(--chart-1)" stopOpacity={.15}/><stop offset="1" stopColor="var(--chart-1)" stopOpacity={0}/></linearGradient></defs>
       <CartesianGrid vertical={false} stroke="var(--line)" strokeOpacity={.6}/>
       <XAxis dataKey="date" axisLine={false} tickLine={false} minTickGap={50} tickMargin={12} tickFormatter={value => date(value, { month: 'short', year: period.preset === 'MAX' || period.preset === '5Y' ? '2-digit' : undefined })}/>
       <YAxis orientation="right" axisLine={false} tickLine={false} width={76} domain={['auto', 'auto']} tickFormatter={axisTick}/>
-      <Tooltip separator=": " isAnimationActive={false} cursor={{ stroke: 'var(--muted-2)', strokeDasharray: '3 3' }} labelFormatter={label => date(String(label), { day: '2-digit', month: 'short', year: 'numeric' })} formatter={value => [format(Number(value)), symbol]}/>
-      {chartRange.active && <ReferenceArea x1={chartRange.active.from} x2={chartRange.active.to} strokeOpacity={0} fill="var(--chart-1)" fillOpacity={0.1}/>}
-      {style === 'Bar' && !price ? <Bar dataKey="value" fill="var(--chart-1)" isAnimationActive={false}/> : <Area type="linear" dataKey="value" stroke="var(--chart-1)" strokeWidth={1.6} fill={`url(#${id})`} dot={false} activeDot={{ r: 3 }} isAnimationActive={false}/>}
-    </ComposedChart></ResponsiveContainer></div> : <p className="holding-history-empty" role={loading ? 'status' : undefined}>{loading ? 'Loading price history…' : 'Not enough recorded history for this period.'}</p>}
+      <Tooltip active={chartRange.active ? false : undefined} separator=": " isAnimationActive={false} cursor={{ stroke: 'var(--muted-2)', strokeDasharray: '3 3' }} labelFormatter={label => date(String(label), { day: '2-digit', month: 'short', year: 'numeric' })} formatter={value => [format(Number(value)), symbol]}/>
+      
+      {style === 'Bar' && !price ? <Bar dataKey="value" fill="var(--chart-1)" isAnimationActive={false}/> : <Area type="linear" dataKey="value" stroke="var(--chart-1)" strokeWidth={1.6} fill={`url(#${id})`} dot={false} activeDot={chartRange.active ? false : { r: 3 }} isAnimationActive={false}/>}
+    <ChartRangeReadout summary={chartRange.summary} dragging={chartRange.dragging} onClear={chartRange.clear} formatValue={(value) => !price && mode === 'Percent' ? `${value.toFixed(2)} pts` : money(value, currency, 2)} formatLabel={(label) => date(label, { day: 'numeric', month: 'short', year: 'numeric' })}/></ComposedChart></ResponsiveContainer></div> : <p className="holding-history-empty" role={loading ? 'status' : undefined}>{loading ? 'Loading price history…' : 'Not enough recorded history for this period.'}</p>}
   </section>
 }

@@ -99,8 +99,9 @@ export function useChartRange(series: RangeSeriesPoint[]) {
       if (!anchor || label === undefined || label === null) return
       setCursor(String(label))
     },
-    onMouseUp: () => {
-      if (anchor && cursor && anchor !== cursor) setLocked(order(series, anchor, cursor))
+    onMouseUp: (state: { activeLabel?: string | number } | null) => {
+      const end = state?.activeLabel == null ? cursor : String(state.activeLabel)
+      if (anchor && end && anchor !== end) setLocked(order(series, anchor, end))
       setAnchor(null)
       setCursor(null)
     },
