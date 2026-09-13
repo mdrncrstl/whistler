@@ -37,7 +37,18 @@ const PortfolioContext = createContext<PortfolioContextValue | null>(null)
 const idleMarketData: MarketDataState = { status: 'idle', source: null, generatedAt: null, updated: 0, failed: 0, message: null }
 
 export function PortfolioProvider({ session, demo, children }: { session: Session | null; demo: boolean; children: ReactNode }) {
-  const [bundle, setBundle] = useState<PortfolioBundle>(() => structuredClone(demoBundle))
+  const [bundle, setBundle] = useState<PortfolioBundle>(() => {
+    const initial = structuredClone(demoBundle)
+    if (demo && initial.profile) {
+      try {
+        const stored = window.sessionStorage.getItem('masterdeck-demo-settings')
+        if (stored) initial.profile.settings = { ...initial.profile.settings, ...JSON.parse(stored) }
+      } catch {
+        // Demo preferences are best-effort and remain local to this browser session.
+      }
+    }
+    return initial
+  })
   const [loading, setLoading] = useState(!demo)
   const [action, setAction] = useState<string | null>(null)
   const [notice, setNotice] = useState<Notice | null>(null)
@@ -107,6 +118,7 @@ export function PortfolioProvider({ session, demo, children }: { session: Sessio
     disconnect: (connectionId) => run(`disconnect-${connectionId}`, () => portfolioApi.disconnect(requireSession(), connectionId)),
     updateProfile: (profile) => demo
       ? run('save-profile', async () => {
+          try { window.sessionStorage.setItem('masterdeck-demo-settings', JSON.stringify(profile.settings)) } catch { /* best effort */ }
           setBundle((current) => ({ ...current, profile: current.profile ? { ...current.profile, ...profile } : null }))
           return { message: 'Demo preferences updated for this session.' }
         })

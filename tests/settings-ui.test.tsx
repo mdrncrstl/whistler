@@ -26,6 +26,7 @@ describe('settings workspace', () => {
     expect(screen.getByRole('region', { name: 'Account' })).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: /Portfolio preferences/ }))
     expect(await screen.findByRole('checkbox', { name: 'Privacy mode' })).toBeInTheDocument()
+    expect(screen.getByRole('checkbox', { name: 'Pro graph mode' })).toBeInTheDocument()
     expect(screen.getByRole('region', { name: 'Portfolio preferences' })).toBeInTheDocument()
     expect(screen.getByRole('combobox', { name: 'Default tax-lot method' })).toHaveValue('fifo')
 
@@ -42,6 +43,7 @@ describe('settings workspace', () => {
 
     fireEvent.click(screen.getByRole('button', { name: /Portfolio preferences/ }))
     fireEvent.click(await screen.findByRole('checkbox', { name: 'Privacy mode' }))
+    fireEvent.click(screen.getByRole('checkbox', { name: 'Pro graph mode' }))
     expect(screen.getByText('Unsaved changes')).toBeInTheDocument()
     expect(save).toBeEnabled()
 

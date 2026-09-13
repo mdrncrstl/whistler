@@ -1,7 +1,8 @@
-import { beforeAll, describe, expect, it } from 'vitest'
+import { beforeAll, describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen, cleanup } from '@testing-library/react'
 import { FinanceChart } from '../src/components/FinanceChart'
 import { nearestFinancePoint, normaliseFinancePoints } from '../src/components/financeChartUtils'
+import { FinanceProToolbar } from '../src/components/FinanceProToolbar'
 
 beforeAll(() => { globalThis.ResizeObserver = class { observe() {} unobserve() {} disconnect() {} } })
 const format = (v: number) => v.toFixed(2)
@@ -47,6 +48,41 @@ describe('Finance chart comparisons', () => {
     expect(plot).toHaveAttribute('data-chart-type', 'candles')
     expect(plot?.querySelectorAll('.finance-candle-wick')).toHaveLength(2)
     expect(plot?.querySelectorAll('.finance-candle-body')).toHaveLength(2)
+    cleanup()
+  })
+
+  it('exposes the Google Finance chart type, comparison and indicator controls', () => {
+    const onStyle = vi.fn()
+    const onComparison = vi.fn()
+    const onIndicators = vi.fn()
+    render(<FinanceProToolbar chartStyle="area" onChartStyleChange={onStyle} comparisonOptions={[{ id: 'AMZN', label: 'AMZN', detail: 'Amazon.com Inc · NASDAQ (US)' }]} comparison="none" onComparisonChange={onComparison} indicators={[]} onIndicatorsChange={onIndicators} candleAvailable={false}/>)
+
+    fireEvent.click(screen.getByRole('button', { name: /Area/ }))
+    expect(screen.getByRole('menuitemradio', { name: /Line/ })).toBeInTheDocument()
+    expect(screen.getByRole('menuitemradio', { name: /Candle/ })).toBeDisabled()
+    fireEvent.click(screen.getByRole('menuitemradio', { name: /Line/ }))
+    expect(onStyle).toHaveBeenCalledWith('line')
+
+    fireEvent.click(screen.getByRole('button', { name: /Compare/ }))
+    fireEvent.click(screen.getByRole('menuitemradio', { name: /AMZN/ }))
+    expect(onComparison).toHaveBeenCalledWith('AMZN')
+
+    fireEvent.click(screen.getByRole('button', { name: /Indicators/ }))
+    fireEvent.click(screen.getByRole('menuitemcheckbox', { name: 'Moving average' }))
+    expect(onIndicators).toHaveBeenCalledWith(['sma'])
+    cleanup()
+  })
+
+  it('renders selected moving average, envelope and MACD series', () => {
+    const points = Array.from({ length: 30 }, (_, index) => ({ date: `2026-01-${String(index + 1).padStart(2, '0')}`, value: 100 + index + Math.sin(index) }))
+    render(<FinanceChart points={points} chartStyle="area" indicators={['sma', 'envelope', 'macd']} formatValue={format}/>)
+    const plot = screen.getByRole('img').parentElement
+    expect(plot).toHaveAttribute('data-chart-style', 'area')
+    expect(plot).toHaveAttribute('data-indicators', 'sma,envelope,macd')
+    expect(plot?.querySelectorAll('.finance-indicator-sma')).toHaveLength(1)
+    expect(plot?.querySelectorAll('.finance-indicator-envelope')).toHaveLength(2)
+    expect(plot?.querySelectorAll('.finance-indicator-line')).toHaveLength(5)
+    expect(plot?.querySelector('.finance-indicator-title')).toHaveTextContent('MACD')
     cleanup()
   })
 })

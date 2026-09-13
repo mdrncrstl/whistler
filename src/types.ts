@@ -18,6 +18,7 @@ export interface ProfileSettings {
   privacyMode?: boolean
   defaultTaxMethod?: TaxMethod
   compactTables?: boolean
+  proGraphMode?: boolean
 }
 
 export interface Profile {

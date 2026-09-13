@@ -35,7 +35,7 @@ export const demoBundle: PortfolioBundle = {
     full_name: 'Demo Investor',
     avatar_url: null,
     base_currency: 'AUD',
-    settings: { privacyMode: false, defaultTaxMethod: 'fifo' },
+    settings: { privacyMode: false, defaultTaxMethod: 'fifo', proGraphMode: false },
   },
   holdings: [
     { provider: 'ibkr', account_name: 'IBKR Main', symbol: 'AAPL', name: 'Apple Inc.', market: 'NASDAQ', currency: 'USD', asset_class: 'US shares', sector: 'Technology', quantity: 80, average_cost: 163.4, current_price: 226.4, fx_rate: 1.54, value_aud: 27892.48, cost_aud: 20130.88, unrealised_gain_aud: 7761.6, return_pct: 38.56, day_change_aud: 312.4 },

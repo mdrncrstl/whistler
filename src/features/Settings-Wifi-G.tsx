@@ -1,4 +1,5 @@
 import {
+  Activity,
   ArrowUpRight,
   Calculator,
   Check,
@@ -29,6 +30,7 @@ import { planForSubscription } from '../lib/billing'
 import { authClient } from '../lib/supabase'
 import type { TaxMethod } from '../types'
 import { Badge, Button, PageHeader, Select } from '../components/ui'
+import '../components/finance-chart.css'
 
 type SettingsSection = 'account' | 'portfolio' | 'data' | 'security' | 'billing'
 
@@ -43,7 +45,7 @@ const settingsSections: Array<{ id: SettingsSection; label: string; description:
 export function Settings({ onExitDemo }: { onExitDemo: () => void }) {
   const { bundle, demo, action, updateProfile, session } = usePortfolio()
   const profile = bundle.profile
-  return <SettingsForm key={`${profile?.id}-${profile?.full_name}-${JSON.stringify(profile?.settings || {})}`} profile={profile} demo={demo} action={action} updateProfile={updateProfile} onExitDemo={onExitDemo} session={session} />
+  return <SettingsForm key={profile?.id || 'settings'} profile={profile} demo={demo} action={action} updateProfile={updateProfile} onExitDemo={onExitDemo} session={session} />
 }
 
 function SettingsForm({ profile, demo, action, updateProfile, onExitDemo, session }: {
@@ -63,15 +65,17 @@ function SettingsForm({ profile, demo, action, updateProfile, onExitDemo, sessio
   const [name, setName] = useState(profile?.full_name || '')
   const [privacyMode, setPrivacyMode] = useState(Boolean(profile?.settings?.privacyMode))
   const [compactTables, setCompactTables] = useState(Boolean(profile?.settings?.compactTables))
+  const [proGraphMode, setProGraphMode] = useState(Boolean(profile?.settings?.proGraphMode))
   const [method, setMethod] = useState<TaxMethod>(profile?.settings?.defaultTaxMethod || 'fifo')
   const [savedState, setSavedState] = useState({
     name: profile?.full_name || '',
     privacyMode: Boolean(profile?.settings?.privacyMode),
     compactTables: Boolean(profile?.settings?.compactTables),
+    proGraphMode: Boolean(profile?.settings?.proGraphMode),
     method: profile?.settings?.defaultTaxMethod || 'fifo' as TaxMethod,
   })
 
-  const dirty = name.trim() !== savedState.name || privacyMode !== savedState.privacyMode || compactTables !== savedState.compactTables || method !== savedState.method
+  const dirty = name.trim() !== savedState.name || privacyMode !== savedState.privacyMode || compactTables !== savedState.compactTables || proGraphMode !== savedState.proGraphMode || method !== savedState.method
   const planLabel = billingLoading
     ? 'Checking plan…'
     : demo
@@ -102,10 +106,10 @@ function SettingsForm({ profile, demo, action, updateProfile, onExitDemo, sessio
     await updateProfile({
       full_name: nextName,
       avatar_url: profile?.avatar_url || null,
-      settings: { ...profile?.settings, privacyMode, compactTables, defaultTaxMethod: method },
+      settings: { ...profile?.settings, privacyMode, compactTables, proGraphMode, defaultTaxMethod: method },
     })
     setName(nextName)
-    setSavedState({ name: nextName, privacyMode, compactTables, method })
+    setSavedState({ name: nextName, privacyMode, compactTables, proGraphMode, method })
   }
 
   const signOut = async () => {
@@ -149,7 +153,7 @@ function SettingsForm({ profile, demo, action, updateProfile, onExitDemo, sessio
               transition={{ duration: reduceMotion ? 0.08 : 0.16, ease: [0.23, 1, 0.32, 1] }}
             >
               {activeSection === 'account' && <AccountSettings profile={profile} name={name} accountName={accountName} planLabel={planLabel} planDetail={planDetail} onNameChange={setName}/>}
-              {activeSection === 'portfolio' && <PortfolioSettings privacyMode={privacyMode} compactTables={compactTables} method={method} onPrivacyMode={setPrivacyMode} onCompactTables={setCompactTables} onMethod={setMethod}/>}
+              {activeSection === 'portfolio' && <PortfolioSettings privacyMode={privacyMode} compactTables={compactTables} proGraphMode={proGraphMode} method={method} onPrivacyMode={setPrivacyMode} onCompactTables={setCompactTables} onProGraphMode={setProGraphMode} onMethod={setMethod}/>}
               {activeSection === 'data' && <DataSettings demo={demo}/>}
               {activeSection === 'security' && <SecuritySettings demo={demo} onSignOut={signOut}/>}
               {activeSection === 'billing' && <BillingSettings planLabel={planLabel} planDetail={planDetail} paid={paid || trialActive}/>}
@@ -188,12 +192,14 @@ function AccountSettings({ profile, name, accountName, planLabel, planDetail, on
   </>
 }
 
-function PortfolioSettings({ privacyMode, compactTables, method, onPrivacyMode, onCompactTables, onMethod }: {
+function PortfolioSettings({ privacyMode, compactTables, proGraphMode, method, onPrivacyMode, onCompactTables, onProGraphMode, onMethod }: {
   privacyMode: boolean
   compactTables: boolean
+  proGraphMode: boolean
   method: TaxMethod
   onPrivacyMode: (value: boolean) => void
   onCompactTables: (value: boolean) => void
+  onProGraphMode: (value: boolean) => void
   onMethod: (value: TaxMethod) => void
 }) {
   return <div className="settings-group settings-group-first">
@@ -207,6 +213,11 @@ function PortfolioSettings({ privacyMode, compactTables, method, onPrivacyMode, 
       <span className="settings-row-icon"><Rows3 size={17}/></span>
       <span><strong>Compact tables</strong><small>Fit more holdings and transactions on screen.</small></span>
       <input aria-label="Compact tables" type="checkbox" checked={compactTables} onChange={(event) => onCompactTables(event.target.checked)}/><i aria-hidden="true"/>
+    </label>
+    <label className="settings-control-row">
+      <span className="settings-row-icon"><Activity size={17}/></span>
+      <span><strong>Pro graph mode</strong><small>Use Google Finance style chart controls, comparisons and indicators.</small></span>
+      <input aria-label="Pro graph mode" type="checkbox" checked={proGraphMode} onChange={(event) => onProGraphMode(event.target.checked)}/><i aria-hidden="true"/>
     </label>
     <label className="settings-control-row settings-select-row">
       <span className="settings-row-icon"><Calculator size={17}/></span>
