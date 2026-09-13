@@ -45,10 +45,14 @@ function DeckAI() {
   useEffect(() => {
     const conversation = conversationRef.current
     if (!conversation) return
-    conversation.scrollTo({
-      top: conversation.scrollHeight,
-      behavior: reducedMotion ? 'auto' : 'smooth',
-    })
+    if (typeof conversation.scrollTo === 'function') {
+      conversation.scrollTo({
+        top: conversation.scrollHeight,
+        behavior: reducedMotion ? 'auto' : 'smooth',
+      })
+    } else {
+      conversation.scrollTop = conversation.scrollHeight
+    }
   }, [messages, preparing, reducedMotion])
   const suggestions = questionGroups[category]
   const send = (value = prompt) => {

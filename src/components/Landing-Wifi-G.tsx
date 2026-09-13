@@ -525,7 +525,7 @@ export function Landing({ onDemo, signedIn = false, onOpenApp, page }: LandingPr
             <p>{signedIn ? 'Pick up where you left off.' : 'Give Masterdeck the records. Get back the full picture.'}</p>
             <div className="cloud-actions">
               <button className="cloud-button cloud-button-light" onClick={() => openAuthentication('signup')} disabled={redirecting}>{signupLabel}<ArrowRight /></button>
-              {!signedIn && <a className="cloud-button cloud-button-outline-light" href="/pricing">See pricing</a>}
+              <a className="cloud-button cloud-button-outline-light" href="/pricing">See pricing</a>
             </div>
           </div>
         </Reveal>
