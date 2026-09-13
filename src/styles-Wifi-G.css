@@ -6172,3 +6172,6 @@ html { scrollbar-gutter: stable; }
 .chart-range-measure-label strong { font-size:14px; font-weight:650; }
 .portfolio-main-chart,.holding-chart-surface,.ai-stock-plot { user-select:none; }
 .portfolio-main-chart:has(.chart-range-measurement)::after,.holding-chart-surface:has(.chart-range-measurement)::after,.ai-stock-plot:has(.chart-range-measurement)::after { display:none; }
+
+/* Keep page hierarchy in the headings and remove redundant eyebrow tags. */
+.section-label { display:none !important; }

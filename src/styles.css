@@ -474,3 +474,6 @@ td small { display: block; margin-top: 4px; color: var(--muted-2); font-size: 8.
 .settings-field input { background: var(--surface); }
 .settings-static-value { background: var(--surface-2); }
 .settings-control-row > i { background: var(--surface-3); }
+
+/* Keep page hierarchy in the headings and remove redundant eyebrow tags. */
+.section-label { display:none !important; }
