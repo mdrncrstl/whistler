@@ -9,6 +9,7 @@ function fixture() {
   bundle.cash = [{ provider: 'ibkr', account_name: 'IBKR Main', currency: 'AUD', balance: 780, fx_rate: 1, value_aud: 780 }]
   bundle.transactions = [{ ...bundle.transactions[0], symbol: 'TEST', date: '2026-09-02', quantity: 2, price: 110, amount: -220, fees: 0, currency: 'AUD' }]
   bundle.snapshots = [{ date: '2026-09-01', value_aud: 2000, invested_aud: 1000, cash_aud: 1000 }]
+  bundle.demo = false
   const h: MarketHistory = { symbol: 'TEST', currency: 'AUD', exchange: 'NASDAQ', source: 'test', generatedAt: '2026-09-03', points: [{ date: '2026-09-01', price: 100 }, { date: '2026-09-02', price: 110 }, { date: '2026-09-03', price: 120 }] }
   return { bundle, histories: new Map([[historyKey('TEST','NASDAQ'), h]]) }
 }
@@ -60,6 +61,18 @@ describe('daily portfolio valuations', () => {
     expect(rows.map(p => p.currency_gain_aud)).toEqual([0, 0, 0])
     expect(rows.map(p => p.income_aud)).toEqual([0, 0, 0])
     expect(rows.map(p => p.total_return_aud)).toEqual([0, 120, 240])
+  })
+  it('keeps the demo chart daily and aligned with its recorded metric totals', () => {
+    const bundle = structuredClone(demoBundle)
+    const rows = buildDailyPortfolioHistory(bundle, new Map(), '2026-09-14')
+    const last = rows.at(-1)!
+    expect(rows.length).toBeGreaterThan(300)
+    expect(last.date).toBe('2026-08-14')
+    expect(last.value_aud).toBe(139854.61)
+    expect(last.capital_gain_aud).toBe(32638.11)
+    expect(last.currency_gain_aud).toBe(0)
+    expect(last.income_aud).toBe(553.13)
+    expect(last.total_return_aud).toBe(33191.24)
   })
   it('reverses dividends and deposits from cash on the correct date', () => {
     const { bundle, histories } = fixture()

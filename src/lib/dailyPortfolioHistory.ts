@@ -23,10 +23,68 @@ function transactionIncome(t: Transaction) {
   return incomeTypes.has(String(t.type).toUpperCase()) ? Math.abs(Number(t.amount || 0) * Number(t.fx_rate || 1)) : 0
 }
 
+function buildDemoPortfolioHistory(bundle: PortfolioBundle): PortfolioSnapshot[] {
+  const recorded = [...bundle.snapshots]
+    .map(snapshot => ({ ...snapshot, time: Date.parse(day(snapshot.date)) }))
+    .filter(snapshot => Number.isFinite(snapshot.time))
+    .sort((a, b) => a.time - b.time)
+  if (recorded.length < 2) return bundle.snapshots
+
+  const cost = bundle.holdings.reduce((sum, holding) => sum + Math.abs(Number(holding.cost_aud || 0)), 0)
+  const cash = bundle.cash.reduce((sum, item) => sum + Number(item.value_aud || item.balance || 0), 0)
+  const currentValue = bundle.holdings.reduce((sum, holding) => sum + Number(holding.value_aud || 0), 0) + cash
+  const currencyGain = bundle.holdings.reduce((sum, holding) => {
+    const localCost = Number(holding.average_cost || 0) * Number(holding.quantity || 0)
+    const costAud = Number(holding.cost_aud || 0)
+    const rate = Number(holding.fx_rate || 0)
+    if (!localCost || !costAud || !rate) return sum
+    return sum + localCost * (rate - costAud / localCost)
+  }, 0)
+  const income = bundle.transactions
+    .filter(transaction => transactionTypesForHistory(transaction))
+    .map(transaction => ({ time: Date.parse(day(transaction.date)), value: transactionIncome(transaction) }))
+    .filter(item => Number.isFinite(item.time))
+  const historyEnd = Math.max(recorded.at(-1)!.time, ...income.map(item => item.time))
+  const valueAt = (time: number) => {
+    if (time === historyEnd) return currentValue
+    const nextIndex = recorded.findIndex(snapshot => snapshot.time >= time)
+    if (nextIndex <= 0) return recorded[0].value_aud
+    if (nextIndex === -1) return recorded.at(-1)!.value_aud
+    const previous = recorded[nextIndex - 1]
+    const next = recorded[nextIndex]
+    const progress = (time - previous.time) / Math.max(next.time - previous.time, 1)
+    return previous.value_aud + (next.value_aud - previous.value_aud) * progress
+  }
+  const output: PortfolioSnapshot[] = []
+  for (let time = recorded[0].time; time <= historyEnd; time += DAY) {
+    const date = new Date(time).toISOString().slice(0, 10)
+    const portfolioValue = valueAt(time)
+    const incomeValue = income.filter(item => item.time <= time).reduce((sum, item) => sum + item.value, 0)
+    const capitalGain = portfolioValue - cash - cost - currencyGain
+    output.push({
+      date,
+      value_aud: round(portfolioValue),
+      cash_aud: round(cash),
+      invested_aud: round(portfolioValue - cash),
+      capital_gain_aud: round(capitalGain),
+      currency_gain_aud: round(currencyGain),
+      income_aud: round(incomeValue),
+      total_return_aud: round(capitalGain + currencyGain + incomeValue),
+      source: 'demo-recorded-ledger',
+    })
+  }
+  return output
+}
+
+function transactionTypesForHistory(transaction: Transaction) {
+  return incomeTypes.has(String(transaction.type).toUpperCase())
+}
+
 /** Reconstruct closing valuations backwards from the current balances and recorded ledger.
  * Prices and FX are observed closes, never interpolation between monthly snapshots.
  */
 export function buildDailyPortfolioHistory(bundle: PortfolioBundle, histories: Map<string, MarketHistory>, endDate: string): PortfolioSnapshot[] {
+  if (bundle.demo) return buildDemoPortfolioHistory(bundle)
   const end = Date.parse(day(endDate))
   const firstRecord = bundle.snapshots.map(p => Date.parse(day(p.date))).filter(Number.isFinite).sort((a,b) => a-b)[0]
   const start = Math.max(end - 365 * DAY, firstRecord ?? end - 365 * DAY)
