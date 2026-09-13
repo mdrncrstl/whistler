@@ -8,12 +8,14 @@ export function HoldingChart({ points, symbol, currency = 'AUD', price = false, 
   mode?: 'Amount' | 'Percent'; onModeChange?: (value: 'Amount' | 'Percent') => void;
   period: PerformancePeriod; onPeriodChange: (value: PerformancePeriod) => void;
 }) {
-  const [style, setStyle] = useState<'Line' | 'Bar'>('Line')
+  const [style, setStyle] = useState<'Line' | 'Bar' | 'Candles'>('Line')
   const data = useMemo(() => {
     const filtered = filterPerformancePoints(points, period)
     const base = filtered[0]?.holdingAmount || 0
-    return filtered.map(point => ({ date: point.date, measurementValue: price ? point.price : point.holdingAmount, value: price ? point.price : mode === 'Percent' ? (base ? (point.holdingAmount / base - 1) * 100 : 0) : point.holdingAmount }))
+    return filtered.map(point => ({ date: point.date, measurementValue: price ? point.price : point.holdingAmount, value: price ? point.price : mode === 'Percent' ? (base ? (point.holdingAmount / base - 1) * 100 : 0) : point.holdingAmount, open: point.open, high: point.high, low: point.low, close: point.close, volume: point.volume }))
   }, [points, period, price, mode])
+  const hasCandleData = price && data.length > 1 && data.every(point => [point.open, point.high, point.low, point.close].every(value => Number.isFinite(value)))
+  const activeStyle = style === 'Candles' && !hasCandleData ? 'Line' : style
   const format = (value: number) => !price && mode === 'Percent' ? `${value.toFixed(2)}%` : money(value, currency, 2)
   /**
    * Pick the tick format from the visible span, not from each value. Compact notation
@@ -35,11 +37,9 @@ export function HoldingChart({ points, symbol, currency = 'AUD', price = false, 
   return <section className={`holding-simple-chart ${price ? 'is-price' : ''}`} aria-label={`${symbol} ${price ? 'price' : 'performance'} chart`}>
     {price && <h2>Price</h2>}
     <div className="chart-mode-row">
-      {!price && <><div>{(['Amount', 'Percent'] as const).map(value => <button key={value} aria-pressed={mode === value} className={mode === value ? 'active' : ''} onClick={() => onModeChange?.(value)}>{value}</button>)}</div><div>{(['Line', 'Bar'] as const).map(value => <button key={value} aria-pressed={style === value} className={style === value ? 'active' : ''} onClick={() => setStyle(value)}>{value}</button>)}</div></>}
-
-      
+      {price ? <div role="group" aria-label="Price chart style"><button type="button" aria-label="Price line chart" aria-pressed={activeStyle === 'Line'} className={activeStyle === 'Line' ? 'active' : ''} onClick={() => setStyle('Line')}>Line</button>{hasCandleData && <button type="button" aria-label="Price candlestick chart" aria-pressed={activeStyle === 'Candles'} className={activeStyle === 'Candles' ? 'active' : ''} onClick={() => setStyle('Candles')}>Candles</button>}</div> : <><div>{(['Amount', 'Percent'] as const).map(value => <button type="button" key={value} aria-pressed={mode === value} className={mode === value ? 'active' : ''} onClick={() => onModeChange?.(value)}>{value}</button>)}</div><div>{(['Line', 'Bar'] as const).map(value => <button type="button" key={value} aria-pressed={activeStyle === value} className={activeStyle === value ? 'active' : ''} onClick={() => setStyle(value)}>{value}</button>)}</div></>}
     </div>
-    {loading && data.length < 2 ? <p role="status">Loading price history…</p> : <FinanceChart points={data.map(p => ({ ...p, value: Number(p.value) }))} label={price ? 'Price' : 'Portfolio'} formatValue={format} formatAxis={axisTick} bars={style === 'Bar' && !price}/>}
+    {loading && data.length < 2 ? <p role="status">Loading price history…</p> : <FinanceChart points={data.map(p => ({ ...p, value: Number(p.value) }))} label={price ? 'Price' : 'Portfolio'} resolution={price ? 'daily' : 'recorded'} formatValue={format} formatAxis={axisTick} bars={activeStyle === 'Bar' && !price} candles={activeStyle === 'Candles' && hasCandleData}/>}
       <div className="finance-periods">{(['5D', '1M', '6M', 'YTD', '1Y', '3Y', '5Y', 'MAX'] as const).map(value => <button key={value} aria-pressed={period.preset === value} className={period.preset === value ? 'active' : ''} onClick={() => onPeriodChange({ preset: value })}>{value === 'MAX' ? 'All' : value}</button>)}</div>
   </section>
 }

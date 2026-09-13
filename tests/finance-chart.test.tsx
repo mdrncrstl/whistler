@@ -37,4 +37,16 @@ describe('Finance chart comparisons', () => {
     expect(screen.getByRole('status').textContent).not.toMatch(/Infinity|NaN/)
     cleanup()
   })
+
+  it('renders provider OHLC values as candlesticks', () => {
+    render(<FinanceChart candles points={[
+      { date: '2026-01-01', value: 101, open: 100, high: 104, low: 98, close: 101 },
+      { date: '2026-01-02', value: 99, open: 101, high: 103, low: 97, close: 99 },
+    ]} formatValue={format}/>)
+    const plot = screen.getByRole('img').parentElement
+    expect(plot).toHaveAttribute('data-chart-type', 'candles')
+    expect(plot?.querySelectorAll('.finance-candle-wick')).toHaveLength(2)
+    expect(plot?.querySelectorAll('.finance-candle-body')).toHaveLength(2)
+    cleanup()
+  })
 })

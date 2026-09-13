@@ -14,7 +14,7 @@ import { usePortfolio } from '../context/PortfolioContext'
 import { date, money } from '../lib/format'
 import { holdingCurrencyGain } from '../lib/portfolio'
 import { companyUrlForSymbol } from '../lib/companyIdentity'
-import { fetchMarketHistory, fetchMarketMovement, marketFreshnessLabel, type MarketMovement } from '../lib/marketDataApi'
+import { fetchMarketHistory, fetchMarketMovement, marketFreshnessLabel, type MarketHistoryPoint, type MarketMovement } from '../lib/marketDataApi'
 import type { Transaction } from '../types'
 import { SupplyChain } from './SupplyChain'
 
@@ -22,8 +22,8 @@ type Tab = 'Overview' | 'Trades' | 'Income' | 'Notes'
 type SortDirection = 'asc' | 'desc'
 type TradeSort = 'date' | 'type' | 'quantity' | 'price' | 'fees' | 'amount'
 type IncomeSort = 'date' | 'type' | 'gross' | 'franking' | 'net'
-type PerformancePoint = { date: string; holdingPercent: number; benchmarkPercent: number; holdingAmount: number; benchmarkAmount: number; price: number }
-type PricePoint = { date: string; price: number; adjustedPrice?: number }
+type PerformancePoint = { date: string; holdingPercent: number; benchmarkPercent: number; holdingAmount: number; benchmarkAmount: number; price: number; open?: number; high?: number; low?: number; close?: number; volume?: number }
+type PricePoint = MarketHistoryPoint
 
 function transactionKey(item: Transaction) { return item.id || item.provider_external_id }
 function financialYear(value: string) { const current = new Date(value); const year = current.getUTCFullYear(); return `FY ${current.getUTCMonth() >= 6 ? year + 1 : year}` }
@@ -118,7 +118,8 @@ export function HoldingDetail() {
       const comparablePrice = point.adjustedPrice ?? point.price
       const holdingPercent = (comparablePrice / firstPrice - 1) * 100
       const benchmarkPercent = ((benchmarkPoint?.value_aud || firstBenchmark) / firstBenchmark - 1) * 100
-      return { date: point.date, holdingPercent, benchmarkPercent, holdingAmount: holding.value_aud * comparablePrice / latestPrice, benchmarkAmount: holding.cost_aud * (1 + benchmarkPercent / 100), price: comparablePrice }
+      const hasCandle = Number.isFinite(point.open) && Number.isFinite(point.high) && Number.isFinite(point.low) && Number.isFinite(point.close)
+      return { date: point.date, holdingPercent, benchmarkPercent, holdingAmount: holding.value_aud * comparablePrice / latestPrice, benchmarkAmount: holding.cost_aud * (1 + benchmarkPercent / 100), price: point.price, ...(hasCandle ? { open: point.open, high: point.high, low: point.low, close: point.close } : {}), ...(point.volume !== undefined ? { volume: point.volume } : {}) }
     })
   }, [bundle.snapshots, holding, priceHistory])
 

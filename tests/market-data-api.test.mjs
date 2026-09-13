@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { loadQuote, normaliseTicker } from '../api/_market-data.mjs'
+import { buildMarketHistoryPoints, loadQuote, normaliseTicker } from '../api/_market-data.mjs'
 
 describe('market symbol normalisation', () => {
   it('maps common global exchanges without corrupting US or pre-qualified symbols', () => {
@@ -23,5 +23,21 @@ describe('quote validation', () => {
     expect(quote.previousClose).toBe(309.35)
     expect(quote.change).toBeCloseTo(10.35)
     expect(quote.currency).toBe('USD')
+  })
+})
+
+describe('OHLC history points', () => {
+  it('preserves complete source candles and skips incomplete candle fields', () => {
+    const points = buildMarketHistoryPoints({
+      timestamp: [1, 2],
+      indicators: {
+        quote: [{ open: [10, 20], high: [12, 22], low: [9, 19], close: [11, 21], volume: [100, 200] }],
+        adjclose: [{ adjclose: [10.5, 20.5] }],
+      },
+    }, 'USD')
+    expect(points[0]).toMatchObject({ price: 11, adjustedPrice: 10.5, open: 10, high: 12, low: 9, close: 11, volume: 100 })
+    const incomplete = buildMarketHistoryPoints({ timestamp: [1], indicators: { quote: [{ open: [10], high: [null], low: [9], close: [11] }] } }, 'USD')
+    expect(incomplete[0]).toMatchObject({ price: 11 })
+    expect(incomplete[0]).not.toHaveProperty('open')
   })
 })

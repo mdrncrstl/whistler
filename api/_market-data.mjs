@@ -34,6 +34,7 @@ export function normaliseTicker(symbol, market) {
 }
 
 function finite(value) {
+  if (value === null || value === undefined || value === '') return null
   const number = Number(value)
   return Number.isFinite(number) ? number : null
 }
@@ -94,6 +95,47 @@ export function normaliseQuoteUnits(price, previousClose, rawCurrency) {
 export function normalisePriceUnit(price, rawCurrency) {
   const value = Number(price)
   return rawCurrency === 'GBp' || rawCurrency === 'GBX' ? value / 100 : value
+}
+
+/** Preserve the provider's complete OHLC observations so charts never invent candle values. */
+export function buildMarketHistoryPoints(chart, rawCurrency) {
+  const timestamps = Array.isArray(chart?.timestamp) ? chart.timestamp : []
+  const quote = chart?.indicators?.quote?.[0] || {}
+  const closes = Array.isArray(quote.close) ? quote.close : []
+  const opens = Array.isArray(quote.open) ? quote.open : []
+  const highs = Array.isArray(quote.high) ? quote.high : []
+  const lows = Array.isArray(quote.low) ? quote.low : []
+  const volumes = Array.isArray(quote.volume) ? quote.volume : []
+  const adjusted = chart?.indicators?.adjclose?.[0]?.adjclose || []
+
+  return timestamps.flatMap((timestamp, index) => {
+    const time = finite(timestamp)
+    const close = finite(closes[index])
+    if (time === null || close === null) return []
+
+    const price = normalisePriceUnit(close, rawCurrency)
+    const adjustedClose = finite(adjusted[index])
+    const open = finite(opens[index])
+    const high = finite(highs[index])
+    const low = finite(lows[index])
+    const volume = finite(volumes[index])
+    const point = {
+      date: new Date(time * 1000).toISOString(),
+      price,
+      adjustedPrice: adjustedClose === null ? price : normalisePriceUnit(adjustedClose, rawCurrency),
+    }
+
+    if (open !== null && high !== null && low !== null) {
+      Object.assign(point, {
+        open: normalisePriceUnit(open, rawCurrency),
+        high: normalisePriceUnit(high, rawCurrency),
+        low: normalisePriceUnit(low, rawCurrency),
+        close: price,
+      })
+    }
+    if (volume !== null) Object.assign(point, { volume })
+    return [point]
+  })
 }
 
 function inferMarketState(meta, asOfSeconds) {

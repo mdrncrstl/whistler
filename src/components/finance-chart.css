@@ -26,6 +26,8 @@
 .finance-grid { stroke: #dadce3; stroke-width: 1; }
 .finance-selection-band { fill: var(--finance-selection); pointer-events: none; }
 .finance-marker { pointer-events: none; }
+.finance-candle { pointer-events: none; }
+.finance-candle-wick, .finance-candle-body { vector-effect: non-scaling-stroke; }
 
 .finance-readout {
   position: absolute;

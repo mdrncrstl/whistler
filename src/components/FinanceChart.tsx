@@ -9,6 +9,7 @@ type FinanceChartProps = {
   formatValue: (value: number) => string
   formatAxis?: (value: number) => string
   bars?: boolean
+  candles?: boolean
   comparisonLabel?: string
   area?: boolean
   resolution?: 'daily' | 'recorded'
@@ -17,7 +18,7 @@ type FinanceChartProps = {
 const fullDate = { day: 'numeric' as const, month: 'short' as const, year: 'numeric' as const, timeZone: 'UTC' as const }
 
 /** Shared Google Finance-style plot: hover a daily point, or drag two points to compare them. */
-export function FinanceChart({ points, label = 'Price', formatValue, formatAxis = formatValue, bars = false, comparisonLabel = 'Benchmark', area = true, resolution = 'recorded' }: FinanceChartProps) {
+export function FinanceChart({ points, label = 'Price', formatValue, formatAxis = formatValue, bars = false, candles = false, comparisonLabel = 'Benchmark', area = true, resolution = 'recorded' }: FinanceChartProps) {
   const host = useRef<HTMLDivElement>(null)
   const svgRef = useRef<SVGSVGElement>(null)
   const id = useId().replaceAll(':', '')
@@ -44,6 +45,7 @@ export function FinanceChart({ points, label = 'Price', formatValue, formatAxis 
     return () => observer.disconnect()
   }, [data.length])
 
+  const candleMode = !bars && candles && data.length > 1 && data.every(point => [point.open, point.high, point.low, point.close].every(value => Number.isFinite(value)))
   if (data.length < 2) return <p className="finance-empty">Not enough recorded history for this period.</p>
 
   const height = width < 500 ? 280 : 310
@@ -52,7 +54,9 @@ export function FinanceChart({ points, label = 'Price', formatValue, formatAxis 
   const right = width - 24
   const top = width < 500 ? 86 : 58
   const bottom = height - 42
-  const values = data.flatMap(p => [p.value, ...(p.comparison !== undefined && Number.isFinite(p.comparison) ? [p.comparison] : [])])
+  const hasVolume = data.some(point => point.volume !== undefined)
+  const plotBottom = hasVolume ? bottom - 48 : bottom
+  const values = data.flatMap(p => [p.value, ...(candleMode ? [p.high!, p.low!] : []), ...(p.comparison !== undefined && Number.isFinite(p.comparison) ? [p.comparison] : [])])
   const low = Math.min(...values, ...(bars ? [0] : []))
   const high = Math.max(...values, ...(bars ? [0] : []))
   const span = high - low || Math.abs(high) * .1 || 1
@@ -68,7 +72,12 @@ export function FinanceChart({ points, label = 'Price', formatValue, formatAxis 
   const times = data.map(point => Date.parse(point.date))
   const x = (index: number) => left + (times[index] - firstTime) / timeSpan * chartSpan
   const xForTime = (time: number) => left + (time - firstTime) / timeSpan * chartSpan
-  const y = (value: number) => bottom - (value - min) / (max - min || 1) * (bottom - top)
+  const slotWidth = (index: number) => {
+    const intervals = [index > 0 ? times[index] - times[index - 1] : 0, index < times.length - 1 ? times[index + 1] - times[index] : 0].filter(value => value > 0)
+    const interval = intervals.length ? Math.min(...intervals) : timeSpan / Math.max(1, data.length - 1)
+    return Math.max(2, Math.min(32, interval / timeSpan * chartSpan * .78))
+  }
+  const y = (value: number) => plotBottom - (value - min) / (max - min || 1) * (plotBottom - top)
 
   const pointFromPointer = (clientX: number, clientY: number) => {
     const rect = svgRef.current?.getBoundingClientRect()
@@ -121,11 +130,11 @@ export function FinanceChart({ points, label = 'Price', formatValue, formatAxis 
   const volume = (value: number) => Intl.NumberFormat('en', { notation: 'compact', maximumFractionDigits: 1 }).format(value)
   const tooltipIndex = hover ?? selected?.[1] ?? null
   const tooltipPoint = tooltipIndex === null ? null : data[tooltipIndex]
-  const tooltipStyle = pointer ? { left: `${Math.max(left + 10, Math.min(right - 10, pointer.x))}px`, top: `${Math.max(top + 42, Math.min(bottom - 10, pointer.y - 12))}px` } : undefined
-  const dataDescription = resolution === 'daily' ? 'Daily market points' : 'Recorded portfolio points'
+  const tooltipStyle = pointer ? { left: `${Math.max(left + 10, Math.min(right - 10, pointer.x))}px`, top: `${Math.max(top + 42, Math.min(plotBottom - 10, pointer.y - 12))}px` } : undefined
+  const dataDescription = candleMode ? 'Daily OHLC market points' : resolution === 'daily' ? 'Daily market points' : 'Recorded portfolio points'
 
-  return <div className="finance-plot" ref={host} data-range={Boolean(selected)} data-points={data.length} data-resolution={resolution} data-first-date={data[0].date} data-last-date={data.at(-1)!.date} data-range-start={selectedStart?.date} data-range-end={selectedEnd?.date}>
-    <svg ref={svgRef} width="100%" height={height} viewBox={`0 0 ${width} ${height}`} role="img" aria-label={`${label} history. ${dataDescription} can be inspected with the pointer. Drag between dates to compare. Use arrow keys to inspect, Shift and arrows to compare, Escape to clear.`}
+  return <div className="finance-plot" ref={host} data-chart-type={candleMode ? 'candles' : bars ? 'bars' : 'line'} data-range={Boolean(selected)} data-points={data.length} data-resolution={resolution} data-first-date={data[0].date} data-last-date={data.at(-1)!.date} data-range-start={selectedStart?.date} data-range-end={selectedEnd?.date}>
+    <svg ref={svgRef} width="100%" height={height} viewBox={`0 0 ${width} ${height}`} role="img" aria-label={`${label} ${candleMode ? 'candlestick' : bars ? 'bar' : 'line'} history. ${dataDescription} can be inspected with the pointer. Drag between dates to compare. Use arrow keys to inspect, Shift and arrows to compare, Escape to clear.`}
       tabIndex={0} onPointerMove={move}
       onPointerDown={event => {
         if (event.button !== 0) return
@@ -161,19 +170,28 @@ export function FinanceChart({ points, label = 'Price', formatValue, formatAxis 
         }
       }}>
       <defs><linearGradient id={`finance-${id}`} x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor={color} stopOpacity=".34"/><stop offset="1" stopColor={color} stopOpacity="0"/></linearGradient></defs>
-      {selected && !bars && <rect className="finance-selection-band" x={x(selected[0])} y={top - 12} width={Math.max(1, x(selected[1]) - x(selected[0]))} height={bottom - top + 12}/>}
-      {[...new Set(xTicks)].map(time => { const px = xForTime(time); return <g key={time}><line x1={px} x2={px} y1={top} y2={bottom} className="finance-grid"/><text x={px} y={height - 16} textAnchor={px < left + 24 ? 'start' : px > right - 24 ? 'end' : 'middle'}>{date(new Date(time).toISOString(), lastTime - firstTime < 60 * 86400000 ? { day: 'numeric', month: 'short', timeZone: 'UTC' } : { month: 'short', year: width < 500 ? '2-digit' : 'numeric', timeZone: 'UTC' })}</text></g> })}
+      {selected && !bars && <rect className="finance-selection-band" x={x(selected[0])} y={top - 12} width={Math.max(1, x(selected[1]) - x(selected[0]))} height={plotBottom - top + 12}/>}
+      {[...new Set(xTicks)].map(time => { const px = xForTime(time); return <g key={time}><line x1={px} x2={px} y1={top} y2={plotBottom} className="finance-grid"/><text x={px} y={height - 16} textAnchor={px < left + 24 ? 'start' : px > right - 24 ? 'end' : 'middle'}>{date(new Date(time).toISOString(), lastTime - firstTime < 60 * 86400000 ? { day: 'numeric', month: 'short', timeZone: 'UTC' } : { month: 'short', year: width < 500 ? '2-digit' : 'numeric', timeZone: 'UTC' })}</text></g> })}
       {ticks.map(tick => <text key={tick} x={left - 14} y={y(tick) + 4} textAnchor="end">{formatAxis(tick)}</text>)}
-      {bars ? data.map((point, index) => <rect key={point.date} x={x(index) - Math.min(14, chartSpan / data.length * .35)} y={Math.min(y(0), y(point.value))} width={Math.min(28, chartSpan / data.length * .7)} height={Math.max(1, Math.abs(y(point.value) - y(0)))} fill={point.value >= 0 ? 'var(--finance-up)' : 'var(--finance-down)'} opacity=".7"/>) : <>
-        {area && <path d={`${line} L${right},${bottom} L${left},${bottom} Z`} fill={`url(#finance-${id})`}/>}
+      {bars ? data.map((point, index) => <rect className="finance-bar" key={point.date} x={x(index) - slotWidth(index) * .36} y={Math.min(y(0), y(point.value))} width={slotWidth(index) * .72} height={Math.max(1, Math.abs(y(point.value) - y(0)))} fill={point.value >= 0 ? 'var(--finance-up)' : 'var(--finance-down)'} opacity=".7"/>) : candleMode ? data.map((point, index) => {
+        const open = point.open ?? point.value
+        const high = point.high ?? point.value
+        const low = point.low ?? point.value
+        const close = point.close ?? point.value
+        const rising = close >= open
+        const stroke = rising ? 'var(--finance-up)' : 'var(--finance-down)'
+        const bodyWidth = Math.max(3, Math.min(14, slotWidth(index) * .72))
+        return <g key={point.date} className={`finance-candle ${rising ? 'is-up' : 'is-down'}`}><line className="finance-candle-wick" x1={x(index)} x2={x(index)} y1={y(high)} y2={y(low)} stroke={stroke} strokeWidth="1.5"/><rect className="finance-candle-body" x={x(index) - bodyWidth / 2} y={Math.min(y(open), y(close))} width={bodyWidth} height={Math.max(2, Math.abs(y(close) - y(open)))} fill={stroke} stroke={stroke} strokeWidth="1"/></g>
+      }) : <>
+        {area && <path d={`${line} L${right},${plotBottom} L${left},${plotBottom} Z`} fill={`url(#finance-${id})`}/>}
         <path d={line} fill="none" stroke={color} strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round"/>
       </>}
-      {data.map((point, index) => point.volume !== undefined && <rect key={`v-${point.date}`} x={x(index)} y={bottom - point.volume / maxVolume * 44} width={Math.max(1, chartSpan / data.length * .8)} height={point.volume / maxVolume * 44} fill={point.value >= (data[index - 1]?.value ?? point.value) ? 'var(--finance-up)' : 'var(--finance-down)'} opacity=".4"/>)}
+      {data.map((point, index) => point.volume !== undefined && <rect className="finance-volume-bar" key={`v-${point.date}`} x={x(index) - slotWidth(index) * .4} y={bottom - point.volume / maxVolume * 44} width={Math.max(1, slotWidth(index) * .8)} height={point.volume / maxVolume * 44} fill={point.value >= (data[index - 1]?.value ?? point.value) ? 'var(--finance-up)' : 'var(--finance-down)'} opacity=".4"/>)}
       {data.some(point => point.comparison !== undefined) && <path d={data.map((point, index) => point.comparison === undefined ? '' : `${index && data[index - 1].comparison !== undefined ? 'L' : 'M'}${x(index)},${y(point.comparison)}`).join(' ')} fill="none" stroke="#7986cb" strokeWidth="1.7"/>}
-      {(selected || (hover !== null ? [hover] : [])).map(index => <g key={index} className="finance-marker"><line x1={x(index)} x2={x(index)} y1={top - 10} y2={bottom} stroke="#aeb4c0" strokeWidth="2" strokeDasharray="2 6" strokeLinecap="round"/><circle cx={x(index)} cy={y(data[index].value)} r="5" fill="#3268ee"/></g>)}
-      {!selected && hover === null && !bars && <circle cx={right} cy={y(data.at(-1)!.value)} r="5" fill={color}/>}
+      {(selected || (hover !== null ? [hover] : [])).map(index => <g key={index} className="finance-marker"><line x1={x(index)} x2={x(index)} y1={top - 10} y2={plotBottom} stroke="#aeb4c0" strokeWidth="2" strokeDasharray="2 6" strokeLinecap="round"/><circle cx={x(index)} cy={y(data[index].value)} r="5" fill="#3268ee"/></g>)}
+      {!selected && hover === null && !bars && !candleMode && <circle cx={right} cy={y(data.at(-1)!.value)} r="5" fill={color}/>}
     </svg>
-    {tooltipPoint && pointer && !bars && !selected && <div className="finance-pointer-tooltip" style={tooltipStyle} role="tooltip"><span>{date(tooltipPoint.date, fullDate)}</span><strong>{formatValue(tooltipPoint.value)}</strong>{tooltipPoint.volume !== undefined && <small>Volume {volume(tooltipPoint.volume)}</small>}</div>}
+    {tooltipPoint && pointer && !bars && !selected && <div className="finance-pointer-tooltip" style={tooltipStyle} role="tooltip"><span>{date(tooltipPoint.date, fullDate)}</span>{candleMode ? <><strong>Open {formatValue(tooltipPoint.open!)}</strong><strong>High {formatValue(tooltipPoint.high!)}</strong><strong>Low {formatValue(tooltipPoint.low!)}</strong><strong>Close {formatValue(tooltipPoint.close!)}</strong></> : <strong>{formatValue(tooltipPoint.value)}</strong>}{tooltipPoint.volume !== undefined && <small>Volume {volume(tooltipPoint.volume)}</small>}</div>}
     {a && b && <div className="finance-readout" role="status">
       <span>{label}: <span className={positive ? 'gain' : 'loss'}>{selected ? formatValue(displayDelta) : formatValue(a.value)} {percent !== null && `(${percentText})`}</span></span>
       {selected && <span>{date(a.date, fullDate)} – {date(b.date, fullDate)}</span>}

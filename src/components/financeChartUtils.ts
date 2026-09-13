@@ -1,4 +1,4 @@
-export type FinancePoint = { date: string; value: number; measurementValue?: number; volume?: number; comparison?: number }
+export type FinancePoint = { date: string; value: number; measurementValue?: number; volume?: number; comparison?: number; open?: number; high?: number; low?: number; close?: number }
 
 /** Keep the chart's x-axis honest: dates are ordered and duplicate observations are collapsed. */
 export function normaliseFinancePoints(points: FinancePoint[]) {
@@ -13,6 +13,10 @@ export function normaliseFinancePoints(points: FinancePoint[]) {
       ...(Number.isFinite(point.measurementValue) ? { measurementValue: Number(point.measurementValue) } : {}),
       ...(Number.isFinite(point.volume) ? { volume: Number(point.volume) } : {}),
       ...(Number.isFinite(point.comparison) ? { comparison: Number(point.comparison) } : {}),
+      ...(Number.isFinite(point.open) ? { open: Number(point.open) } : {}),
+      ...(Number.isFinite(point.high) ? { high: Number(point.high) } : {}),
+      ...(Number.isFinite(point.low) ? { low: Number(point.low) } : {}),
+      ...(Number.isFinite(point.close) ? { close: Number(point.close) } : {}),
     })
   })
   return [...byTime.values()].sort((a, b) => Date.parse(a.date) - Date.parse(b.date))

@@ -1,8 +1,9 @@
 import type { PortfolioBundle } from '../types'
+import type { MarketHistoryPoint } from './marketDataApi'
 import { allocationBy, incomeTransactions, summarisePortfolio } from './portfolio'
 import { money, percent } from './format'
 
-export interface PortfolioAnswer { title: string; text: string; symbol?: string; exchange?: string; currency?: string; href?: string; link?: string; metrics?: { label: string; value: string }[]; points?: { date: string; price: number }[]; source?: { url: string; label: string; asOf: string | null }; alternatives?: { symbol: string; name: string }[] }
+export interface PortfolioAnswer { title: string; text: string; symbol?: string; exchange?: string; currency?: string; href?: string; link?: string; metrics?: { label: string; value: string }[]; points?: MarketHistoryPoint[]; source?: { url: string; label: string; asOf: string | null }; alternatives?: { symbol: string; name: string }[] }
 
 /** Deliberately local and deterministic: never executes a trade or calls a model. */
 export function portfolioAnswer(question: string, bundle: PortfolioBundle): PortfolioAnswer {

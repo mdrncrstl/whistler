@@ -1,4 +1,4 @@
-import { loadMarketChart, normaliseCurrency, normalisePriceUnit, normaliseTicker } from './_market-data.mjs'
+import { buildMarketHistoryPoints, loadMarketChart, normaliseCurrency, normaliseTicker } from './_market-data.mjs'
 
 const CACHE_TTL_MS = 60 * 60 * 1000
 const historyCache = new Map()
@@ -20,10 +20,8 @@ async function loadHistory(symbol, market) {
   const period1 = period2 - 3653 * 24 * 60 * 60
   const chart = await loadMarketChart(ticker, `period1=${period1}&period2=${period2}&interval=1d&events=div%2Csplits&includeAdjustedClose=true`)
   if (!chart?.timestamp?.length) throw new Error(`No daily market history is available for ${ticker}.`)
-  const adjusted = chart.indicators?.adjclose?.[0]?.adjclose || []
-  const closes = chart.indicators?.quote?.[0]?.close || []
   const rawCurrency = chart.meta?.currency || ''
-  const points = chart.timestamp.flatMap((timestamp, index) => Number.isFinite(closes[index]) ? [{ date: new Date(timestamp * 1000).toISOString(), price: normalisePriceUnit(closes[index], rawCurrency), adjustedPrice: Number.isFinite(adjusted[index]) ? normalisePriceUnit(adjusted[index], rawCurrency) : normalisePriceUnit(closes[index], rawCurrency) }] : [])
+  const points = buildMarketHistoryPoints(chart, rawCurrency)
   const splits = Object.values(chart.events?.splits || {}).map(split => ({ date: new Date(split.date * 1000).toISOString(), numerator: Number(split.numerator), denominator: Number(split.denominator) }))
   const payload = { symbol: ticker, currency: normaliseCurrency(rawCurrency), exchange: chart.meta?.fullExchangeName || chart.meta?.exchangeName || market || '', source: 'Just now', generatedAt: new Date().toISOString(), points, splits }
   historyCache.set(ticker, { fetchedAt: Date.now(), payload })

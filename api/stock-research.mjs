@@ -1,4 +1,4 @@
-import { loadMarketChart, normaliseCurrency, normalisePriceUnit } from './_market-data.mjs'
+import { buildMarketHistoryPoints, loadMarketChart, normaliseCurrency, normalisePriceUnit } from './_market-data.mjs'
 
 export async function researchStock(query, fetcher = fetch) {
   const response = await fetcher(`https://query1.finance.yahoo.com/v1/finance/search?q=${encodeURIComponent(query)}&quotesCount=6&newsCount=0`, { signal: AbortSignal.timeout(7000), headers: { 'User-Agent': 'Mozilla/5.0 Masterdeck/1.0' } })
@@ -11,11 +11,7 @@ export async function researchStock(query, fetcher = fetch) {
   const meta = chart.meta || {}
   const currency = normaliseCurrency(meta.currency || 'USD')
   const convert = value => Number.isFinite(value) ? normalisePriceUnit(value, meta.currency || 'USD') : null
-  const points = (chart.timestamp || []).flatMap((time, index) => {
-    const price = convert(chart.indicators?.quote?.[0]?.close?.[index])
-    const volume = chart.indicators?.quote?.[0]?.volume?.[index]
-    return price === null ? [] : [{ date: new Date(time * 1000).toISOString(), price, ...(Number.isFinite(volume) ? { volume } : {}) }]
-  })
+  const points = buildMarketHistoryPoints(chart, meta.currency || 'USD')
   return { ...match, candidates, currency, price: convert(meta.regularMarketPrice), high: convert(meta.fiftyTwoWeekHigh), low: convert(meta.fiftyTwoWeekLow), asOf: meta.regularMarketTime ? new Date(meta.regularMarketTime * 1000).toISOString() : null, points, sourceUrl: `https://finance.yahoo.com/quote/${encodeURIComponent(match.symbol)}/` }
 }
 
