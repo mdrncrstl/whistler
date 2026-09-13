@@ -123,10 +123,6 @@ function SettingsForm({ profile, demo, action, updateProfile, onExitDemo, sessio
 
       <form id="settings-form" className="settings-workspace" onSubmit={save}>
         <aside className="settings-section-rail" aria-label="Settings sections">
-          <div className="settings-account-rail-summary">
-            <span className="settings-avatar settings-avatar-small">{profile?.avatar_url ? <img src={profile.avatar_url} alt=""/> : <UserRound size={17}/>}</span>
-            <span><strong>{accountName}</strong><small>{planLabel}</small></span>
-          </div>
           <nav>
             {settingsSections.map(({ id, label, description, icon: Icon }) => (
               <button key={id} type="button" className={activeSection === id ? 'active' : ''} aria-current={activeSection === id ? 'page' : undefined} onClick={() => setActiveSection(id)}>

@@ -1013,14 +1013,8 @@ td small { display: block; margin-top: 4px; color: var(--muted-2); font-size: 8.
 .settings-workspace { min-width: 0; display: grid; grid-template-columns: 224px minmax(0, 1fr); align-items: start; gap: 18px; }
 .settings-section-rail, .settings-panel { border: 1px solid var(--line); border-radius: 11px; background: var(--surface); box-shadow: 0 1px 2px rgb(15 23 42 / 2%); }
 .settings-section-rail { position: sticky; top: 70px; overflow: hidden; }
-.settings-account-rail-summary { min-height: 72px; padding: 14px; border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 10px; }
-.settings-account-rail-summary > span:last-child { min-width: 0; }
-.settings-account-rail-summary strong, .settings-account-rail-summary small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.settings-account-rail-summary strong { font-size: 11px; }
-.settings-account-rail-summary small { margin-top: 3px; color: var(--muted-2); font-size: 9px; }
 .settings-avatar { width: 46px; height: 46px; flex: 0 0 auto; border: 1px solid color-mix(in srgb, var(--green) 18%, var(--line)); border-radius: 12px; display: grid; place-items: center; overflow: hidden; background: color-mix(in srgb, var(--green) 7%, var(--surface)); color: var(--green-strong); }
 .settings-avatar img { width: 100%; height: 100%; object-fit: cover; }
-.settings-avatar-small { width: 34px; height: 34px; border-radius: 9px; }
 .settings-section-rail nav { padding: 7px; display: grid; gap: 2px; }
 .settings-section-rail nav button { width: 100%; min-height: 50px; padding: 7px 9px; border: 0; border-radius: 8px; display: grid; grid-template-columns: 23px minmax(0, 1fr); align-items: center; gap: 7px; background: transparent; color: var(--muted); font: inherit; text-align: left; cursor: pointer; transition: background .16s var(--ease-out), color .16s var(--ease-out), transform var(--duration-press) var(--ease-out); }
 .settings-section-rail nav button:hover { background: var(--surface-2); color: var(--text); }
@@ -2006,7 +2000,7 @@ body { font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-s
   .settings-save-actions { width: 100%; justify-content: space-between; }
   .settings-workspace { grid-template-columns: minmax(0, 1fr); gap: 12px; }
   .settings-section-rail { position: static; overflow: visible; }
-  .settings-account-rail-summary, .settings-rail-foot { display: none; }
+  .settings-rail-foot { display: none; }
   .settings-section-rail nav { padding: 6px; display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; }
   .settings-section-rail nav::-webkit-scrollbar { display: none; }
   .settings-section-rail nav button { width: auto; min-width: max-content; min-height: 38px; padding: 7px 10px; grid-template-columns: 17px auto; gap: 6px; }
