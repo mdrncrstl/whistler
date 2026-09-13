@@ -1,13 +1,13 @@
 .finance-plot {
-  --finance-up: #087f23;
-  --finance-down: #c5221f;
-  --finance-selection: rgb(52 168 83 / 14%);
+  --finance-up: #008000;
+  --finance-down: #ea4335;
+  --finance-selection: rgb(0 128 0 / 8%);
   position: relative;
   min-width: 0;
   overflow: hidden;
-  border: 1px solid #e1e5eb;
-  border-radius: 14px;
-  background: #f8f9fa;
+  border: 0;
+  border-radius: 4px;
+  background: #f6f7f9;
   color: #3c4043;
   user-select: none;
 }
@@ -30,17 +30,17 @@
 .finance-readout {
   position: absolute;
   z-index: 2;
-  top: 14px;
-  left: 16px;
+  top: 20px;
+  left: 18px;
   display: flex;
   flex-wrap: wrap;
   gap: 3px 8px;
   max-width: calc(100% - 32px);
-  padding: 6px 9px;
+  padding: 4px 6px;
   border: 1px solid #dadce0;
-  border-radius: 8px;
-  background: rgb(255 255 255 / 96%);
-  box-shadow: 0 1px 2px rgb(60 64 67 / 12%);
+  border-radius: 4px;
+  background: #fff;
+  box-shadow: none;
   color: #202124;
   font-size: 12px;
   font-weight: 400;
@@ -83,9 +83,10 @@
   gap: 2px;
   flex-wrap: wrap;
   padding: 8px 12px;
-  border-top: 1px solid #e1e5eb;
-  border-radius: 0 0 14px 14px;
-  background: #f8f9fa;
+  border-top: 0;
+  margin-top: 3px;
+  border-radius: 0 0 22px 22px;
+  background: #f6f7f9;
 }
 
 .finance-periods button {
@@ -110,9 +111,10 @@
   align-items: center;
   gap: 4px;
   padding: 9px 14px;
-  border-bottom: 1px solid #e1e5eb;
-  border-radius: 14px 14px 0 0;
-  background: #f8f9fa;
+  border-bottom: 0;
+  margin-bottom: 3px;
+  border-radius: 22px 22px 4px 4px;
+  background: #f6f7f9;
 }
 
 .finance-chart-controls button,
@@ -130,8 +132,8 @@
 
 .finance-chart-controls button[aria-pressed="true"] { background: #e8eaef; font-weight: 600; }
 .finance-chart-controls button:hover { background: #e8eaef; }
-.report-chart-card .finance-plot { border-radius: 14px; }
-.holding-simple-chart:has(.finance-plot) .chart-mode-row, .portfolio-chart-section:has(.finance-plot) .chart-mode-row { margin: 0 0 3px; padding: 12px 16px; border: 0; border-radius: 14px 14px 0 0; background: #f8f9fa; }
+.report-chart-card .finance-plot { border-radius: 4px; }
+.holding-simple-chart:has(.finance-plot) .chart-mode-row, .portfolio-chart-section:has(.finance-plot) .chart-mode-row { margin: 0 0 3px; padding: 12px 16px; border: 0; border-radius: 22px 22px 4px 4px; background: #f6f7f9; }
 .holding-simple-chart:has(.finance-plot) .chart-mode-row button, .portfolio-chart-section:has(.finance-plot) .chart-mode-row button { border: 0; border-radius: 8px; background: transparent; color: #5f6368; padding: 8px 12px; }
 .holding-simple-chart:has(.finance-plot) .chart-mode-row button.active, .portfolio-chart-section:has(.finance-plot) .chart-mode-row button.active { background: #e8eaef; color: #102a43; }
 .ai-stock-chart:has(.finance-plot) { min-width: 0; }
@@ -146,7 +148,7 @@
 
 @media (max-width: 500px) {
   .finance-periods { padding: 8px; }
-  .finance-periods button { min-width: 40px; padding: 6px 9px; }
+  .finance-periods button { min-width: 40px; padding: 4px 6px; }
   .finance-readout { top: 8px; left: 8px; max-width: calc(100% - 16px); font-size: 11px; }
   .finance-pointer-tooltip { min-width: 100px; padding: 7px 8px; font-size: 10px; }
   .finance-plot text { font-size: 10px; }

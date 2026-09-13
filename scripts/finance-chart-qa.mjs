@@ -21,7 +21,7 @@ try {
     await page.mouse.down(); await page.mouse.move(to, y, { steps: 30 }); await page.mouse.up()
     assert.equal(await plot.locator('.finance-marker').count(), 2)
     assert.equal(await plot.locator('.finance-selection-band').count(), name === 'bar' ? 0 : 1)
-    if (name !== 'bar') assert.equal(await plot.locator('.finance-pointer-tooltip').count(), 1)
+    assert.equal(await plot.locator('.finance-pointer-tooltip').count(), 0, 'Range uses one compact readout without an overlapping tooltip')
     const forward = await plot.locator('.finance-readout').innerText()
     await plot.screenshot({ path: join(tmpdir(), `finance-${name}-drag.png`) })
     await page.mouse.move(to, y); await page.mouse.down(); await page.mouse.move(from, y, { steps: 30 }); await page.mouse.up()

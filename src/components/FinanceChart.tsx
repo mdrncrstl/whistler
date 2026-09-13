@@ -39,7 +39,7 @@ export function FinanceChart({ points, label = 'Price', formatValue, formatAxis 
 
   useLayoutEffect(() => {
     if (!host.current) return
-    const observer = new ResizeObserver(([entry]) => setWidth(Math.max(320, entry.contentRect.width)))
+    const observer = new ResizeObserver(([entry]) => setWidth(Math.max(240, entry.contentRect.width)))
     observer.observe(host.current)
     return () => observer.disconnect()
   }, [data.length])
@@ -50,7 +50,7 @@ export function FinanceChart({ points, label = 'Price', formatValue, formatAxis 
   const axisLabelLength = Math.max(...data.flatMap(p => [formatAxis(p.value).length, p.comparison === undefined ? 0 : formatAxis(p.comparison).length]))
   const left = Math.max(width < 500 ? 58 : 70, Math.min(width * .35, axisLabelLength * (width < 500 ? 5.5 : 7) + 18))
   const right = width - 24
-  const top = 58
+  const top = width < 500 ? 86 : 58
   const bottom = height - 42
   const values = data.flatMap(p => [p.value, ...(p.comparison !== undefined && Number.isFinite(p.comparison) ? [p.comparison] : [])])
   const low = Math.min(...values, ...(bars ? [0] : []))
@@ -173,7 +173,7 @@ export function FinanceChart({ points, label = 'Price', formatValue, formatAxis 
       {(selected || (hover !== null ? [hover] : [])).map(index => <g key={index} className="finance-marker"><line x1={x(index)} x2={x(index)} y1={top - 10} y2={bottom} stroke="#aeb4c0" strokeWidth="2" strokeDasharray="2 6" strokeLinecap="round"/><circle cx={x(index)} cy={y(data[index].value)} r="5" fill="#3268ee"/></g>)}
       {!selected && hover === null && !bars && <circle cx={right} cy={y(data.at(-1)!.value)} r="5" fill={color}/>}
     </svg>
-    {tooltipPoint && pointer && !bars && <div className="finance-pointer-tooltip" style={tooltipStyle} role="tooltip"><span>{date(tooltipPoint.date, fullDate)}</span><strong>{formatValue(tooltipPoint.value)}</strong>{tooltipPoint.volume !== undefined && <small>Volume {volume(tooltipPoint.volume)}</small>}</div>}
+    {tooltipPoint && pointer && !bars && !selected && <div className="finance-pointer-tooltip" style={tooltipStyle} role="tooltip"><span>{date(tooltipPoint.date, fullDate)}</span><strong>{formatValue(tooltipPoint.value)}</strong>{tooltipPoint.volume !== undefined && <small>Volume {volume(tooltipPoint.volume)}</small>}</div>}
     {a && b && <div className="finance-readout" role="status">
       <span>{label}: <span className={positive ? 'gain' : 'loss'}>{selected ? formatValue(displayDelta) : formatValue(a.value)} {percent !== null && `(${percentText})`}</span></span>
       {selected && <span>{date(a.date, fullDate)} – {date(b.date, fullDate)}</span>}
