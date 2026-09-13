@@ -42,4 +42,4 @@ The three Edge Functions are `stripe-checkout`, `stripe-portal`, and `stripe-web
 
 `https://cbfettdbdjlgbjxzwvps.supabase.co/functions/v1/stripe-webhook`
 
-Subscribe it to `checkout.session.completed`, `customer.subscription.created`, `customer.subscription.updated`, and `customer.subscription.deleted`. Prices are created inline by Checkout from the reviewed server-side plan map, so browser-supplied amounts are never trusted.
+Subscribe it to `checkout.session.completed`, `customer.subscription.created`, `customer.subscription.updated`, `customer.subscription.deleted`, and `invoice.paid` (used for referral qualification). Checkout selects the server-side price IDs from the reviewed plan map, so browser-supplied amounts are never trusted.
