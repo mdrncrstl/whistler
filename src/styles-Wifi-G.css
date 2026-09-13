@@ -1029,22 +1029,22 @@ td small { display: block; margin-top: 4px; color: var(--muted-2); font-size: 8.
 .settings-rail-foot strong, .settings-rail-foot small { display: block; }
 .settings-rail-foot strong { color: var(--text); font-size: 9.5px; }
 .settings-rail-foot small { margin-top: 3px; color: var(--muted-2); font-size: 8.5px; }
-.settings-panel { min-width: 0; min-height: 610px; overflow: hidden; }
-.settings-panel-head { min-height: 78px; padding: 17px 20px; border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 11px; }
+.settings-panel { min-width: 0; min-height: 0; overflow: hidden; }
+.settings-panel-head { min-height: 76px; padding: 16px 24px; border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 11px; }
 .settings-panel-head > span { width: 34px; height: 34px; border-radius: 9px; display: grid; place-items: center; background: color-mix(in srgb, var(--green) 8%, var(--surface)); color: var(--green-strong); }
 .settings-panel-head h2 { margin: 0; font-size: 16px; letter-spacing: -.015em; }
 .settings-panel-head p { margin: 4px 0 0; color: var(--muted-2); font-size: 9.5px; }
-.settings-panel-body { min-height: 530px; padding: 0 20px 22px; }
+.settings-panel-body { min-height: 0; padding: 18px 24px 24px; }
 .settings-identity { min-height: 94px; padding: 20px 0; border-bottom: 1px solid var(--line); display: grid; grid-template-columns: 46px minmax(0, 1fr) auto; align-items: center; gap: 12px; }
 .settings-identity h3 { margin: 0; font-size: 14px; }
 .settings-identity p { margin: 4px 0 0; color: var(--muted); font-size: 9.5px; }
-.settings-group { margin-top: 20px; }
+.settings-group { margin-top: 24px; }
 .settings-group-first { margin-top: 0; }
-.settings-group-compact { margin-top: 18px; }
-.settings-group-heading { min-height: 47px; padding-bottom: 10px; border-bottom: 1px solid var(--line); }
+.settings-group-compact { margin-top: 24px; }
+.settings-group-heading { min-height: 0; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
 .settings-group-heading h3 { margin: 0; font-size: 12px; }
 .settings-group-heading p { margin: 4px 0 0; color: var(--muted-2); font-size: 9px; }
-.settings-field, .settings-control-row, .settings-link-row, .settings-security-row { min-height: 68px; border-bottom: 1px solid var(--line); display: grid; align-items: center; gap: 14px; }
+.settings-field, .settings-control-row, .settings-link-row, .settings-security-row { min-height: 72px; padding: 10px 0; border-bottom: 1px solid var(--line); display: grid; align-items: center; gap: 14px; }
 .settings-field { grid-template-columns: minmax(190px, .85fr) minmax(250px, 1.15fr); }
 .settings-field > span:first-child strong, .settings-field > span:first-child small, .settings-control-row > span:nth-child(2) strong, .settings-control-row > span:nth-child(2) small, .settings-link-row > span:nth-child(2) strong, .settings-link-row > span:nth-child(2) small, .settings-security-row > span:nth-child(2) strong, .settings-security-row > span:nth-child(2) small, .settings-session > span:nth-child(2) strong, .settings-session > span:nth-child(2) small, .settings-danger-row strong, .settings-danger-row small, .settings-status-row strong, .settings-status-row small { display: block; }
 .settings-field strong, .settings-control-row strong, .settings-link-row strong, .settings-security-row strong, .settings-session strong, .settings-danger-row strong, .settings-status-row strong { font-size: 10.5px; }
@@ -1079,11 +1079,12 @@ td small { display: block; margin-top: 4px; color: var(--muted-2); font-size: 8.
 .settings-security-row > svg { color: var(--green); }
 .settings-session { min-height: 66px; margin-top: 18px; padding: 0 13px; border: 1px solid var(--line); border-radius: 9px; display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; align-items: center; gap: 11px; background: var(--surface-2); }
 .settings-danger-row { min-height: 74px; margin-top: 16px; padding-top: 16px; border-top: 1px solid color-mix(in srgb, var(--red) 20%, var(--line)); display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-.settings-plan-summary { min-height: 112px; margin-top: 20px; padding: 18px; border: 1px solid color-mix(in srgb, var(--green) 18%, var(--line)); border-radius: 10px; display: grid; grid-template-columns: 42px minmax(0, 1fr) auto; align-items: center; gap: 13px; background: color-mix(in srgb, var(--green) 4%, var(--surface)); }
+.settings-plan-summary { min-height: 112px; margin-top: 0; padding: 18px; border: 1px solid color-mix(in srgb, var(--green) 18%, var(--line)); border-radius: 10px; display: grid; grid-template-columns: 42px minmax(0, 1fr) auto; align-items: center; gap: 13px; background: color-mix(in srgb, var(--green) 4%, var(--surface)); }
 .settings-plan-summary > span { width: 42px; height: 42px; border-radius: 10px; display: grid; place-items: center; color: var(--green-strong); background: color-mix(in srgb, var(--green) 10%, var(--surface)); }
 .settings-plan-summary small { color: var(--muted-2); font-size: 7.5px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; }
 .settings-plan-summary h3 { margin: 3px 0 0; font-size: 15px; }
 .settings-plan-summary p { margin: 4px 0 0; color: var(--muted); font-size: 8px; }
+.settings-panel .badge { border-radius: 6px; padding: 5px 8px; }
 
 /* Modal and toast */
 .modal-backdrop { position: fixed; inset: 0; padding: 22px; background: rgb(0 0 0 / 72%); backdrop-filter: blur(8px); display: grid; place-items: center; z-index: 100; }
@@ -2005,8 +2006,8 @@ body { font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-s
   .settings-section-rail nav::-webkit-scrollbar { display: none; }
   .settings-section-rail nav button { width: auto; min-width: max-content; min-height: 38px; padding: 7px 10px; grid-template-columns: 17px auto; gap: 6px; }
   .settings-section-rail nav button small { display: none; }
-  .settings-panel { min-height: 560px; }
-  .settings-panel-body { min-height: 480px; padding-inline: 16px; }
+  .settings-panel { min-height: 0; }
+  .settings-panel-body { min-height: 0; padding-inline: 16px; }
   .settings-panel-head { padding-inline: 16px; }
   .settings-field { min-height: 84px; padding: 11px 0; grid-template-columns: minmax(0, 1fr); gap: 8px; }
 }
@@ -2016,7 +2017,7 @@ body { font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-s
   .settings-save-actions .button { width: 100%; }
   .settings-panel { min-height: 0; }
   .settings-panel-head { min-height: 68px; }
-  .settings-panel-body { min-height: 470px; padding: 0 13px 18px; }
+  .settings-panel-body { min-height: 0; padding: 18px 13px 18px; }
   .settings-identity { min-height: 84px; grid-template-columns: 42px minmax(0, 1fr); }
   .settings-identity .settings-avatar { width: 42px; height: 42px; }
   .settings-identity .badge { grid-column: 2; width: fit-content; margin-top: -5px; }
