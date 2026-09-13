@@ -16,7 +16,7 @@ html:has(.alpine-site) { overflow-x:clip; }
 .alpine-site .cloud-button:hover { background:#078461; transform:translateY(-2px); }
 .alpine-site .cloud-button-light { background:white; color:#087c5e; }
 .alpine-site .cloud-button-outline-light { background:#ffffff26; color:white; border-color:#ffffff70; }
-.alpine-site .cloud-hero.cloud-container { width:100%; max-width:none; margin:0; min-height:620px; padding:76px 24px 280px; display:block; border-radius:23px; position:relative; isolation:isolate; background:radial-gradient(ellipse at 50% 120%,#37ba8990,transparent 70%),linear-gradient(145deg,#07382c,#105640); box-shadow:none; }
+.alpine-site .cloud-hero.cloud-container { width:100%; max-width:none; margin:0; min-height:620px; padding:76px 24px 280px; display:block; border-radius:0 0 23px 23px; position:relative; isolation:isolate; background:radial-gradient(ellipse at 50% 120%,#37ba8990,transparent 70%),linear-gradient(145deg,#07382c,#105640); box-shadow:none; }
 .alpine-site .cloud-hero-field,.alpine-site .cloud-hero-preview { display:none; }
 .alpine-site .cloud-hero-copy { width:100%; max-width:600px; margin:auto; text-align:center; position:relative; z-index:1; }
 .alpine-site .cloud-hero h1 { max-width:600px; font-size:clamp(38px,4.5vw,58px); font-weight:500; line-height:1.02; color:white; margin:18px auto; letter-spacing:-.06em; }
