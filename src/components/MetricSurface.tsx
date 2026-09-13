@@ -1,12 +1,7 @@
 import type { ReactNode } from 'react'
 import { Info } from 'lucide-react'
 
-/**
- * One tab in the portfolio return strip.
- *
- * Deliberately a bare button: the strip is a flat row of cells, and any wrapper that clips its
- * own overflow also clips the hover value that sits above the cell.
- */
+/** One tab in the portfolio return strip. */
 export function MetricSurface({ label, exact, children, selected, onSelect }: {
   label: string
   exact: string
@@ -28,7 +23,6 @@ export function MetricSurface({ label, exact, children, selected, onSelect }: {
         <Info aria-hidden="true" size={11} />
       </span>
       {children}
-      <span className="metric-hover-value" aria-hidden="true"><span className="private-value">{exact}</span></span>
     </button>
   )
 }

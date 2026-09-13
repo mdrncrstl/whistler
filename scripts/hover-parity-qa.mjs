@@ -72,14 +72,10 @@ for (const theme of ['light', 'dark']) {
   const tabTransition = await tab.evaluate(el => getComputedStyle(el).transitionDuration)
   check(`[${theme}] metric transition is .15s`, tabTransition.startsWith('0.15s'), tabTransition)
 
-  // hover value
-  const tip = tab.locator('.metric-hover-value')
-  const tipOpacity = await tip.evaluate(el => getComputedStyle(el).opacity)
-  await page.mouse.move(5, 5); await page.waitForTimeout(350)
-  const tipHidden = await tip.evaluate(el => getComputedStyle(el).opacity)
-  check(`[${theme}] hover value shows then hides`, tipOpacity === '1' && tipHidden === '0', `${tipOpacity} -> ${tipHidden}`)
-  const tipText = await tip.innerText()
-  check(`[${theme}] hover value is the exact figure`, /^\$?-?[\d,]+\.\d{2}$/.test(tipText.trim()), JSON.stringify(tipText))
+  // The metric already displays the full value and exposes it through aria-label. A second
+  // popup above the strip is redundant and gets clipped when the page is near its top edge.
+  const metricPopupCount = await page.locator('.metric-hover-value').count()
+  check(`[${theme}] metric has no duplicate value popup`, metricPopupCount === 0, `count ${metricPopupCount}`)
 
   // --- table row -------------------------------------------------------------
   const row = page.locator('.portfolio-holdings tbody tr').filter({ hasNot: page.locator('td[colspan]') }).nth(1)

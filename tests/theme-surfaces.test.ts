@@ -44,10 +44,10 @@ describe('theme-aware shared surfaces', () => {
     expect(css).toMatch(/--hover-soft: color-mix\(in srgb, var\(--text\) 3%, transparent\)/)
   })
 
-  it('gives the portfolio metric strip a Navexa-style hover fill and hover value', () => {
+  it('gives the portfolio metric strip a Navexa-style hover fill without a duplicate popup', () => {
     expect(css).toMatch(/\.portfolio-metrics \.metric-tab:hover \{[^}]*background: var\(--hover-soft\)/)
     expect(css).toMatch(/\.portfolio-metrics \.metric-tab\.active \{[^}]*border-bottom-color: var\(--accent\)/)
-    expect(css).toMatch(/\.portfolio-metrics \.metric-tab:hover \.metric-hover-value[^{]*\{[^}]*opacity: 1/)
     expect(css).toMatch(/\.portfolio-metrics \.metric-tab \{[^}]*transition: background-color \.15s ease/)
+    expect(css).not.toContain('metric-hover-value')
   })
 })

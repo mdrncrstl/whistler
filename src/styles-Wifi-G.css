@@ -1235,7 +1235,7 @@ td small { display: block; margin-top: 4px; color: var(--muted-2); font-size: 8.
   .marketing-page *, .marketing-page *::before, .marketing-page *::after, .onboarding-page *, .onboarding-page *::before, .onboarding-page *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
   .loading-mark::before, .loading-mark img { animation: none; opacity: 1; transform: none; }
   .button:active:not(:disabled),.icon-button:active:not(:disabled),.marketing-button:active:not(:disabled),.portfolio-toolbar button:active:not(:disabled),.holdings-head button:active:not(:disabled),.control-menu button:active:not(:disabled),.portfolio-menu button:active:not(:disabled),.account-menu button:active:not(:disabled) { transform: none !important; }
-  .with-tooltip::after,.metric-hover-value { transform: translateX(-50%) !important; }
+  .with-tooltip::after { transform: translateX(-50%) !important; }
 }
 
 /* Light-first workspace density and expanded product surfaces */
@@ -1514,9 +1514,6 @@ body { font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-s
 .portfolio-metrics strong { margin-top: 5px; color: var(--text); font-size: 27px; line-height: 1.08; letter-spacing: -.025em; }
 .portfolio-metrics small { margin-top: 5px; color: var(--muted); font-size: 12px; font-weight: 600; }
 .portfolio-metrics small em { margin-left: 5px; color: var(--muted-2); font-size: 10px; font-style: normal; font-weight: 500; }
-.metric-hover-value { width: max-content; padding: 7px 10px; border: 1px solid var(--line); border-radius: 6px; position: absolute; top: -32px; left: 50%; z-index: 30; opacity: 0; transform: translate(-50%, 4px); pointer-events: none; background: var(--surface); color: var(--text); font-size: 12px; font-weight: 600; box-shadow: 0 6px 18px rgb(15 23 42 / 14%); transition: opacity 130ms var(--ease-out), transform 130ms var(--ease-out); }
-.metric-hover-value .private-value { display: block; }
-.portfolio-metrics .metric-tab:hover .metric-hover-value,.portfolio-metrics .metric-tab:focus-visible .metric-hover-value { opacity: 1; transform: translate(-50%, 0); }
 .portfolio-chart-section { border: 0; }
 .chart-mode-row { height: 34px; margin-top: 15px; display: flex; align-items: center; gap: 8px; }
 .chart-mode-row > div { display: inline-flex; }
