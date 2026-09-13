@@ -29,6 +29,7 @@ export async function researchAnswer(query: string, signal: AbortSignal): Promis
   return {
     title: data.name,
     symbol: data.symbol,
+    exchange: data.exchange,
     currency: data.currency,
     text: `${data.symbol} · ${data.exchange} · ${data.type === 'ETF' ? 'Exchange-traded fund' : data.type === 'EQUITY' ? 'Listed company' : data.type}. ${[data.sector, data.industry].filter(Boolean).join(' · ')}${data.sector ? '.' : ''} Prices are quoted in ${data.currency}.${period}`,
     metrics: [{ label: 'Latest price', value: amount(data.price) }, { label: '52-week low', value: amount(data.low) }, { label: '52-week high', value: amount(data.high) }],
