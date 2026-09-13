@@ -7,13 +7,14 @@ export async function researchStock(query, fetcher = fetch) {
   const candidates = (search.quotes || []).filter(item => ['EQUITY', 'ETF', 'MUTUALFUND', 'INDEX'].includes(item.quoteType)).map(item => ({ symbol: item.symbol, name: item.longname || item.shortname || item.symbol, exchange: item.exchDisp || item.exchange, sector: item.sector, industry: item.industry, type: item.quoteType }))
   const match = candidates.find(item => item.symbol.toLowerCase() === query.toLowerCase()) || candidates[0]
   if (!match) return { candidates: [], error: 'No matching listing found. Try its ticker and exchange suffix, such as BHP.AX.' }
-  const chart = await loadMarketChart(match.symbol, 'range=3mo&interval=1d', fetcher)
+  const chart = await loadMarketChart(match.symbol, 'range=1y&interval=1d', fetcher)
   const meta = chart.meta || {}
   const currency = normaliseCurrency(meta.currency || 'USD')
   const convert = value => Number.isFinite(value) ? normalisePriceUnit(value, meta.currency || 'USD') : null
   const points = (chart.timestamp || []).flatMap((time, index) => {
     const price = convert(chart.indicators?.quote?.[0]?.close?.[index])
-    return price === null ? [] : [{ date: new Date(time * 1000).toISOString(), price }]
+    const volume = chart.indicators?.quote?.[0]?.volume?.[index]
+    return price === null ? [] : [{ date: new Date(time * 1000).toISOString(), price, ...(Number.isFinite(volume) ? { volume } : {}) }]
   })
   return { ...match, candidates, currency, price: convert(meta.regularMarketPrice), high: convert(meta.fiftyTwoWeekHigh), low: convert(meta.fiftyTwoWeekLow), asOf: meta.regularMarketTime ? new Date(meta.regularMarketTime * 1000).toISOString() : null, points, sourceUrl: `https://finance.yahoo.com/quote/${encodeURIComponent(match.symbol)}/` }
 }

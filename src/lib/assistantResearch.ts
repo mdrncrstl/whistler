@@ -25,7 +25,7 @@ export async function researchAnswer(query: string, signal: AbortSignal): Promis
   const amount = (value: number | null) => value == null ? 'Unavailable' : new Intl.NumberFormat('en-AU', { style: 'currency', currency: data.currency }).format(value)
   const first = data.points?.[0]
   const last = data.points?.at(-1)
-  const period = first?.price > 0 && last ? ` Across the available three-month daily history, the price moved ${((last.price / first.price - 1) * 100).toFixed(2)}%. This price change excludes dividends and currency effects.` : ''
+  const period = first?.price > 0 && last ? ` Across the available daily history, the price moved ${((last.price / first.price - 1) * 100).toFixed(2)}%. This price change excludes dividends and currency effects.` : ''
   return {
     title: data.name,
     symbol: data.symbol,
