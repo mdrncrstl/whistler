@@ -221,7 +221,7 @@ body {
 /* Authenticated workspace */
 .app-shell {
   grid-template-columns: 248px minmax(0, 1fr);
-  background: var(--site-canvas);
+  background: var(--bg);
 }
 
 .sidebar {
