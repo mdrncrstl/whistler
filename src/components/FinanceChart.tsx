@@ -124,7 +124,7 @@ export function FinanceChart({ points, label = 'Price', formatValue, formatAxis 
   const tooltipStyle = pointer ? { left: `${Math.max(left + 10, Math.min(right - 10, pointer.x))}px`, top: `${Math.max(top + 42, Math.min(bottom - 10, pointer.y - 12))}px` } : undefined
   const dataDescription = resolution === 'daily' ? 'Daily market points' : 'Recorded portfolio points'
 
-  return <div className="finance-plot" ref={host} data-range={Boolean(selected)} data-points={data.length} data-resolution={resolution}>
+  return <div className="finance-plot" ref={host} data-range={Boolean(selected)} data-points={data.length} data-resolution={resolution} data-first-date={data[0].date} data-last-date={data.at(-1)!.date} data-range-start={selectedStart?.date} data-range-end={selectedEnd?.date}>
     <svg ref={svgRef} width="100%" height={height} viewBox={`0 0 ${width} ${height}`} role="img" aria-label={`${label} history. ${dataDescription} can be inspected with the pointer. Drag between dates to compare. Use arrow keys to inspect, Shift and arrows to compare, Escape to clear.`}
       tabIndex={0} onPointerMove={move}
       onPointerDown={event => {

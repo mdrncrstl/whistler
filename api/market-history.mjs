@@ -24,7 +24,8 @@ async function loadHistory(symbol, market) {
   const closes = chart.indicators?.quote?.[0]?.close || []
   const rawCurrency = chart.meta?.currency || ''
   const points = chart.timestamp.flatMap((timestamp, index) => Number.isFinite(closes[index]) ? [{ date: new Date(timestamp * 1000).toISOString(), price: normalisePriceUnit(closes[index], rawCurrency), adjustedPrice: Number.isFinite(adjusted[index]) ? normalisePriceUnit(adjusted[index], rawCurrency) : normalisePriceUnit(closes[index], rawCurrency) }] : [])
-  const payload = { symbol: ticker, currency: normaliseCurrency(rawCurrency), exchange: chart.meta?.fullExchangeName || chart.meta?.exchangeName || market || '', source: 'Just now', generatedAt: new Date().toISOString(), points }
+  const splits = Object.values(chart.events?.splits || {}).map(split => ({ date: new Date(split.date * 1000).toISOString(), numerator: Number(split.numerator), denominator: Number(split.denominator) }))
+  const payload = { symbol: ticker, currency: normaliseCurrency(rawCurrency), exchange: chart.meta?.fullExchangeName || chart.meta?.exchangeName || market || '', source: 'Just now', generatedAt: new Date().toISOString(), points, splits }
   historyCache.set(ticker, { fetchedAt: Date.now(), payload })
   return payload
 }

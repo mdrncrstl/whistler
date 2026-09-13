@@ -163,3 +163,5 @@
 .finance-legend { display: flex; justify-content: center; gap: 20px; padding: 0 12px 10px; color: var(--muted); font-size: 11px; }
 .finance-legend span::before { display: inline-block; width: 12px; height: 2px; margin: 0 6px 3px 0; background: var(--finance-up); content: ''; }
 .finance-legend span + span::before { background: #7986cb; }
+
+.finance-history-status { margin: 0 0 10px; color: var(--muted); font-size: 12px; }

@@ -1,7 +1,7 @@
 import type { Position } from '../types'
 
 export interface MarketHistoryPoint { date: string; price: number; adjustedPrice?: number }
-export interface MarketHistory { symbol: string; currency: string; exchange: string; source: string; generatedAt: string; points: MarketHistoryPoint[] }
+export interface MarketHistory { symbol: string; currency: string; exchange: string; source: string; generatedAt: string; points: MarketHistoryPoint[]; splits?: Array<{ date: string; numerator: number; denominator: number }> }
 
 export interface MarketMovementItem {
   date: string
