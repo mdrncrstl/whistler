@@ -90,6 +90,10 @@ export interface PortfolioSnapshot {
   value_aud: number
   cash_aud: number
   invested_aud: number
+  capital_gain_aud?: number
+  currency_gain_aud?: number
+  income_aud?: number
+  total_return_aud?: number
   benchmark_value_aud?: number | null
   source?: string
 }

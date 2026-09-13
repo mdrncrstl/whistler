@@ -1,4 +1,5 @@
 import { FinanceChart } from '../components/FinanceChart'
+import { FinancePeriodSelector } from '../components/FinancePeriodSelector'
 import { CalendarDays, ChevronLeft, ChevronRight, Download, Scale, Search, TrendingUp } from 'lucide-react'
 
 import { useMemo, useState, type ReactNode } from 'react'
@@ -18,6 +19,7 @@ import { usePortfolio } from '../context/PortfolioContext'
 import { allocationBy, holdingCapitalGain, holdingCurrencyGain, incomeTransactions, summarisePortfolio } from '../lib/portfolio'
 
 import { date, downloadCsv, money, percent, share } from '../lib/format'
+import { filterFinancePoints, type FinancePeriod } from '../lib/financePeriods'
 
 import type { PortfolioBundle, Position, Transaction } from '../types'
 
@@ -211,7 +213,9 @@ function HoldingsPerformanceTable({ holdings, transactions }: { holdings: Positi
 
 function Benchmark({ bundle }: { bundle: PortfolioBundle }) {
 
-  const snapshots = bundle.snapshots
+  const [chartPeriod, setChartPeriod] = useState<FinancePeriod>('MAX')
+
+  const snapshots = useMemo(() => filterFinancePoints(bundle.snapshots, chartPeriod), [bundle.snapshots, chartPeriod])
 
   const first = snapshots[0]
 
@@ -229,7 +233,7 @@ function Benchmark({ bundle }: { bundle: PortfolioBundle }) {
 
     <MetricStrip><Metric label="Entity" value="Portfolio" sub="Recorded values"/><Metric label="Value growth" value={first?.value_aud ? percent(portfolioReturn) : '—'} sub="Includes deposits and withdrawals"/><Metric label="Capital gain" value={percent(summarisePortfolio(bundle).returnPct)} /><Metric label="Income return" value={money(summarisePortfolio(bundle).income)} /><Metric label="Currency gain" value={money(summarisePortfolio(bundle).currencyGain)} sub={summarisePortfolio(bundle).currencyGainComplete ? 'Exchange-rate movement on cost base' : 'Partial — some holdings lack a cost base'}/></MetricStrip>
 
-    <Card className="report-chart-card"><div className="card-title-row"><div><span className="section-label">PORTFOLIO VS BENCHMARK</span><h2>Recorded portfolio and benchmark values</h2></div><Badge tone={portfolioReturn >= benchmarkReturn ? 'success' : 'warning'}>{first?.benchmark_value_aud && last?.benchmark_value_aud ? `${percent(portfolioReturn - benchmarkReturn)} value growth difference` : 'Benchmark unavailable'}</Badge></div>{snapshots.length > 1 ? <FinanceChart points={snapshots.map(p => ({ date: p.date, value: p.value_aud, comparison: p.benchmark_value_aud ?? undefined }))} label="Portfolio" formatValue={v => money(v, 'AUD', 2)} formatAxis={v => '$' + Intl.NumberFormat('en', { notation: 'compact' }).format(v)}/> : <EmptyState icon={Scale} title="Benchmark history is building" description="Daily snapshots are required for a like-for-like comparison."/>}</Card>
+    <Card className="report-chart-card"><div className="card-title-row"><div><span className="section-label">PORTFOLIO VS BENCHMARK</span><h2>Recorded portfolio and benchmark values</h2></div><Badge tone={portfolioReturn >= benchmarkReturn ? 'success' : 'warning'}>{first?.benchmark_value_aud && last?.benchmark_value_aud ? `${percent(portfolioReturn - benchmarkReturn)} value growth difference` : 'Benchmark unavailable'}</Badge></div>{snapshots.length > 1 ? <FinanceChart points={snapshots.map(p => ({ date: p.date, value: p.value_aud, comparison: p.benchmark_value_aud ?? undefined }))} label="Portfolio" formatValue={v => money(v, 'AUD', 2)} formatAxis={v => '$' + Intl.NumberFormat('en', { notation: 'compact' }).format(v)}/> : <EmptyState icon={Scale} title="Benchmark history is building" description="Daily snapshots are required for a like-for-like comparison."/>}<FinancePeriodSelector value={chartPeriod} onChange={setChartPeriod} ariaLabel="Benchmark chart period"/></Card>
 
     <div className="report-two-col"><RankedCard title="Highest holding gains" rows={winners.slice(0, rankedCount)} /><RankedCard title="Lowest holding gains" rows={winners.slice(-rankedCount).reverse()} /></div>
 
@@ -284,15 +288,19 @@ function Growth({ bundle }: { bundle: PortfolioBundle }) {
 
   const [chartMode, setChartMode] = useState<'line' | 'bar'>('line')
 
+  const [chartPeriod, setChartPeriod] = useState<FinancePeriod>('MAX')
+
+  const chartSnapshots = useMemo(() => filterFinancePoints(bundle.snapshots, chartPeriod), [bundle.snapshots, chartPeriod])
+
   const progress = target ? Math.min(100, summary.total / target * 100) : 0
 
   const chartData = useMemo(() => {
 
-    const first = bundle.snapshots[0]?.value_aud || 0
+    const first = chartSnapshots[0]?.value_aud || 0
 
-    const invested = bundle.snapshots[0]?.invested_aud || 0
+    const invested = chartSnapshots[0]?.invested_aud || 0
 
-    return bundle.snapshots.map((snapshot) => ({
+    return chartSnapshots.map((snapshot) => ({
 
       ...snapshot,
 
@@ -302,7 +310,7 @@ function Growth({ bundle }: { bundle: PortfolioBundle }) {
 
     }))
 
-  }, [bundle.snapshots, displayMode])
+  }, [chartSnapshots, displayMode])
 
   const formatGrowthValue = (value: number) => displayMode === 'amount' ? money(value) : `${value.toFixed(1)}%`
 
@@ -310,7 +318,7 @@ function Growth({ bundle }: { bundle: PortfolioBundle }) {
 
     <MetricStrip><Metric label="Portfolio value" value={money(summary.total)} /><Metric label="Capital gain" value={money(summary.unrealised)} sub={percent(summary.returnPct)} /><Metric label="Income return" value={money(summary.income)} /><Metric label="Target progress" value={share(progress)} /></MetricStrip>
 
-    <Card className="report-chart-card"><div className="card-title-row"><div><span className="section-label">GROWTH HISTORY</span><h2>Portfolio value vs contributed capital</h2></div><div className="segmented" role="group" aria-label="Growth chart display"><button type="button" className={displayMode === 'amount' ? 'active' : ''} aria-pressed={displayMode === 'amount'} onClick={() => setDisplayMode('amount')}>Amount</button><button type="button" className={displayMode === 'percent' ? 'active' : ''} aria-pressed={displayMode === 'percent'} onClick={() => setDisplayMode('percent')}>Percent</button><button type="button" className={chartMode === 'line' ? 'active' : ''} aria-pressed={chartMode === 'line'} onClick={() => setChartMode('line')}>Line</button><button type="button" className={chartMode === 'bar' ? 'active' : ''} aria-pressed={chartMode === 'bar'} onClick={() => setChartMode('bar')}>Bar</button></div></div>{bundle.snapshots.length > 1 ? <FinanceChart points={chartData.map(p => ({ date: p.date, value: p.value, comparison: p.invested, measurementValue: p.value_aud }))} label="Portfolio" comparisonLabel="Contributed capital" formatValue={formatGrowthValue} bars={chartMode === 'bar'}/> : <EmptyState icon={TrendingUp} title="Growth history is building" description="Portfolio snapshots will appear here as prices sync."/>}</Card>
+    <Card className="report-chart-card"><div className="card-title-row"><div><span className="section-label">GROWTH HISTORY</span><h2>Portfolio value vs contributed capital</h2></div><div className="segmented" role="group" aria-label="Growth chart display"><button type="button" className={displayMode === 'amount' ? 'active' : ''} aria-pressed={displayMode === 'amount'} onClick={() => setDisplayMode('amount')}>Amount</button><button type="button" className={displayMode === 'percent' ? 'active' : ''} aria-pressed={displayMode === 'percent'} onClick={() => setDisplayMode('percent')}>Percent</button><button type="button" className={chartMode === 'line' ? 'active' : ''} aria-pressed={chartMode === 'line'} onClick={() => setChartMode('line')}>Line</button><button type="button" className={chartMode === 'bar' ? 'active' : ''} aria-pressed={chartMode === 'bar'} onClick={() => setChartMode('bar')}>Bar</button></div></div>{chartSnapshots.length > 1 ? <FinanceChart points={chartData.map(p => ({ date: p.date, value: p.value, comparison: p.invested, measurementValue: p.value_aud }))} label="Portfolio" comparisonLabel="Contributed capital" formatValue={formatGrowthValue} bars={chartMode === 'bar'}/> : <EmptyState icon={TrendingUp} title="Growth history is building" description="Portfolio snapshots will appear here as prices sync."/>}<FinancePeriodSelector value={chartPeriod} onChange={setChartPeriod} ariaLabel="Growth chart period"/></Card>
 
     <Card className="goal-card"><div><span className="section-label">GOAL</span><h2>Portfolio target</h2><p>Set a target to see how your current portfolio value compares. This view does not forecast future returns.</p></div><label>Target value<input type="number" min="1" value={target} onChange={(event) => setTarget(Number(event.target.value))}/></label><div className="goal-progress"><span style={{ width: `${progress}%` }}/></div><strong>{money(summary.total)} of {money(target)}</strong></Card>
 

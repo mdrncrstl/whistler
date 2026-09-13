@@ -14,6 +14,7 @@ import {
 import { CalendarDays, Crosshair, Minus, Plus, RotateCcw, Scale, SlidersHorizontal } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
 import { date, money } from '../lib/format'
+import { FINANCE_PERIODS } from '../lib/financePeriods'
 
 export type PerformanceRangePreset = '1D' | '5D' | '1M' | '3M' | '6M' | 'YTD' | '1Y' | '3Y' | '5Y' | 'MAX' | 'CUSTOM'
 export type PerformanceMode = 'Amount' | 'Percent'
@@ -68,7 +69,7 @@ interface DisplayPoint {
   price: number
 }
 
-const presets: PerformanceRangePreset[] = ['1D', '5D', '1M', '3M', '6M', 'YTD', '1Y', '3Y', '5Y', 'MAX']
+const presets: PerformanceRangePreset[] = [...FINANCE_PERIODS]
 const DAY_MS = 86_400_000
 
 function isoDay(value: string) {

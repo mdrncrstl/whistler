@@ -6,6 +6,22 @@ const day = (value: string) => value.slice(0, 10)
 export const historyKey = (symbol: string, market = '') => `${symbol.toUpperCase()}|${market.toUpperCase()}`
 const accountKey = (provider: string, account?: string | null) => `${provider}|${account || ''}`
 const round = (value: number) => Math.round(value * 100) / 100
+const incomeTypes = new Set(['DIVIDEND', 'DISTRIBUTION', 'INTEREST'])
+const positionKey = (provider: string, account: string | null | undefined, symbol: string) => `${accountKey(provider, account)}|${symbol.toUpperCase()}`
+
+type PositionState = {
+  key: string
+  symbol: string
+  market: string
+  currency: string
+  quantity: number
+  costLocal: number
+  costAud: number
+}
+
+function transactionIncome(t: Transaction) {
+  return incomeTypes.has(String(t.type).toUpperCase()) ? Math.abs(Number(t.amount || 0) * Number(t.fx_rate || 1)) : 0
+}
 
 /** Reconstruct closing valuations backwards from the current balances and recorded ledger.
  * Prices and FX are observed closes, never interpolation between monthly snapshots.
@@ -19,8 +35,20 @@ export function buildDailyPortfolioHistory(bundle: PortfolioBundle, histories: M
     if (h.splits?.some(s => Date.parse(day(s.date)) >= start && Date.parse(day(s.date)) <= end)) throw new Error(`Daily history for ${h.symbol} needs its stock split reconciled first.`)
   })
   const positions = bundle.holdings.map(p => ({ ...p, quantity: Number(p.quantity) }))
+  const positionStates: PositionState[] = positions.map(p => ({
+    key: positionKey(p.provider, p.account_name, p.symbol),
+    symbol: p.symbol,
+    market: p.market || '',
+    currency: p.currency,
+    quantity: p.quantity,
+    costLocal: Math.abs(Number(p.average_cost || 0) * p.quantity),
+    costAud: Math.abs(Number(p.cost_aud || 0)),
+  }))
   const trades = bundle.transactions.filter(t => Date.parse(day(t.date)) >= start && Date.parse(day(t.date)) <= end)
     .sort((a,b) => b.date.localeCompare(a.date))
+  let incomeTotal = bundle.transactions
+    .filter(t => Date.parse(day(t.date)) <= end)
+    .reduce((sum, t) => sum + transactionIncome(t), 0)
   const cash = new Map<string, { currency: string; amount: number }>()
   bundle.cash.forEach(c => {
     const key = `${accountKey(c.provider, c.account_name)}|${c.currency}`
@@ -42,8 +70,26 @@ export function buildDailyPortfolioHistory(bundle: PortfolioBundle, histories: M
     if (type === 'BUY' || type === 'SELL') {
       const matches = positions.filter(p => p.symbol === t.symbol && accountKey(p.provider, p.account_name) === accountKey(t.provider, t.account_name))
       if (matches.length !== 1) throw new Error(`Daily history needs the recorded position and market for ${t.symbol}.`)
+      const stateMatches = positionStates.filter(p => p.key === positionKey(t.provider, t.account_name, t.symbol || ''))
+      if (stateMatches.length !== 1) throw new Error(`Daily history needs the recorded position and market for ${t.symbol}.`)
+      const state = stateMatches[0]
+      const quantity = Math.abs(Number(t.quantity || 0))
+      const localPrice = Math.abs(Number(t.price || 0))
+      const transactionRate = Number(t.fx_rate || 1)
+      const audRate = Number.isFinite(transactionRate) && transactionRate > 0 ? transactionRate : 1
       matches[0].quantity += (type === 'BUY' ? -1 : 1) * Math.abs(t.quantity)
       if (matches[0].quantity < -0.000001) throw new Error(`Trade history does not reconcile for ${t.symbol}.`)
+      if (type === 'BUY') {
+        state.quantity = matches[0].quantity
+        state.costLocal = Math.max(0, state.costLocal - localPrice * quantity)
+        state.costAud = Math.max(0, state.costAud - (localPrice * quantity + Math.abs(Number(t.fees || 0))) * audRate)
+      } else {
+        const unitLocal = state.quantity > 0.000001 ? state.costLocal / state.quantity : localPrice
+        const unitAud = state.quantity > 0.000001 ? state.costAud / state.quantity : localPrice * audRate
+        state.quantity = matches[0].quantity
+        state.costLocal += unitLocal * quantity
+        state.costAud += unitAud * quantity
+      }
     }
     const prefix = accountKey(t.provider, t.account_name)
     const localKey = `${prefix}|${t.currency}`, audKey = `${prefix}|AUD`
@@ -54,6 +100,7 @@ export function buildDailyPortfolioHistory(bundle: PortfolioBundle, histories: M
     const outgoing = ['BUY','WITHDRAWAL','FEE','TAX'].includes(type)
     const change = (outgoing ? -1 : 1) * Math.abs(t.amount) - (['BUY','SELL'].includes(type) ? Math.abs(t.fees) : 0)
     cash.set(key, { currency, amount: (cash.get(key)?.amount || 0) - change * rate })
+    incomeTotal -= transactionIncome(t)
   }
   const output: PortfolioSnapshot[] = []
   let index = 0
@@ -67,7 +114,34 @@ export function buildDailyPortfolioHistory(bundle: PortfolioBundle, histories: M
       return sum + p.quantity * close(key, date) * fx(p.currency, date)
     }, 0)
     const cashValue = [...cash.values()].reduce((sum,c) => sum + c.amount * fx(c.currency, date), 0)
-    output.push({ date, value_aud: round(holdingsValue + cashValue), cash_aud: round(cashValue), invested_aud: round(holdingsValue), source: 'daily-market-ledger' })
+    let capitalGain = 0
+    let currencyGain = 0
+    let componentsComplete = true
+    positionStates.forEach(state => {
+      if (Math.abs(state.quantity) < 0.000001) return
+      const price = close(historyKey(state.symbol, state.market), date)
+      const exchangeRate = fx(state.currency, date)
+      if (!Number.isFinite(state.costLocal) || !Number.isFinite(state.costAud) || state.costLocal <= 0) {
+        componentsComplete = false
+        return
+      }
+      capitalGain += (state.quantity * price - state.costLocal) * exchangeRate
+      currencyGain += state.costLocal * exchangeRate - state.costAud
+    })
+    const snapshot: PortfolioSnapshot = {
+      date,
+      value_aud: round(holdingsValue + cashValue),
+      cash_aud: round(cashValue),
+      invested_aud: round(holdingsValue),
+      income_aud: round(incomeTotal),
+      source: 'daily-market-ledger',
+    }
+    if (componentsComplete) {
+      snapshot.capital_gain_aud = round(capitalGain)
+      snapshot.currency_gain_aud = round(currencyGain)
+      snapshot.total_return_aud = round(capitalGain + currencyGain + incomeTotal)
+    }
+    output.push(snapshot)
   }
   return output.reverse()
 }

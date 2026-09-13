@@ -80,11 +80,11 @@
 .finance-pointer-tooltip strong { color: #202124; font-size: 13px; font-weight: 600; }
 
 .finance-periods {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
   align-items: center;
-  gap: 2px;
-  flex-wrap: wrap;
-  padding: 8px 12px;
+  gap: 0;
+  padding: 4px 8px;
   border-top: 0;
   margin-top: 3px;
   border-radius: 0 0 22px 22px;
@@ -92,11 +92,12 @@
 }
 
 .finance-periods button {
-  min-width: 48px;
-  min-height: 34px;
-  padding: 6px 14px;
+  width: 100%;
+  min-width: 0;
+  min-height: 40px;
+  padding: 6px 8px;
   border: 0;
-  border-radius: 10px;
+  border-radius: 14px;
   background: transparent;
   color: #5f6368;
   cursor: pointer;
@@ -140,8 +141,6 @@
 .holding-simple-chart:has(.finance-plot) .chart-mode-row button.active, .portfolio-chart-section:has(.finance-plot) .chart-mode-row button.active { background: #e8eaef; color: #102a43; }
 .ai-stock-chart:has(.finance-plot) { min-width: 0; }
 
-.finance-periods { justify-content: center; padding-block: 6px; }
-
 [data-theme="dark"] .finance-plot, [data-theme="dark"] .finance-periods, [data-theme="dark"] .finance-chart-controls { --finance-selection: rgb(106 203 139 / 16%); border-color: #334155; background: #18212b; }
 [data-theme="dark"] .finance-plot { --finance-up: #6acb8b; --finance-down: #ef7777; }
 [data-theme="dark"] .finance-plot text { fill: #b7c0cc; }
@@ -151,8 +150,9 @@
 [data-theme="dark"] .finance-pointer-tooltip span, [data-theme="dark"] .finance-pointer-tooltip small { color: #b7c0cc; }
 
 @media (max-width: 500px) {
-  .finance-periods { padding: 8px; }
-  .finance-periods button { min-width: 40px; padding: 4px 6px; }
+  .finance-periods { display: flex; justify-content: flex-start; overflow-x: auto; flex-wrap: nowrap; padding: 4px 8px; scrollbar-width: none; }
+  .finance-periods::-webkit-scrollbar { display: none; }
+  .finance-periods button { width: auto; flex: 1 0 36px; min-width: 36px; padding: 4px 3px; font-size: 11px; }
   .finance-readout { top: 8px; left: 8px; max-width: calc(100% - 16px); font-size: 11px; }
   .finance-pointer-tooltip { min-width: 100px; padding: 7px 8px; font-size: 10px; }
   .finance-plot text { font-size: 10px; }

@@ -48,6 +48,19 @@ describe('daily portfolio valuations', () => {
     bundle.transactions[0].quantity = 20
     expect(() => buildDailyPortfolioHistory(bundle, histories, '2026-09-03')).toThrow('does not reconcile')
   })
+  it('exposes daily capital, currency, income, and total return components', () => {
+    const { bundle, histories } = fixture()
+    bundle.holdings[0].average_cost = 100
+    bundle.holdings[0].cost_aud = 1200
+    bundle.transactions[0].price = 100
+    bundle.transactions[0].amount = -200
+    bundle.transactions[0].fx_rate = 1
+    const rows = buildDailyPortfolioHistory(bundle, histories, '2026-09-03')
+    expect(rows.map(p => p.capital_gain_aud)).toEqual([0, 120, 240])
+    expect(rows.map(p => p.currency_gain_aud)).toEqual([0, 0, 0])
+    expect(rows.map(p => p.income_aud)).toEqual([0, 0, 0])
+    expect(rows.map(p => p.total_return_aud)).toEqual([0, 120, 240])
+  })
   it('reverses dividends and deposits from cash on the correct date', () => {
     const { bundle, histories } = fixture()
     bundle.holdings[0].quantity = 10

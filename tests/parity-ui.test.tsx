@@ -36,7 +36,7 @@ describe('Navexa-depth workspace routes', () => {
     expect(screen.queryByText('p.a.')).not.toBeInTheDocument()
     expect(within(screen.getByRole('row', {name:'Open AAPL holding'})).getByText('$7,797.40')).toBeInTheDocument()
     fireEvent.click(screen.getByRole('tab', {name:/Capital Gain/}))
-    expect(screen.getByText('Historical return components are not available')).toBeInTheDocument()
+    expect(screen.getByText(/Loading daily return history|Historical return components are not available/)).toBeInTheDocument()
   })
 
   it('renders the full nested report and tax sidebar hierarchy', () => {
@@ -124,7 +124,7 @@ describe('Navexa-depth workspace routes', () => {
     expect(screen.getByRole('heading', { name: 'Apple Inc.' })).toBeInTheDocument()
     const capitalMetric = screen.getByText('Capital Gain').closest('article')!
     const oneYearCapital = within(capitalMetric).getByText(/\$/).textContent
-    fireEvent.click(screen.getAllByRole('button', { name: 'All' })[0])
+    fireEvent.click(screen.getAllByRole('button', { name: 'MAX' })[0])
     expect(within(capitalMetric).getByText(/\$/).textContent).not.toBe(oneYearCapital)
     fireEvent.click(screen.getByRole('button', { name: 'Bar' }))
     expect(screen.getByRole('button', { name: 'Bar' })).toHaveAttribute('aria-pressed', 'true')

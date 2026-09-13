@@ -2,6 +2,8 @@ import { useMemo, useState } from 'react'
 import { filterPerformancePoints, type AdvancedPerformancePoint, type PerformancePeriod } from './AdvancedPerformanceChart'
 import { money } from '../lib/format'
 import { FinanceChart } from './FinanceChart'
+import { FinancePeriodSelector } from './FinancePeriodSelector'
+import { FINANCE_PERIODS, type FinancePeriod } from '../lib/financePeriods'
 
 export function HoldingChart({ points, symbol, currency = 'AUD', price = false, loading = false, mode = 'Amount', onModeChange, period, onPeriodChange }: {
   points: AdvancedPerformancePoint[]; symbol: string; currency?: string; price?: boolean; loading?: boolean;
@@ -16,6 +18,7 @@ export function HoldingChart({ points, symbol, currency = 'AUD', price = false, 
   }, [points, period, price, mode])
   const hasCandleData = price && data.length > 1 && data.every(point => [point.open, point.high, point.low, point.close].every(value => Number.isFinite(value)))
   const activeStyle = style === 'Candles' && !hasCandleData ? 'Line' : style
+  const selectedPeriod: FinancePeriod = FINANCE_PERIODS.includes(period.preset as FinancePeriod) ? period.preset as FinancePeriod : 'MAX'
   const format = (value: number) => !price && mode === 'Percent' ? `${value.toFixed(2)}%` : money(value, currency, 2)
   /**
    * Pick the tick format from the visible span, not from each value. Compact notation
@@ -40,6 +43,6 @@ export function HoldingChart({ points, symbol, currency = 'AUD', price = false, 
       {price ? <div role="group" aria-label="Price chart style"><button type="button" aria-label="Price line chart" aria-pressed={activeStyle === 'Line'} className={activeStyle === 'Line' ? 'active' : ''} onClick={() => setStyle('Line')}>Line</button>{hasCandleData && <button type="button" aria-label="Price candlestick chart" aria-pressed={activeStyle === 'Candles'} className={activeStyle === 'Candles' ? 'active' : ''} onClick={() => setStyle('Candles')}>Candles</button>}</div> : <><div>{(['Amount', 'Percent'] as const).map(value => <button type="button" key={value} aria-pressed={mode === value} className={mode === value ? 'active' : ''} onClick={() => onModeChange?.(value)}>{value}</button>)}</div><div>{(['Line', 'Bar'] as const).map(value => <button type="button" key={value} aria-pressed={activeStyle === value} className={activeStyle === value ? 'active' : ''} onClick={() => setStyle(value)}>{value}</button>)}</div></>}
     </div>
     {loading && data.length < 2 ? <p role="status">Loading price history…</p> : <FinanceChart points={data.map(p => ({ ...p, value: Number(p.value) }))} label={price ? 'Price' : 'Portfolio'} resolution={price ? 'daily' : 'recorded'} formatValue={format} formatAxis={axisTick} bars={activeStyle === 'Bar' && !price} candles={activeStyle === 'Candles' && hasCandleData}/>}
-      <div className="finance-periods">{(['5D', '1M', '6M', 'YTD', '1Y', '3Y', '5Y', 'MAX'] as const).map(value => <button key={value} aria-pressed={period.preset === value} className={period.preset === value ? 'active' : ''} onClick={() => onPeriodChange({ preset: value })}>{value === 'MAX' ? 'All' : value}</button>)}</div>
+      <FinancePeriodSelector value={selectedPeriod} onChange={(value) => onPeriodChange({ preset: value })} ariaLabel={`${symbol} chart period`}/>
   </section>
 }
