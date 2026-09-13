@@ -79,6 +79,16 @@ export function Landing({ onDemo, signedIn = false, onOpenApp, page }: LandingPr
   const [password, setPassword] = useState('')
   const [passwordVisible, setPasswordVisible] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
+  useEffect(() => {
+    if (!mobileOpen) return
+    const closeOutside = (event: PointerEvent) => { if (!(event.target as Element).closest('.cloud-header')) setMobileOpen(false) }
+    const escape = (event: KeyboardEvent) => { if (event.key === 'Escape') { setMobileOpen(false); document.querySelector<HTMLButtonElement>('.cloud-menu')?.focus() } }
+    const resize = () => { if (window.innerWidth > 860) setMobileOpen(false) }
+    document.addEventListener('pointerdown', closeOutside)
+    document.addEventListener('keydown', escape)
+    window.addEventListener('resize', resize)
+    return () => { document.removeEventListener('pointerdown', closeOutside); document.removeEventListener('keydown', escape); window.removeEventListener('resize', resize) }
+  }, [mobileOpen])
   const [annual, setAnnual] = useState(true)
   const [openFaq, setOpenFaq] = useState(0)
   const [headerScrolled, setHeaderScrolled] = useState(false)
@@ -89,6 +99,7 @@ export function Landing({ onDemo, signedIn = false, onOpenApp, page }: LandingPr
   })
 
   const openAuthentication = (mode: 'signin' | 'signup') => {
+    setMobileOpen(false)
     if (signedIn) {
       onOpenApp?.()
       return
@@ -228,7 +239,7 @@ export function Landing({ onDemo, signedIn = false, onOpenApp, page }: LandingPr
               {signupLabel}<ArrowRight />
             </button>
           </div>
-          <button className="cloud-menu" aria-label="Toggle mobile menu" aria-expanded={mobileOpen} onClick={() => setMobileOpen(!mobileOpen)}>
+          <button className="cloud-menu" aria-label="Toggle mobile menu" aria-controls="mobile-navigation" aria-expanded={mobileOpen} onClick={() => setMobileOpen(!mobileOpen)}>
             {mobileOpen ? <X /> : <Menu />}
           </button>
         </div>
@@ -236,6 +247,7 @@ export function Landing({ onDemo, signedIn = false, onOpenApp, page }: LandingPr
           {mobileOpen && (
             <motion.nav
               className="cloud-mobile-nav"
+              id="mobile-navigation"
               aria-label="Mobile navigation"
               initial={reduceMotion ? false : { opacity: 0, y: -8 }}
               animate={{ opacity: 1, y: 0 }}

@@ -144,6 +144,12 @@ html:has(.alpine-site) { overflow-x:clip; }
 .alpine-site .md-public-hero:not(:has(.md-public-plans)) h1,.alpine-site .md-public-hero:not(:has(.md-public-plans)) p,.alpine-site .md-public-hero:not(:has(.md-public-plans)) .md-breadcrumb { color:#fff; }
 .alpine-site .md-public-hero .md-demo-button { background:#fff; color:#087c5e; }
 .alpine-site .cloud-nav button { white-space:nowrap; }
+@media(max-width:860px) {
+  .alpine-site .cloud-mobile-nav { top:100%; max-height:calc(100dvh - 70px); overscroll-behavior:contain; z-index:100; }
+  .alpine-site .cloud-menu { min-width:44px; min-height:44px; }
+  .alpine-site .md-site-menu.is-mobile .md-menu-group > button { font-size:16px; }
+  .alpine-site .md-site-menu.is-mobile .md-menu-links a { padding:12px 8px; }
+}
 .alpine-site .cloud-header .cloud-button-small { font-size:12px; padding:10px 16px; }
 @media(min-width:641px) and (max-width:1050px) { .alpine-site .cloud-nav { gap:16px; } .alpine-site .cloud-nav-actions { gap:10px; } .alpine-site .cloud-home .brand-logo-image { width:145px; } .alpine-site .md-menu-group>button { font-size:11px; gap:4px; } .alpine-site .md-site-menu { gap:10px; } }
 .alpine-site .md-public-plans .is-featured h2,.alpine-site .md-public-plans .is-featured strong,.alpine-site .md-public-plans .is-featured p,.alpine-site .md-public-plans .is-featured li { color:white; }
