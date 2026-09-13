@@ -284,18 +284,20 @@ export function AppShell({ children, onExitDemo }: { children: ReactNode; onExit
           </div>
           <div className="topbar-actions">
             <button className="global-search" type="button" onClick={() => { setSearchQuery(''); setActiveCommandIndex(0); setSearchOpen(true) }}><Search size={15}/><span>Search ticker, company, or page…</span><kbd><Command size={10}/>K</kbd></button>
-            <Button variant="ghost" icon={RefreshCw} busy={action === 'refresh-quotes'} onClick={() => refreshQuotes()}>Refresh prices</Button>
-            <div className="notifications-wrap"><IconButton label="Notifications" onClick={() => setNotificationsOpen(!notificationsOpen)}><Bell size={17}/></IconButton><MotionPopover open={notificationsOpen} className="notifications-menu" role="status"><header><strong>Notifications</strong><button onClick={() => setNotificationsOpen(false)} aria-label="Close notifications"><X size={14}/></button></header><div><span><Bell size={17}/></span><strong>You’re all caught up</strong><p>Sync alerts and portfolio updates will appear here.</p></div></MotionPopover></div>
-            <IconButton label={`Use ${theme === 'light' ? 'dark' : 'light'} theme`} onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}>{theme === 'light' ? <Moon size={17}/> : <Sun size={17}/>}</IconButton>
-            <div className="account-menu-wrap"><button className="topbar-avatar" type="button" title={profile?.email || undefined} aria-label="Open account menu" aria-haspopup="menu" aria-expanded={accountMenuOpen} onClick={() => setAccountMenuOpen(!accountMenuOpen)}>{(profile?.full_name || profile?.email || 'M').slice(0, 1).toUpperCase()}</button><MotionPopover open={accountMenuOpen} className="account-menu" role="menu">
-              <header><span className="account-avatar"><UserRound size={18}/></span><span><strong>{profile?.full_name || 'Masterdeck investor'}</strong><small>{profile?.email || (demo ? 'Demo workspace' : 'Private workspace')}</small></span></header>
-              <button role="menuitem" onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}><Moon size={15}/><span>Dark mode</span><span className={`menu-switch ${theme === 'dark' ? 'on' : ''}`} aria-hidden="true"/></button>
-              <button role="menuitem" onClick={() => openCommand('/app/settings')}><Settings size={15}/><span>Settings</span></button>
-              <button role="menuitem" onClick={() => openCommand('/app/billing')}><ArrowUpRight size={15}/><span>Change Plan</span></button>
-              <button role="menuitem" onClick={() => openCommand('/app/billing')}><CreditCard size={15}/><span>Billing &amp; Subscription</span></button>
-              <button role="menuitem" onClick={() => openCommand('/app/referrals')}><Gift size={15}/><span>Refer a Friend</span></button>
-              <button role="menuitem" onClick={signOut}><LogOut size={15}/><span>Log out</span></button>
-            </MotionPopover></div>
+            <div className="topbar-tools">
+              <Button variant="ghost" icon={RefreshCw} busy={action === 'refresh-quotes'} onClick={() => refreshQuotes()}>Refresh prices</Button>
+              <div className="notifications-wrap"><IconButton label="Notifications" onClick={() => setNotificationsOpen(!notificationsOpen)}><Bell size={17}/></IconButton><MotionPopover open={notificationsOpen} className="notifications-menu" role="status"><header><strong>Notifications</strong><button onClick={() => setNotificationsOpen(false)} aria-label="Close notifications"><X size={14}/></button></header><div><span><Bell size={17}/></span><strong>You’re all caught up</strong><p>Sync alerts and portfolio updates will appear here.</p></div></MotionPopover></div>
+              <IconButton label={`Use ${theme === 'light' ? 'dark' : 'light'} theme`} onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}>{theme === 'light' ? <Moon size={17}/> : <Sun size={17}/>}</IconButton>
+              <div className="account-menu-wrap"><button className="topbar-avatar" type="button" title={profile?.email || undefined} aria-label="Open account menu" aria-haspopup="menu" aria-expanded={accountMenuOpen} onClick={() => setAccountMenuOpen(!accountMenuOpen)}>{(profile?.full_name || profile?.email || 'M').slice(0, 1).toUpperCase()}</button><MotionPopover open={accountMenuOpen} className="account-menu" role="menu">
+                <header><span className="account-avatar"><UserRound size={18}/></span><span><strong>{profile?.full_name || 'Masterdeck investor'}</strong><small>{profile?.email || (demo ? 'Demo workspace' : 'Private workspace')}</small></span></header>
+                <button role="menuitem" onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}><Moon size={15}/><span>Dark mode</span><span className={`menu-switch ${theme === 'dark' ? 'on' : ''}`} aria-hidden="true"/></button>
+                <button role="menuitem" onClick={() => openCommand('/app/settings')}><Settings size={15}/><span>Settings</span></button>
+                <button role="menuitem" onClick={() => openCommand('/app/billing')}><ArrowUpRight size={15}/><span>Change Plan</span></button>
+                <button role="menuitem" onClick={() => openCommand('/app/billing')}><CreditCard size={15}/><span>Billing &amp; Subscription</span></button>
+                <button role="menuitem" onClick={() => openCommand('/app/referrals')}><Gift size={15}/><span>Refer a Friend</span></button>
+                <button role="menuitem" onClick={signOut}><LogOut size={15}/><span>Log out</span></button>
+              </MotionPopover></div>
+            </div>
           </div>
         </header>
         <AnimatePresence initial={false} mode="wait">

@@ -422,3 +422,68 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .md-related a { transition: none; }
 }
+
+/* Workspace top bar: share the content grid instead of floating the search in
+   the middle of a full-width header. */
+@media (min-width: 861px) {
+  .topbar {
+    height: 56px;
+    min-height: 56px;
+    padding-inline: max(28px, calc((100% - 1380px) / 2));
+    justify-content: initial;
+    gap: 24px;
+  }
+
+  .topbar-title {
+    display: none;
+  }
+
+  .topbar-actions {
+    width: 100%;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+  }
+
+  .global-search {
+    position: static;
+    left: auto;
+    flex: 0 1 520px;
+    width: min(520px, 100%);
+    max-width: 520px;
+    height: 32px;
+    transform: none;
+  }
+
+  .topbar-tools {
+    min-width: 0;
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .topbar-tools > .button {
+    display: none;
+  }
+}
+
+@media (max-width: 860px) {
+  .topbar-actions {
+    width: auto;
+    flex: 0 0 auto;
+    gap: 2px;
+  }
+
+  .topbar-tools {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+  }
+
+  .topbar-tools > .button,
+  .topbar-tools .notifications-wrap {
+    display: none;
+  }
+}
