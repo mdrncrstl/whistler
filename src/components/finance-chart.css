@@ -209,7 +209,7 @@
   display: flex;
   align-items: center;
   gap: 5px;
-  overflow-x: auto;
+  overflow: visible;
   scrollbar-width: none;
   background: #f6f7f9;
 }
