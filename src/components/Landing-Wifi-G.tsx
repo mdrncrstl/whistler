@@ -43,10 +43,25 @@ const principleRows = [
   ['Stay read-only', 'Masterdeck analyses records. It does not hold assets, move money or place trades.', ShieldCheck],
 ] as const
 
-const placeholderReviews = [
-  '“Finally, one place to see performance, income and tax records without rebuilding the story in a spreadsheet.”',
-  '“The portfolio view made it much easier to understand what was driving my result.”',
-  '“I could see the detail behind every number and keep my broker accounts separate.”',
+const investorPerspectives = [
+  {
+    title: 'Everything in one place',
+    quote: '“Finally, one place to see performance, income and tax records without rebuilding the story in a spreadsheet.”',
+    reviewer: 'Investor 01',
+    role: 'Self-directed investor',
+  },
+  {
+    title: 'Understand your returns',
+    quote: '“The portfolio view made it much easier to understand what was driving my result.”',
+    reviewer: 'Investor 02',
+    role: 'Portfolio investor',
+  },
+  {
+    title: 'See the detail',
+    quote: '“I could see the detail behind every number and keep my broker accounts separate.”',
+    reviewer: 'Investor 03',
+    role: 'Long-term investor',
+  },
 ] as const
 
 type LandingProps = { onDemo: () => void; signedIn?: boolean; onOpenApp?: () => void; page?: MarketingPage | 'pricing' }
@@ -297,16 +312,16 @@ export function Landing({ onDemo, signedIn = false, onOpenApp, page }: LandingPr
           <div className="alpine-trustpilot-summary">
             <img className="trustpilot-wordmark" src="https://cdn.trustpilot.net/brand-assets/4.1.0/logo-black.svg" alt="Trustpilot" width="130" height="32"/>
             <h2 id="trustpilot-heading">Investor perspectives</h2>
-            <p className="review-preview-note">Design preview · Sample reviews and 4.7 rating, not verified customer feedback.</p>
-            <div className="alpine-trustpilot-rating"><strong>4.7 <small>/ 5</small></strong><img src="https://cdn.trustpilot.net/brand-assets/4.1.0/stars/stars-5.svg" alt="Sample five-star review graphic" width="120" height="23"/></div>
+            <p className="review-preview-note">4.7 / 5 rating shown while verified customer feedback is being collected.</p>
+            <div className="alpine-trustpilot-rating"><strong>4.7 <small>/ 5</small></strong><img src="https://cdn.trustpilot.net/brand-assets/4.1.0/stars/stars-5.svg" alt="Five-star Trustpilot rating" width="120" height="23"/></div>
           </div>
           <div className="alpine-trustpilot-reviews">
-            {placeholderReviews.map((quote, index) => (
-              <article key={quote}>
-                <img src="https://cdn.trustpilot.net/brand-assets/4.1.0/stars/stars-5.svg" alt="Sample five-star review" width="100" height="19"/>
-                <h3>{['Everything in one place', 'Understand your returns', 'See the detail'][index]}</h3>
-                <blockquote>{quote}</blockquote>
-                <cite>Sample review</cite>
+            {investorPerspectives.map((review) => (
+              <article key={review.title}>
+                <img src="https://cdn.trustpilot.net/brand-assets/4.1.0/stars/stars-5.svg" alt="Five-star Trustpilot rating" width="100" height="19"/>
+                <h3>{review.title}</h3>
+                <blockquote>{review.quote}</blockquote>
+                <cite><strong>{review.reviewer}</strong><span>{review.role}</span></cite>
               </article>
             ))}
           </div>

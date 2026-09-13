@@ -391,7 +391,9 @@ html:has(.alpine-site) { overflow-x:clip; }
 .alpine-site .alpine-trustpilot-reviews article:hover { transform:none; box-shadow:none; }
 .alpine-site .alpine-trustpilot-reviews h3 { font-size:15px; line-height:1.4; margin:20px 0 8px; }
 .alpine-site .alpine-trustpilot-reviews blockquote { margin:0 0 20px; font-size:13px; line-height:1.6; }
-.alpine-site .alpine-trustpilot-reviews cite { margin-top:auto; font-size:11px; }
+.alpine-site .alpine-trustpilot-reviews cite { display:grid; gap:3px; margin-top:auto; font-size:11px; }
+.alpine-site .alpine-trustpilot-reviews cite strong { color:#183c2d; font-weight:650; }
+.alpine-site .alpine-trustpilot-reviews cite span { color:#718b7f; }
 .alpine-site .alpine-proof-section { padding-top:48px; padding-bottom:48px; }
 .alpine-site .cloud-principles { padding:64px 0; }
 .alpine-site .cloud-principles-layout { display:block; }
