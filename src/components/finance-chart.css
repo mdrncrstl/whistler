@@ -133,10 +133,12 @@
 .finance-chart-controls button[aria-pressed="true"] { background: #e8eaef; font-weight: 600; }
 .finance-chart-controls button:hover { background: #e8eaef; }
 .report-chart-card .finance-plot { border-radius: 4px; }
-.holding-simple-chart:has(.finance-plot) .chart-mode-row, .portfolio-chart-section:has(.finance-plot) .chart-mode-row { margin: 0 0 3px; padding: 12px 16px; border: 0; border-radius: 22px 22px 4px 4px; background: #f6f7f9; }
-.holding-simple-chart:has(.finance-plot) .chart-mode-row button, .portfolio-chart-section:has(.finance-plot) .chart-mode-row button { border: 0; border-radius: 8px; background: transparent; color: #5f6368; padding: 8px 12px; }
+.holding-simple-chart:has(.finance-plot) .chart-mode-row, .portfolio-chart-section:has(.finance-plot) .chart-mode-row { height: auto; min-height: 44px; margin: 0 0 3px; padding: 6px 16px; border: 0; border-radius: 22px 22px 4px 4px; background: #f6f7f9; justify-content: center; gap: 12px; }
+.holding-simple-chart:has(.finance-plot) .chart-mode-row button, .portfolio-chart-section:has(.finance-plot) .chart-mode-row button { height: 32px; min-height: 32px; display: inline-flex; align-items: center; justify-content: center; border: 0; border-radius: 8px; background: transparent; color: #5f6368; padding: 0 12px; line-height: 1.2; }
 .holding-simple-chart:has(.finance-plot) .chart-mode-row button.active, .portfolio-chart-section:has(.finance-plot) .chart-mode-row button.active { background: #e8eaef; color: #102a43; }
 .ai-stock-chart:has(.finance-plot) { min-width: 0; }
+
+.finance-periods { justify-content: center; padding-block: 6px; }
 
 [data-theme="dark"] .finance-plot, [data-theme="dark"] .finance-periods, [data-theme="dark"] .finance-chart-controls { --finance-selection: rgb(106 203 139 / 16%); border-color: #334155; background: #18212b; }
 [data-theme="dark"] .finance-plot { --finance-up: #6acb8b; --finance-down: #ef7777; }
