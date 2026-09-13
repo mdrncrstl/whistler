@@ -7,6 +7,7 @@ const browser = await chromium.launch()
 try {
   const page = await browser.newPage({ viewport: { width: 1440, height: 1000 }, reducedMotion: 'reduce' })
   await page.goto(process.env.MENU_QA_URL || 'http://127.0.0.1:4184')
+  await page.evaluate(() => document.fonts.ready)
   for (const width of [2560, 1440, 1024, 900, 861]) {
     await page.setViewportSize({ width, height: 1000 })
     for (const name of ['Features', 'Who it’s for', 'Company']) {
