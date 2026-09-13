@@ -5960,7 +5960,7 @@ body { font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-s
 }
 /* Shared chart and navigation polish. */
 html { scrollbar-gutter: stable; }
-.portfolio-switcher-wrap { margin-top: 8px; }
+.portfolio-switcher-wrap { margin-top: 0; }
 .portfolio-switcher { min-height: 44px; gap: 10px; }
 .portfolio-switcher .brand-mark { width: 25px; height: 25px; }
 .portfolio-switcher > span > small { display: none; }
