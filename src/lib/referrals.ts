@@ -1,5 +1,6 @@
 import type { Session } from '@supabase/supabase-js'
 import { authClient } from './supabase'
+import { canonicalAppOrigin } from './app-origin'
 
 export const REFERRAL_STORAGE_KEY = 'masterdeck-referral-code'
 export const REFERRAL_CREDIT_AUD = 20
@@ -77,6 +78,6 @@ export async function loadReferralDashboard(session: Session): Promise<ReferralD
   }
 }
 
-export function referralLink(code: string, origin = window.location.origin) {
+export function referralLink(code: string, origin = canonicalAppOrigin()) {
   return `${origin}/?ref=${encodeURIComponent(code)}`
 }

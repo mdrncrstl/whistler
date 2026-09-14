@@ -6,6 +6,7 @@ import { useAccountAccess } from '../context/AccountAccessContext'
 import { useBillingStatus } from '../hooks/useBillingStatus'
 import { annualSavingsPercent, billingPlans as plans, formatAud, planForSubscription } from '../lib/billing'
 import { config, edgeUrl } from '../lib/config'
+import { canonicalAppOrigin } from '../lib/app-origin'
 
 const paidStatuses = new Set(['active', 'trialing', 'past_due', 'unpaid'])
 
@@ -56,7 +57,7 @@ export function Billing() {
       const response = await fetch(edgeUrl(endpoint), {
         method: 'POST',
         headers: { Authorization: `Bearer ${session.access_token}`, apikey: config.dataKey, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...body, returnUrl: window.location.origin }),
+        body: JSON.stringify({ ...body, returnUrl: canonicalAppOrigin() }),
       })
       const data = await response.json()
       if (!response.ok) throw new Error(data.error || 'Billing could not open.')

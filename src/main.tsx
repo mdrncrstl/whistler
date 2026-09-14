@@ -8,6 +8,7 @@ import '@fontsource/inter/600.css'
 import '@fontsource/inter/700.css'
 import App from './App'
 import { config } from './lib/config'
+import { redirectToCanonicalHost } from './lib/app-origin'
 import './styles-Wifi-G.css'
 import './laptop-density.css'
 import './product-story.css'
@@ -16,12 +17,14 @@ import './assistant-motion.css'
 import './site-editorial.css'
 import './alpine-site.css'
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <GoogleOAuthProvider clientId={config.googleClientId}>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
-    </GoogleOAuthProvider>
-  </StrictMode>,
-)
+if (!redirectToCanonicalHost()) {
+  createRoot(document.getElementById('root')!).render(
+    <StrictMode>
+      <GoogleOAuthProvider clientId={config.googleClientId}>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </GoogleOAuthProvider>
+    </StrictMode>,
+  )
+}

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { authClient } from '../lib/supabase'
+import { canonicalAppOrigin, canonicalAppUrl } from '../lib/app-origin'
 import { Brand } from './ui'
 import { LoaderCircle } from 'lucide-react'
 
@@ -18,7 +19,10 @@ export function AuthCallback() {
     void authClient.auth.getSession().then(({ data, error: sessionError }) => {
       if (!alive) return
       window.clearTimeout(timeout)
-      if (data.session) navigate('/app', { replace: true })
+      if (data.session) {
+        if (window.location.origin === canonicalAppOrigin()) navigate('/app', { replace: true })
+        else window.location.replace(canonicalAppUrl('/app'))
+      }
       else setError(providerError || sessionError?.message || 'This sign-in link has expired or was cancelled. Please try again.')
     }).catch(() => {
       if (alive) { window.clearTimeout(timeout); setError('Unable to finish sign-in. Check your connection and try again.') }

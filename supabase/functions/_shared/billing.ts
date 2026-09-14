@@ -19,7 +19,6 @@ const defaultAppOrigin = 'https://masterdeck.app'
 const allowedAppOrigins = new Set([
   defaultAppOrigin,
   'https://www.masterdeck.app',
-  'https://masterdeck-eosin.vercel.app',
   'http://localhost:4180',
   'http://127.0.0.1:4180',
   'http://localhost:5173',

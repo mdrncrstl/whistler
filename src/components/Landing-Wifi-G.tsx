@@ -15,6 +15,7 @@ import { annualSavingsPercent, billingPlans, formatAud } from '../lib/billing'
 import { brokers } from '../lib/brokers'
 import { authClient } from '../lib/supabase'
 import { applySeo } from '../lib/seo'
+import { canonicalAppUrl } from '../lib/app-origin'
 import { Brand, MotionDialogSurface } from './ui-Wifi-G'
 
 const howItWorks = [
@@ -191,7 +192,7 @@ export function Landing({ onDemo, signedIn = false, onOpenApp, page }: LandingPr
     const { data, error: signUpError } = await authClient.auth.signUp({
       email: cleanEmail,
       password,
-      options: { emailRedirectTo: window.location.origin + '/auth/callback' },
+      options: { emailRedirectTo: canonicalAppUrl('/auth/callback') },
     })
     if (signUpError) {
       setError(friendlyAuthError(signUpError.message))
@@ -241,7 +242,7 @@ export function Landing({ onDemo, signedIn = false, onOpenApp, page }: LandingPr
       const response = await fetch(`${config.authUrl}/auth/v1/settings`, { headers: { apikey: config.authKey } })
       const settings = await response.json()
       if (!response.ok || !settings.external?.apple) throw new Error('Apple sign-in is not available yet. Please use Google or email.')
-      const { error: signInError } = await authClient.auth.signInWithOAuth({ provider: 'apple', options: { redirectTo: `${window.location.origin}/auth/callback` } })
+      const { error: signInError } = await authClient.auth.signInWithOAuth({ provider: 'apple', options: { redirectTo: canonicalAppUrl('/auth/callback') } })
       if (signInError) throw signInError
     } catch (error) { setError(error instanceof Error ? error.message : 'Apple sign-in could not be started.'); setRedirecting(false) }
   }

@@ -11,6 +11,7 @@ import { PortfolioProvider } from './context/PortfolioContext'
 import { useBillingStatus } from './hooks/useBillingStatus'
 import { authClient } from './lib/supabase'
 import { captureReferralFromLocation, claimStoredReferral } from './lib/referrals'
+import { canonicalAppUrl } from './lib/app-origin'
 
 const Overview = lazy(() => import('./features/Overview').then((module) => ({ default: module.Overview })))
 const Holdings = lazy(() => import('./features/Holdings').then((module) => ({ default: module.Holdings })))
@@ -133,7 +134,7 @@ export default function App() {
   const authenticated = Boolean(session || demo)
   return (
     <Routes>
-      <Route path="/" element={<Landing onDemo={enterDemo} signedIn={authenticated} onOpenApp={() => window.location.assign('/app')} />} />
+      <Route path="/" element={<Landing onDemo={enterDemo} signedIn={authenticated} onOpenApp={() => window.location.assign(canonicalAppUrl('/app'))} />} />
       <Route path="/auth/callback" element={<AuthCallback />} />
       <Route path="/*" element={authenticated ? <AccountAccessProvider session={session || null} demo={demo}><AccountRoutes session={session || null} demo={demo} onExitDemo={exitDemo} /></AccountAccessProvider> : <Navigate to="/" replace />} />
       <Route path="*" element={<Navigate to={authenticated ? '/app' : '/'} replace />} />

@@ -1,6 +1,7 @@
 import { ArrowRight, Check, DatabaseZap, Landmark, LockKeyhole, Mail, RefreshCcw, ShieldCheck } from 'lucide-react'
 import { useState } from 'react'
 import { authClient } from '../lib/supabase'
+import { canonicalAppUrl } from '../lib/app-origin'
 import { Brand, Button } from './ui'
 
 export function LegacyLanding({ onDemo }: { onDemo: () => void }) {
@@ -12,7 +13,7 @@ export function LegacyLanding({ onDemo }: { onDemo: () => void }) {
     setError('')
     const { error: signInError } = await authClient.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: `${window.location.origin}/auth/callback`, queryParams: { prompt: 'select_account' } },
+      options: { redirectTo: canonicalAppUrl('/auth/callback'), queryParams: { prompt: 'select_account' } },
     })
     if (signInError) {
       setError(signInError.message)

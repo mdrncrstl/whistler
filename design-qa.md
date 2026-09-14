@@ -217,7 +217,7 @@ The combined comparison was opened as one side-by-side image. MASTERDECK preserv
 - Copy and content: passed. The page has an explicit per-asset name, ticker/market, account, asset class, current price, daily movement, benchmark legend, tax cost base and portfolio weighting.
 - Responsive evidence: 390 x 844 reported `scrollWidth === clientWidth` at an effective 375 px layout width; the holding metrics collapsed into a readable two-column grid and the lower detail stack reduced to one column.
 - Interaction evidence: Trades, Income and Notes tabs rendered their own states; the Overview mode changed; date/position selectors remained semantic; and each Price range button updated the selected state. Browser console diagnostics contained no errors.
-- Production evidence: `https://masterdeck-eosin.vercel.app/app/holdings/BHP` rendered BHP with five metrics and the Price chart; AAPL rendered its own identity and `Recorded trades` history; live Trades and Notes states worked; desktop and 390 x 844 mobile checks reported no page overflow and no browser errors.
+- Production evidence: `https://masterdeck.app/app/holdings/BHP` rendered BHP with five metrics and the Price chart; AAPL rendered its own identity and `Recorded trades` history; live Trades and Notes states worked; desktop and 390 x 844 mobile checks reported no page overflow and no browser errors.
 - Post-fix comparison found no actionable P0/P1/P2 findings in the requested holding-detail scope. Remaining difference is intentional: Masterdeck keeps its own green identity and demo/account data rather than copying Navexa branding or private source values.
 
 ### Pass 15 — concise onboarding redesign (2026-08-28)
@@ -253,7 +253,7 @@ The combined comparison was opened as one side-by-side image. MASTERDECK preserv
 - Navigation: document scrolling is smooth by default, respects reduced-motion preferences, and all section targets use a sticky-header offset so desktop and mobile nav links land cleanly.
 - Local browser evidence: 1440 x 1000 and 390 x 844 runs showed the updated hero, proof band, boundary block and workflow selector; the mobile stats remained readable and no page-level overflow was detected. Desktop/mobile console diagnostics were empty.
 - Automated evidence: 14 test files / 44 tests passed; typecheck, lint, build and `git diff --check` passed.
-- Production evidence: deployment `dpl_AUZ4wd54wu6KkqLXRxzwdaeSkEkM` reported READY and the stable alias `https://masterdeck-eosin.vercel.app` rendered the updated hero, four interactive stats, icon-led boundary section, selectable workflow and enlarged previews. Desktop and 390 x 844 mobile production checks reported no page-level overflow and zero browser warnings/errors.
+- Production evidence: deployment `dpl_AUZ4wd54wu6KkqLXRxzwdaeSkEkM` reported READY and the stable alias `https://masterdeck.app` rendered the updated hero, four interactive stats, icon-led boundary section, selectable workflow and enlarged previews. Desktop and 390 x 844 mobile production checks reported no page-level overflow and zero browser warnings/errors.
 
 ## Functional evidence
 
@@ -263,10 +263,10 @@ The combined comparison was opened as one side-by-side image. MASTERDECK preserv
 - `npm.cmd run build`: passed.
 - Desktop browser audit: 21/21 authenticated routes had meaningful DOM, zero page-level overflow and zero console errors.
 - Mobile browser audit: 21/21 authenticated routes settled at 390 x 844 with meaningful DOM and zero page-level overflow.
-- Production audit: all 16 rebuilt report, tax and tool routes rendered at `https://masterdeck-eosin.vercel.app` under the signed-in account, preserved their deep links, showed no demo portfolio state and had zero page-level overflow.
+- Production audit: all 16 rebuilt report, tax and tool routes rendered at `https://masterdeck.app` under the signed-in account, preserved their deep links, showed no demo portfolio state and had zero page-level overflow.
 - Interactions: report holding filter, sale-allocation selector, Deck AI suggestion/response, custom-group creation, nested/full sidebar collapse, command search, portfolio filters, chart modes, group/sort/column controls, exports, holding details and route navigation passed.
 - Latest holding-detail browser verification: BHP and AAPL rendered their own asset identity and metrics; Overview, Trades, Income and Notes states passed; the Price 5D control updated selection; desktop and mobile console diagnostics remained clean.
-- Latest deployment: Vercel production deployment `dpl_AUZ4wd54wu6KkqLXRxzwdaeSkEkM` reported READY and aliased to `https://masterdeck-eosin.vercel.app`.
+- Latest deployment: Vercel production deployment `dpl_AUZ4wd54wu6KkqLXRxzwdaeSkEkM` reported READY and aliased to `https://masterdeck.app`.
 
 ## Findings
 

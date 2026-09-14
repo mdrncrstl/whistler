@@ -12,6 +12,7 @@ import { AccountAccessProvider, useAccountAccess } from './context/AccountAccess
 import { PortfolioProvider } from './context/PortfolioContext'
 import { useBillingStatus } from './hooks/useBillingStatus'
 import { authClient } from './lib/supabase'
+import { canonicalAppUrl } from './lib/app-origin'
 
 const Overview = lazy(() => import('./features/Overview-Wifi-G').then((module) => ({ default: module.Overview })))
 const Holdings = lazy(() => import('./features/Holdings-Wifi-G').then((module) => ({ default: module.Holdings })))
@@ -122,9 +123,9 @@ function AppContent() {
     <>
       <PointerChartEnhancer />
       <Routes>
-        <Route path="/" element={<Landing onDemo={enterDemo} signedIn={authenticated} onOpenApp={() => window.location.assign('/app')} />} />
-        {marketingPages.map(page => <Route key={page.path} path={page.path} element={<Landing page={page} onDemo={enterDemo} signedIn={authenticated} onOpenApp={() => window.location.assign('/app')} />} />)}
-        <Route path="/pricing" element={<Landing page="pricing" onDemo={enterDemo} signedIn={authenticated} onOpenApp={() => window.location.assign('/app')} />} />
+        <Route path="/" element={<Landing onDemo={enterDemo} signedIn={authenticated} onOpenApp={() => window.location.assign(canonicalAppUrl('/app'))} />} />
+        {marketingPages.map(page => <Route key={page.path} path={page.path} element={<Landing page={page} onDemo={enterDemo} signedIn={authenticated} onOpenApp={() => window.location.assign(canonicalAppUrl('/app'))} />} />)}
+        <Route path="/pricing" element={<Landing page="pricing" onDemo={enterDemo} signedIn={authenticated} onOpenApp={() => window.location.assign(canonicalAppUrl('/app'))} />} />
         <Route path="/auth/callback" element={<AuthCallback />} />
         <Route path="/*" element={authenticated ? <AccountAccessProvider session={session || null} demo={demo}><AccountRoutes session={session || null} demo={demo} onExitDemo={exitDemo} /></AccountAccessProvider> : <Navigate to="/" replace />} />
         <Route path="*" element={<Navigate to={authenticated ? '/app' : '/'} replace />} />

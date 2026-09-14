@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { authClient } from '../lib/supabase'
+import { canonicalAppOrigin, canonicalAppUrl } from '../lib/app-origin'
 import { Brand } from './ui'
 import { LoaderCircle } from 'lucide-react'
 
@@ -12,12 +13,17 @@ export function AuthCallback() {
     const finish = async () => {
       const code = new URL(window.location.href).searchParams.get('code')
       const current = await authClient.auth.getSession()
-      if (current.data.session) return navigate('/welcome', { replace: true })
+      if (current.data.session) {
+        if (window.location.origin === canonicalAppOrigin()) return navigate('/welcome', { replace: true })
+        window.location.replace(canonicalAppUrl('/welcome'))
+        return
+      }
       if (!code) return setError('The sign-in link is invalid or has expired.')
       const { error: exchangeError } = await authClient.auth.exchangeCodeForSession(code)
       if (!alive) return
       if (exchangeError) setError(exchangeError.message)
-      else navigate('/welcome', { replace: true })
+      else if (window.location.origin === canonicalAppOrigin()) navigate('/welcome', { replace: true })
+      else window.location.replace(canonicalAppUrl('/welcome'))
     }
     finish()
     return () => { alive = false }
