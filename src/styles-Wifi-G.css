@@ -6214,3 +6214,467 @@ html { scrollbar-gutter: stable; }
   font-size: 12px;
   font-weight: 700;
 }
+
+/* MyTax review workspace: keep the return focused, readable and visually distinct
+   from the dense source-depth tables used by the other tax reports. */
+.tax-page--mytax {
+  width: min(1360px, 100%);
+  margin-inline: auto;
+}
+.tax-page--mytax .page-heading {
+  min-height: 0;
+  margin-bottom: 24px;
+  align-items: flex-end;
+}
+.tax-page--mytax .page-heading > div:first-child {
+  min-width: 0;
+  max-width: 760px;
+}
+.tax-page--mytax .page-heading h1 {
+  margin-bottom: 8px;
+  font-size: 32px;
+  line-height: 1.06;
+}
+.tax-page--mytax .page-heading p {
+  max-width: 68ch;
+  font-size: 13px;
+  line-height: 1.55;
+}
+.tax-page--mytax .page-actions {
+  flex: 0 0 auto;
+}
+.tax-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.tax-header-actions .select-wrap {
+  min-width: 150px;
+  height: 40px;
+}
+.tax-header-actions .select-wrap:last-child {
+  min-width: 176px;
+}
+.tax-header-actions .select-wrap select {
+  font-size: 11px;
+}
+
+.tax-page--mytax .mytax-hero {
+  margin-bottom: 16px;
+  padding: 28px 30px;
+  border: 1px solid color-mix(in srgb, var(--green) 18%, var(--line));
+  border-radius: 18px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(250px, 292px);
+  gap: 30px;
+  background: linear-gradient(120deg, color-mix(in srgb, var(--green) 10%, var(--surface)) 0%, var(--surface) 68%);
+  box-shadow: 0 12px 30px color-mix(in srgb, var(--green) 7%, transparent);
+}
+.mytax-hero-copy {
+  min-width: 0;
+}
+.mytax-hero-copy h2 {
+  margin: 0;
+  font-size: 25px;
+  line-height: 1.12;
+  letter-spacing: -.035em;
+}
+.mytax-hero-copy > p {
+  max-width: 58ch;
+  margin: 9px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+.mytax-context-grid {
+  margin-top: 25px;
+  padding-top: 17px;
+  border-top: 1px solid color-mix(in srgb, var(--green) 17%, var(--line));
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+.mytax-context-grid > div {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.mytax-context-grid span,
+.mytax-hero-result > span,
+.mytax-capital-stat > span {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: .035em;
+  text-transform: uppercase;
+}
+.mytax-context-grid strong {
+  overflow: visible;
+  color: var(--text);
+  font-size: 12px;
+  line-height: 1.35;
+  white-space: normal;
+}
+.mytax-hero-result {
+  min-width: 0;
+  padding: 22px 0 22px 28px;
+  border-left: 1px solid color-mix(in srgb, var(--green) 17%, var(--line));
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.mytax-hero-result > strong {
+  margin-top: 9px;
+  color: var(--green);
+  font-size: 34px;
+  line-height: 1;
+  letter-spacing: -.045em;
+}
+.mytax-hero-result > small {
+  margin-top: 10px;
+  color: var(--muted-2);
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+.tax-page--mytax .mytax-section-card {
+  margin-bottom: 16px;
+  padding: 25px 28px 28px;
+  border-radius: 16px;
+}
+.mytax-section-head {
+  min-width: 0;
+  margin-bottom: 22px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+}
+.mytax-section-head h2 {
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.2;
+  letter-spacing: -.025em;
+}
+.mytax-section-head p {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.5;
+}
+.mytax-section-link {
+  flex: 0 0 auto;
+  min-height: 36px;
+  padding: 0 11px;
+  border: 1px solid color-mix(in srgb, var(--green) 24%, var(--line));
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--green);
+  font-size: 10px;
+  font-weight: 750;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.mytax-section-link:hover,
+.mytax-section-link:focus-visible {
+  border-color: color-mix(in srgb, var(--green) 55%, var(--line));
+  background: color-mix(in srgb, var(--green) 6%, var(--surface));
+  outline: 0;
+}
+.tax-page--mytax .mytax-capital-grid {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  background: var(--surface-2);
+}
+.mytax-capital-stat {
+  min-width: 0;
+  min-height: 106px;
+  padding: 18px 20px;
+  border-right: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.mytax-capital-stat:last-child {
+  border-right: 0;
+}
+.mytax-capital-stat.is-accent {
+  background: color-mix(in srgb, var(--green) 7%, var(--surface));
+}
+.mytax-capital-stat > strong {
+  margin-top: 8px;
+  color: var(--text);
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: -.035em;
+}
+.mytax-capital-stat.is-accent > strong {
+  color: var(--green);
+}
+.mytax-capital-stat > small {
+  margin-top: 8px;
+  color: var(--muted-2);
+  font-size: 10px;
+  line-height: 1.35;
+}
+
+.mytax-form-grid {
+  margin-bottom: 16px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: 16px;
+}
+.tax-page--mytax .mytax-field-card {
+  min-width: 0;
+  margin-bottom: 0;
+  border-radius: 16px;
+}
+.mytax-field-card .card-title-row {
+  min-height: 0;
+  margin: 0;
+  padding: 22px 24px 18px;
+  border-bottom: 1px solid var(--line);
+}
+.mytax-field-card .card-title-row h2 {
+  font-size: 16px;
+  line-height: 1.25;
+}
+.mytax-field-card .tax-field-description {
+  max-width: 44ch;
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.45;
+}
+.mytax-field-card table {
+  min-width: 0;
+  table-layout: fixed;
+}
+.mytax-field-card th,
+.mytax-field-card td {
+  padding: 12px 16px;
+  font-size: 11px;
+  line-height: 1.4;
+  white-space: normal;
+  vertical-align: middle;
+}
+.mytax-field-card th {
+  padding-top: 10px;
+  padding-bottom: 10px;
+  font-size: 9px;
+  white-space: nowrap;
+}
+.mytax-field-card th:first-child,
+.mytax-field-card td:first-child {
+  width: 78px;
+}
+.mytax-field-card th:last-child,
+.mytax-field-card td:last-child {
+  width: 124px;
+}
+.mytax-field-card td:nth-child(2) {
+  color: var(--text);
+}
+.mytax-code {
+  color: var(--green);
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
+  letter-spacing: .02em;
+}
+.mytax-missing {
+  color: var(--muted-2);
+  font-size: 10px;
+  font-style: italic;
+}
+.tax-page--mytax .mytax-disclaimer {
+  margin: 0;
+  padding: 16px 18px;
+  border-radius: 12px;
+  box-shadow: none;
+}
+.mytax-disclaimer > svg {
+  flex: 0 0 auto;
+  margin-top: 1px;
+  color: var(--green);
+}
+.mytax-disclaimer h3 {
+  font-size: 12px;
+}
+.mytax-disclaimer p {
+  font-size: 10px;
+  line-height: 1.6;
+}
+
+@media (max-width: 1100px) {
+  .tax-page--mytax {
+    width: 100%;
+  }
+  .tax-page--mytax .mytax-hero {
+    grid-template-columns: minmax(0, 1fr) minmax(220px, .45fr);
+    gap: 22px;
+    padding-inline: 24px;
+  }
+  .mytax-hero-result {
+    padding-left: 22px;
+  }
+  .mytax-form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 900px) {
+  .tax-page--mytax .page-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .tax-page--mytax .page-actions,
+  .tax-header-actions {
+    width: 100%;
+  }
+  .tax-header-actions .select-wrap {
+    flex: 1 1 0;
+  }
+  .tax-page--mytax .mytax-hero {
+    grid-template-columns: 1fr;
+    gap: 22px;
+    padding: 22px;
+  }
+  .mytax-hero-result {
+    padding: 19px 0 0;
+    border-top: 1px solid color-mix(in srgb, var(--green) 17%, var(--line));
+    border-left: 0;
+  }
+  .mytax-context-grid {
+    gap: 14px;
+  }
+  .tax-page--mytax .mytax-section-card {
+    padding: 22px;
+  }
+  .mytax-section-head {
+    flex-direction: column;
+    gap: 14px;
+  }
+  .mytax-section-link {
+    width: fit-content;
+  }
+  .mytax-field-card .card-title-row {
+    padding-inline: 18px;
+  }
+}
+@media (max-width: 520px) {
+  .tax-page--mytax .page-heading h1 {
+    font-size: 26px;
+  }
+  .tax-header-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .tax-header-actions .select-wrap,
+  .tax-header-actions .select-wrap:last-child {
+    min-width: 0;
+    width: 100%;
+  }
+  .tax-page--mytax .mytax-hero {
+    gap: 10px;
+    padding: 14px 18px;
+    border-radius: 14px;
+  }
+  .mytax-hero-copy h2 {
+    font-size: 22px;
+  }
+  .mytax-context-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    margin-top: 17px;
+    padding-top: 13px;
+  }
+  .mytax-context-grid strong {
+    white-space: normal;
+  }
+  .mytax-context-grid > div:last-child {
+    grid-column: auto;
+  }
+  .mytax-context-grid strong {
+    font-size: 11px;
+  }
+  .mytax-hero-result {
+    padding-top: 12px;
+  }
+  .mytax-hero-result > strong {
+    margin-top: 6px;
+    font-size: 30px;
+  }
+  .mytax-hero-result > small {
+    margin-top: 7px;
+    font-size: 9px;
+  }
+  .tax-page--mytax .mytax-section-card {
+    padding: 18px;
+    border-radius: 14px;
+  }
+  .mytax-section-head {
+    position: relative;
+    margin-bottom: 16px;
+    padding-right: 128px;
+    display: block;
+  }
+  .mytax-section-head > div > p {
+    margin-right: -128px;
+    display: none;
+  }
+  .mytax-section-link {
+    position: absolute;
+    top: 0;
+    right: 0;
+  }
+  .tax-page--mytax .mytax-capital > .mytax-capital-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .mytax-capital-stat {
+    min-height: 0;
+    padding: 11px 8px;
+  }
+  .mytax-capital-stat > span {
+    font-size: 8px;
+    line-height: 1.25;
+  }
+  .mytax-capital-stat > strong {
+    font-size: 20px;
+  }
+  .mytax-capital-stat > small {
+    font-size: 8px;
+  }
+  .tax-page--mytax .mytax-capital-stat:nth-child(2) {
+    border-right: 1px solid var(--line);
+  }
+  .tax-page--mytax .mytax-capital-stat:nth-child(2) {
+    border-bottom: 0;
+  }
+  .tax-page--mytax .mytax-capital-stat:last-child {
+    grid-column: auto;
+    border-bottom: 0;
+  }
+  .mytax-field-card .card-title-row {
+    padding: 19px 16px 16px;
+  }
+  .mytax-field-card th,
+  .mytax-field-card td {
+    padding-inline: 12px;
+  }
+  .mytax-field-card th:first-child,
+  .mytax-field-card td:first-child {
+    width: 64px;
+  }
+  .mytax-field-card th:last-child,
+  .mytax-field-card td:last-child {
+    width: 106px;
+  }
+}

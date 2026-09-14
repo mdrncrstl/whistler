@@ -1,4 +1,4 @@
-import { AlertTriangle, Download, FileCheck2, Landmark, Scale, Search } from 'lucide-react'
+import { AlertTriangle, ArrowUpRight, Download, FileCheck2, Landmark, Scale, Search } from 'lucide-react'
 import { HoldingLogo } from '../components/HoldingLogo'
 import { HoldingNavigationRow } from '../components/HoldingNavigation'
 import { useMemo, useState, type ReactNode } from 'react'
@@ -39,14 +39,21 @@ export function TaxCentre() {
     if (report === 'taxable-income') return downloadCsv(filename, ['Symbol','Date','Type','Description','Recorded cash AUD','Franking credits','Gross taxable amount'], incomeTransactions(bundle.transactions.filter(t => financialYearFor(new Date(t.date)) === fy)).map(t => [t.symbol,t.date,t.type,t.description,Math.abs(t.amount*t.fx_rate),'Not supplied','Not supplied']))
     return downloadCsv(`masterdeck-${report}-current.csv`, ['Symbol','Name','Units','Recorded cost AUD','Latest value AUD','Unrealised gain AUD'], holdings.map(h => [h.symbol,h.name,h.quantity,h.cost_aud,h.value_aud,h.unrealised_gain_aud]))
   }
-  return <>
-    <PageHeader title={title} description={description} />
-    <div className="report-toolbar tax-report-toolbar">
+  return <div className={`tax-page tax-page--${report}`}>
+    <PageHeader
+      title={title}
+      description={description}
+      actions={report === 'mytax' ? <div className="tax-header-actions">
+        <Select value={fy} onChange={(event)=>setFy(event.target.value)} aria-label="Financial year">{fyOptions().map((item)=><option value={item} key={item}>FY {item}</option>)}</Select>
+        <Select value={method} onChange={(event)=>setMethod(event.target.value as TaxMethod)} aria-label="Sale allocation method"><option value="fifo">FIFO</option><option value="lifo">LIFO</option><option value="hifo">Highest cost first</option></Select>
+      </div> : undefined}
+    />
+    {report !== 'mytax' && <div className="report-toolbar tax-report-toolbar">
       {['valuation','unrealised','historical-cost'].includes(report) && <label className="report-search"><Search size={14}/><input value={query} onChange={(event)=>setQuery(event.target.value)} placeholder="Filter holdings…" aria-label="Filter holdings"/></label>}
       {!['valuation','unrealised','historical-cost'].includes(report) && <Select value={fy} onChange={(event)=>setFy(event.target.value)} aria-label="Financial year">{fyOptions().map((item)=><option value={item} key={item}>FY {item}</option>)}</Select>}
       {['overview','capital-gains','mytax'].includes(report) && <Select value={method} onChange={(event)=>setMethod(event.target.value as TaxMethod)} aria-label="Sale allocation method"><option value="fifo">FIFO</option><option value="lifo">LIFO</option><option value="hifo">Highest cost first</option></Select>}
       {!['overview','mytax'].includes(report) && <Button icon={Download} onClick={exportReport}>Export</Button>}
-    </div>
+    </div>}
     {unmatchedSales && ['overview','mytax','capital-gains'].includes(report) && <p role="alert" className="connection-error">Some sales could not be fully matched to purchase records. These estimates are incomplete. Import the missing purchase history before using this report.</p>}
     {report === 'overview' && <TaxOverview bundle={bundle} matches={matches} fy={fy} method={method}/>}
     {report === 'mytax' && <MyTax bundle={bundle} matches={matches} fy={fy} method={method}/>}
@@ -55,7 +62,7 @@ export function TaxCentre() {
     {report === 'valuation' && <Valuation bundle={scoped}/>}
     {report === 'unrealised' && <Unrealised bundle={scoped}/>}
     {report === 'historical-cost' && <HistoricalCost bundle={scoped}/>}
-  </>
+  </div>
 }
 
 function TaxOverview({ bundle, matches, fy, method }: { bundle: PortfolioBundle; matches: TaxMatch[]; fy: string; method: TaxMethod }) {
@@ -74,21 +81,65 @@ function TaxOverview({ bundle, matches, fy, method }: { bundle: PortfolioBundle;
   </>
 }
 
-function MyTax({ bundle, matches, fy, method }: { bundle: PortfolioBundle; matches: TaxMatch[]; fy: string; method: TaxMethod }) {
-  const income = taxIncome(bundle.transactions.filter(t => financialYearFor(new Date(t.date)) === fy)); const summary = taxSummary(matches)
+function MyTax({ bundle, matches, fy, method }: { bundle: PortfolioBundle; matches: TaxMatch[]; fy: string; method: TaxMethod }) {
+  const income = taxIncome(bundle.transactions.filter(t => financialYearFor(new Date(t.date)) === fy))
+  const summary = taxSummary(matches)
+
+  const netCapitalGain = Math.max(0, summary.estimatedDiscountedNet)
+
+  const estimatedDiscount = Math.max(0, summary.net - summary.estimatedDiscountedNet)
+
+  const carriedForwardLoss = Math.abs(Math.min(0, summary.net))
+
+  const portfolioName = bundle.profile?.full_name || 'All portfolios'
+
   const fields = [
     ['10L','Gross interest',income.interest],['10M','TFN amounts withheld from gross interest',null],['11S','Unfranked amount',income.unfranked],['11T','Franked amount',income.franked],['11U','Franking credits',income.franking],['11V','TFN amounts withheld from dividends',null],['D8','Dividend deductions',null],['13U','Share of net income from trusts',null],['13C','Franked distributions from trusts',null],['13Q','Share of franking credits from trusts',null],['13R','TFN amounts withheld from distributions',null],['20E','Assessable foreign source income',null],['20F','Australian franking credits from a NZ company',null],['20M','Other net foreign source income',null],['20O','Foreign income tax offset',null],
   ] as const
+
   return <>
-    <TaxMetricStrip><TaxMetric label="Portfolio" value={bundle.profile?.full_name || 'All portfolios'} /><TaxMetric label="Sale allocation" value={method.toUpperCase()} /><TaxMetric label="Estimate assumes" value="Resident individual" /><TaxMetric label="Financial year" value={`FY ${fy}`} /></TaxMetricStrip>
-    <Card className="mytax-capital"><div className="card-title-row"><h2>Capital gains</h2><Link to="/app/tax/capital-gains">Go to CGT report</Link></div><div><TaxMetric label="Total current-year capital gains" value={money(summary.gains)}/><TaxMetric label="Net capital gain" value={money(Math.max(0,summary.estimatedDiscountedNet))}/><TaxMetric label="Net capital loss carried forward" value={money(Math.abs(Math.min(0,summary.net)))}/></div></Card>
-    <TaxFieldTable title="Australian tax return for individuals" fields={fields.slice(0,7)}/>
-    <TaxFieldTable title="Australian tax return for individuals — supplementary section" fields={fields.slice(7)}/>
-    <TaxDisclaimer />
+    <section className="mytax-hero">
+      <div className="mytax-hero-copy">
+        <h2>Review the return before lodging</h2>
+        <p>A field-by-field view of the records currently feeding this individual tax return.</p>
+        <div className="mytax-context-grid">
+          <div><span>Portfolio</span><strong>{portfolioName}</strong></div>
+          <div><span>Sale allocation</span><strong>{method.toUpperCase()}</strong></div>
+          <div><span>Estimate assumes</span><strong>Resident individual</strong></div>
+        </div>
+      </div>
+      <div className="mytax-hero-result">
+        <span>Estimated net capital gain</span>
+        <strong>{money(netCapitalGain)}</strong>
+        <small>Calculated from matched disposals</small>
+      </div>
+    </section>
+
+    <section className="mytax-section-card mytax-capital" aria-labelledby="mytax-capital-title">
+      <div className="mytax-section-head">
+        <div>
+          <h2 id="mytax-capital-title">Capital gains overview</h2>
+          <p>Check the components feeding the capital gains section of this return.</p>
+        </div>
+        <Link className="mytax-section-link" to="/app/tax/capital-gains">Open CGT report <ArrowUpRight size={15} aria-hidden="true" /></Link>
+      </div>
+      <div className="mytax-capital-grid">
+        <div className="mytax-capital-stat is-accent"><span>Current-year gains</span><strong>{money(summary.gains)}</strong><small>Before estimated discount</small></div>
+        <div className="mytax-capital-stat"><span>Estimated discount</span><strong>{money(estimatedDiscount)}</strong><small>Applied to eligible gains</small></div>
+        <div className="mytax-capital-stat"><span>Loss carried forward</span><strong>{money(carriedForwardLoss)}</strong><small>From the matched result</small></div>
+      </div>
+    </section>
+
+    <div className="mytax-form-grid">
+      <TaxFieldTable className="mytax-field-card" labelStyle="code" title="Australian tax return for individuals" description="Interest, dividend and payment amounts recorded for this financial year." fields={fields.slice(0,7)}/>
+      <TaxFieldTable className="mytax-field-card" labelStyle="code" title="Supplementary section" description="Trust, foreign income and tax offset fields." fields={fields.slice(7)}/>
+    </div>
+
+    <TaxDisclaimer className="mytax-disclaimer" />
   </>
 }
 
-function TaxFieldTable({ title, fields }: { title: string; fields: readonly (readonly [string,string,number | null])[] }) { return <Card className="data-card tax-field-card"><div className="card-title-row"><h2>{title}</h2></div><div className="table-scroll"><table><thead><tr><th>myTax label</th><th>Field</th><th className="numeric">Amount</th></tr></thead><tbody>{fields.map(([code,label,value])=><tr key={code}><td><Badge>{code}</Badge></td><td>{label}</td><td className="numeric">{value === null ? 'Not supplied' : money(value)}</td></tr>)}</tbody></table></div></Card> }
+function TaxFieldTable({ title, description, fields, className = '', labelStyle = 'badge' }: { title: string; description?: string; fields: readonly (readonly [string,string,number | null])[]; className?: string; labelStyle?: 'badge' | 'code' }) { return <Card className={`data-card tax-field-card ${className}`.trim()}><div className="card-title-row"><div><h2>{title}</h2>{description && <p className="tax-field-description">{description}</p>}</div></div><div className="table-scroll"><table><thead><tr><th>Code</th><th>Field</th><th className="numeric">Amount</th></tr></thead><tbody>{fields.map(([code,label,value])=><tr key={code}><td>{labelStyle === 'code' ? <span className="mytax-code">{code}</span> : <Badge>{code}</Badge>}</td><td>{label}</td><td className="numeric">{value === null ? <span className="mytax-missing">Not supplied</span> : money(value)}</td></tr>)}</tbody></table></div></Card> }
 
 function CapitalGains({ matches, method }: { matches: TaxMatch[]; method: TaxMethod }) {
   const summary = taxSummary(matches)
@@ -118,7 +169,8 @@ function HoldingTaxTable({ title, headers, rows }: { title: string; headers: str
 function TaxMetricStrip({ children }: { children: ReactNode }) { return <div className="report-metric-strip tax-metric-strip">{children}</div> }
 function TaxMetric({ label, value, sub }: { label: string; value: ReactNode; sub?: ReactNode }) { return <Card className="report-metric"><span>{label}</span><strong>{value}</strong>{sub&&<small>{sub}</small>}</Card> }
 function SummaryLedger({ title, subtitle, rows }: { title: string; subtitle?: string; rows: [string,number | null][] }) { return <Card className="tax-summary-card"><div><h2>{title}</h2>{subtitle&&<p>{subtitle}</p>}</div><dl>{rows.map(([label,value])=><div key={label}><dt>{label}</dt><dd>{value === null ? 'Not supplied' : money(value)}</dd></div>)}</dl></Card> }
-function TaxDisclaimer() { return <Card className="tax-assumptions"><Scale size={20}/><div><h3>Important notice</h3><p>Franking, withholding and trust tax components are not supplied by the transaction ledger and must be checked against annual statements. CGT estimates assume a resident individual, complete purchase history and no carried-forward losses. Independently confirm the result and consult a tax professional before lodging or acting on it.</p></div></Card> }
+function TaxDisclaimer({ className = '' }: { className?: string }) { return <Card className={`tax-assumptions ${className}`.trim()}><Scale size={20}/><div><h3>Important notice</h3><p>Franking, withholding and trust tax components are not supplied by the transaction ledger and must be checked against annual statements. CGT estimates assume a resident individual, complete purchase history and no carried-forward losses. Independently confirm the result and consult a tax professional before lodging or acting on it.</p></div></Card> }
+
 function taxIncome(transactions: Transaction[]) {
   const items = incomeTransactions(transactions)
   const values = items.map(item => ({ type: String(item.type).toUpperCase(), value: Math.abs(item.amount * item.fx_rate), currency: item.currency }))
