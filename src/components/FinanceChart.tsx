@@ -162,7 +162,7 @@ export function FinanceChart({ points, label = 'Price', formatValue, formatAxis 
   const dataDescription = candleMode ? 'Daily OHLC market points' : resolution === 'daily' ? 'Daily market points' : 'Recorded portfolio points'
 
   return <div className="finance-plot" ref={host} data-chart-type={candleMode ? 'candles' : barMode ? 'bars' : 'line'} data-chart-style={effectiveStyle} data-indicators={activeIndicators.join(',')} data-range={Boolean(selected)} data-points={data.length} data-resolution={resolution} data-first-date={data[0].date} data-last-date={data.at(-1)!.date} data-range-start={selectedStart?.date} data-range-end={selectedEnd?.date}>
-    <svg ref={svgRef} width="100%" height={height} viewBox={`0 0 ${width} ${height}`} role="img" aria-label={`${label} ${candleMode ? 'candlestick' : barMode ? 'bar' : effectiveStyle === 'area' ? 'area' : 'line'} history. ${dataDescription} can be inspected with the pointer. Drag between dates to compare. Use arrow keys to inspect, Shift and arrows to compare, Escape to clear.`}
+    <svg ref={svgRef} width="100%" height={height} viewBox={`0 0 ${width} ${height}`} role="img" aria-label={`${label} ${candleMode ? 'candlestick' : barMode ? 'bar' : effectiveStyle === 'area' ? 'area' : 'line'} history. ${dataDescription} can be inspected with the pointer. Hold and drag between dates to compare; release to clear. Use arrow keys to inspect, Shift and arrows to compare, Escape to clear.`}
       tabIndex={0} onPointerMove={move}
       onPointerDown={event => {
         if (event.button !== 0) return
@@ -172,17 +172,14 @@ export function FinanceChart({ points, label = 'Price', formatValue, formatAxis 
         setHover(next.index)
         setPointer({ x: next.x, y: next.y })
         event.currentTarget.blur()
-        event.currentTarget.setPointerCapture(event.pointerId)
+        event.currentTarget.setPointerCapture?.(event.pointerId)
       }}
       onPointerUp={event => {
-        if (anchor.current !== null) {
-          const next = pointFromPointer(event.clientX, event.clientY)
-          setSelection(next.index === anchor.current ? null : [anchor.current, next.index])
-          setHover(next.index)
-          setPointer({ x: next.x, y: next.y })
-        }
         anchor.current = null
-        if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId)
+        setSelection(null)
+        setHover(null)
+        setPointer(null)
+        if (event.currentTarget.hasPointerCapture?.(event.pointerId)) event.currentTarget.releasePointerCapture?.(event.pointerId)
       }}
       onPointerCancel={() => { anchor.current = null; setSelection(null); setHover(null); setPointer(null) }}
       onPointerLeave={() => { if (anchor.current === null) { setHover(selected?.[1] ?? null); setPointer(null) } }}

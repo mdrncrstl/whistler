@@ -27,6 +27,34 @@ describe('Finance chart comparisons', () => {
     expect(screen.queryByRole('status')).toBeNull()
     cleanup()
   })
+
+  it('clears a pointer comparison when the drag is released', () => {
+    render(<FinanceChart points={[
+      { date: '2026-01-01', value: 100 },
+      { date: '2026-02-01', value: 120 },
+      { date: '2026-03-01', value: 140 },
+    ]} formatValue={format}/>)
+    const chart = screen.getByRole('img') as unknown as SVGElement
+    const plot = chart.parentElement
+    Object.defineProperty(chart, 'getBoundingClientRect', {
+      configurable: true,
+      value: () => ({ left: 0, top: 0, width: 800, height: 310, right: 800, bottom: 310 }),
+    })
+    chart.setPointerCapture = vi.fn()
+    chart.hasPointerCapture = vi.fn(() => true)
+    chart.releasePointerCapture = vi.fn()
+
+    fireEvent.pointerDown(chart, { button: 0, pointerId: 1, clientX: 100, clientY: 150 })
+    fireEvent.pointerMove(chart, { pointerId: 1, clientX: 650, clientY: 150 })
+    expect(plot).toHaveAttribute('data-range', 'true')
+    expect(screen.getByRole('status')).toBeInTheDocument()
+
+    fireEvent.pointerUp(chart, { button: 0, pointerId: 1, clientX: 650, clientY: 150 })
+    expect(plot).toHaveAttribute('data-range', 'false')
+    expect(screen.queryByRole('status')).toBeNull()
+    expect(chart.releasePointerCapture).toHaveBeenCalledWith(1)
+    cleanup()
+  })
   it('handles losses, missing history and a zero baseline without Infinity', () => {
     const {rerender} = render(<FinanceChart points={[]} formatValue={format}/>)
     expect(screen.getByText(/Not enough/)).toBeTruthy()
