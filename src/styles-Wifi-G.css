@@ -86,7 +86,7 @@ h1, h2, h3, p { margin-top: 0; }
 .button-primary { background: var(--green); color: #06100b; }
 .button-primary:hover:not(:disabled) { background: #82efb7; }
 .button-secondary { background: #122019; border-color: var(--line); }
-.button-secondary:hover:not(:disabled) { background: #182a20; border-color: var(--line-strong); }
+.button-secondary:hover:not(:disabled) { background: var(--surface-2); border-color: var(--line-strong); color: var(--text); }
 .button-ghost { background: transparent; border-color: var(--line); color: var(--muted); }
 .button-ghost:hover:not(:disabled) { color: var(--text); background: var(--surface-2); }
 .button-danger { background: color-mix(in srgb, var(--red) 9%, var(--surface)); border-color: color-mix(in srgb, var(--red) 34%, var(--line)); color: var(--red); }
