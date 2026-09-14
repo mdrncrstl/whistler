@@ -25,9 +25,9 @@ const assets: { value: AssetType; title: string; icon: typeof BarChart3 }[] = [
 ]
 
 const stepMeta = [
-  { label: 'Focus', title: 'What do you want to see first?', copy: 'Pick a starting point. You can use everything later.' },
-  { label: 'Structure', title: 'How many portfolios?', copy: 'Choose the view that matches your setup.' },
-  { label: 'Assets', title: 'What do you hold?', copy: 'Pick all that apply.' },
+  { title: 'What do you want to see first?', copy: 'Pick a starting point. You can use everything later.' },
+  { title: 'How many portfolios?', copy: 'Choose the view that matches your setup.' },
+  { title: 'What do you hold?', copy: 'Pick all that apply.' },
 ]
 
 export function Onboarding() {
@@ -86,7 +86,6 @@ export function Onboarding() {
 
     <section className="onboarding-card" aria-labelledby="onboarding-title">
       <div className="onboarding-card-header">
-        <span className="onboarding-panel-kicker">{meta.label}</span>
         <span className="onboarding-step-count"><strong>0{step}</strong><span aria-hidden="true"> / </span>03</span>
       </div>
 
@@ -115,7 +114,7 @@ export function Onboarding() {
 
       {error && <p className="onboarding-error" role="alert">{error}</p>}
 
-      <div className="onboarding-actions">
+      <div className={`onboarding-actions ${step === 1 ? 'onboarding-actions-first' : ''}`}>
         <button type="button" className="onboarding-back" disabled={step === 1 || busy} onClick={() => setStep((current) => Math.max(1, current - 1))}><ArrowLeft size={14} /><span>Back</span></button>
         <button type="button" className="onboarding-skip" disabled={busy} onClick={skip}>Skip and add holdings</button>
         <button type="button" className="onboarding-continue" disabled={!canContinue || busy} onClick={next}><span>{busy ? 'Saving...' : step === 3 ? 'Add my holdings' : 'Continue'}</span>{!busy && <ArrowRight size={16} />}</button>
