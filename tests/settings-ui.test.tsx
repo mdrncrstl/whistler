@@ -7,7 +7,7 @@ import { Settings } from '../src/features/Settings'
 
 function renderSettings() {
   return render(
-    <MemoryRouter initialEntries={['/workspace/settings']}>
+    <MemoryRouter initialEntries={['/deck/settings']}>
       <AccountAccessProvider session={null} demo>
         <PortfolioProvider session={null} demo>
           <Settings onExitDemo={() => undefined}/>
@@ -31,9 +31,9 @@ describe('settings workspace', () => {
     expect(screen.getByRole('combobox', { name: 'Default tax-lot method' })).toHaveValue('fifo')
 
     fireEvent.click(screen.getByRole('button', { name: /Data & connections/ }))
-    expect(await screen.findByRole('link', { name: /Manage connections/ })).toHaveAttribute('href', '/workspace/connections')
+    expect(await screen.findByRole('link', { name: /Manage connections/ })).toHaveAttribute('href', '/deck/connections')
     fireEvent.click(screen.getByRole('button', { name: /Plan & billing/ }))
-    expect(await screen.findByRole('link', { name: /View referrals/ })).toHaveAttribute('href', '/workspace/referrals')
+    expect(await screen.findByRole('link', { name: /View referrals/ })).toHaveAttribute('href', '/deck/referrals')
   })
 
   it('tracks and saves changed portfolio preferences', async () => {

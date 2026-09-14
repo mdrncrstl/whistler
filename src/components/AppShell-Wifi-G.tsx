@@ -14,49 +14,49 @@ type NavItem = { to: string; label: string; icon: LucideIcon; end?: boolean; sub
 type SearchCommand = { id: string; label: string; group: string; to: string; icon?: LucideIcon; holding?: Position }
 
 const portfolioItems: NavItem[] = [
-  { to: '/workspace', label: 'Portfolio', icon: BriefcaseBusiness, end: true },
-  { to: '/workspace/transactions', label: 'Transactions', icon: ArrowLeftRight },
+  { to: '/deck', label: 'Overview', icon: BriefcaseBusiness, end: true },
+  { to: '/deck/transactions', label: 'Activity', icon: ArrowLeftRight },
 ]
 
 const reportItems: NavItem[] = [
-  { to: '/workspace/reports/benchmark', label: 'Benchmark Analysis', icon: Scale },
-  { to: '/workspace/reports/performance', label: 'Performance Breakdown', icon: ListTree },
-  { to: '/workspace/reports/diversification', label: 'Diversification', icon: PieChart },
-  { to: '/workspace/reports/growth', label: 'Growth & Goals', icon: Target },
-  { to: '/workspace/reports/income', label: 'Income Breakdown', icon: CircleDollarSign, subGroup: 'Income' },
-  { to: '/workspace/reports/income-calendar', label: 'Income Calendar', icon: CalendarDays },
+  { to: '/deck/reports/benchmark', label: 'Benchmarks', icon: Scale },
+  { to: '/deck/reports/performance', label: 'Return breakdown', icon: ListTree },
+  { to: '/deck/reports/diversification', label: 'Portfolio mix', icon: PieChart },
+  { to: '/deck/reports/growth', label: 'Growth plan', icon: Target },
+  { to: '/deck/reports/income', label: 'Income overview', icon: CircleDollarSign, subGroup: 'Income' },
+  { to: '/deck/reports/income-calendar', label: 'Income schedule', icon: CalendarDays },
 ]
 
 const taxItems: NavItem[] = [
-  { to: '/workspace/tax', label: 'Overview', icon: Table2, end: true },
-  { to: '/workspace/tax/mytax', label: 'ATO MyTax', icon: FileText, subGroup: 'Tax Reports' },
-  { to: '/workspace/tax/capital-gains', label: 'Capital Gains Tax', icon: ListTree },
-  { to: '/workspace/tax/taxable-income', label: 'Taxable Income', icon: CircleDollarSign },
-  { to: '/workspace/tax/valuation', label: 'Portfolio Valuation', icon: WalletCards, subGroup: 'Tax Planning' },
-  { to: '/workspace/tax/unrealised', label: 'Unrealized Gains', icon: TrendingUp },
-  { to: '/workspace/tax/historical-cost', label: 'Recorded Cost', icon: History },
+  { to: '/deck/tax', label: 'Tax overview', icon: Table2, end: true },
+  { to: '/deck/tax/mytax', label: 'ATO MyTax', icon: FileText, subGroup: 'Tax records' },
+  { to: '/deck/tax/capital-gains', label: 'CGT report', icon: ListTree },
+  { to: '/deck/tax/taxable-income', label: 'Taxable income', icon: CircleDollarSign },
+  { to: '/deck/tax/valuation', label: 'Valuation', icon: WalletCards, subGroup: 'Planning' },
+  { to: '/deck/tax/unrealised', label: 'Open gains', icon: TrendingUp },
+  { to: '/deck/tax/historical-cost', label: 'Cost base', icon: History },
 ]
 
 const toolItems: NavItem[] = [
-  { to: '/workspace/tools/assistant', label: 'Masterdeck AI', icon: Sparkles },
-  { to: '/workspace/tools/groups', label: 'Custom Groups', icon: Layers3 },
-  { to: '/workspace/tools/supply-chain', label: 'Supply chain', icon: Network },
+  { to: '/deck/tools/assistant', label: 'Portfolio assistant', icon: Sparkles },
+  { to: '/deck/tools/groups', label: 'Holding groups', icon: Layers3 },
+  { to: '/deck/tools/supply-chain', label: 'Company relationships', icon: Network },
 ]
 
 const flatNavigation: NavItem[] = [
   ...portfolioItems, ...reportItems, ...taxItems, ...toolItems,
-  { to: '/workspace/settings', label: 'Settings', icon: Settings },
-  { to: '/workspace/holdings', label: 'Holdings', icon: BarChart3 },
-  { to: '/workspace/connections', label: 'Connections', icon: WalletCards },
-  { to: '/workspace/referrals', label: 'Refer & earn', icon: Gift },
+  { to: '/deck/settings', label: 'Account settings', icon: Settings },
+  { to: '/deck/holdings', label: 'Holdings', icon: BarChart3 },
+  { to: '/deck/connections', label: 'Connections', icon: WalletCards },
+  { to: '/deck/referrals', label: 'Refer & earn', icon: Gift },
 ]
 
 const mobileNavLabels: Record<string, string> = {
-  Portfolio: 'Portfolio',
-  Transactions: 'Activity',
-  'Benchmark Analysis': 'Benchmark',
-  'Performance Breakdown': 'Returns',
-  Diversification: 'Mix',
+  Overview: 'Overview',
+  Activity: 'Activity',
+  Benchmarks: 'Benchmarks',
+  'Return breakdown': 'Returns',
+  'Portfolio mix': 'Mix',
 }
 
 export function AppShell({ children, onExitDemo }: { children: ReactNode; onExitDemo: () => void }) {
@@ -163,18 +163,18 @@ export function AppShell({ children, onExitDemo }: { children: ReactNode; onExit
 
   const searchTerm = searchQuery.trim().toLowerCase()
   const searchCommands: SearchCommand[] = [
-    { id: 'page:portfolio', label: 'Portfolio', group: 'Navigation', to: '/workspace', icon: BriefcaseBusiness },
-    { id: 'page:add-holdings', label: 'Add holdings', group: 'Navigation', to: '/workspace/connections', icon: Plus },
-    { id: 'page:manage-portfolios', label: 'Manage portfolios', group: 'Navigation', to: '/workspace/settings', icon: Layers3 },
-    { id: 'page:masterdeck-ai', label: 'Masterdeck AI', group: 'Navigation', to: '/workspace/tools/assistant', icon: Sparkles },
-    { id: 'page:supply-chain', label: 'Supply chain', group: 'Navigation', to: '/workspace/tools/supply-chain', icon: Network },
-    { id: 'page:tax-reports', label: 'Tax reports', group: 'Tax Reporting', to: '/workspace/tax', icon: FileText },
-    { id: 'page:settings', label: 'Settings', group: 'Settings', to: '/workspace/settings', icon: Settings },
+    { id: 'page:portfolio', label: 'Overview', group: 'Navigation', to: '/deck', icon: BriefcaseBusiness },
+    { id: 'page:add-holdings', label: 'Add holdings', group: 'Navigation', to: '/deck/connections', icon: Plus },
+    { id: 'page:manage-portfolios', label: 'Manage portfolios', group: 'Navigation', to: '/deck/settings', icon: Layers3 },
+    { id: 'page:masterdeck-ai', label: 'Portfolio assistant', group: 'Navigation', to: '/deck/tools/assistant', icon: Sparkles },
+    { id: 'page:supply-chain', label: 'Company relationships', group: 'Navigation', to: '/deck/tools/supply-chain', icon: Network },
+    { id: 'page:tax-reports', label: 'Tax reports', group: 'Tax centre', to: '/deck/tax', icon: FileText },
+    { id: 'page:settings', label: 'Account settings', group: 'Settings', to: '/deck/settings', icon: Settings },
     ...bundle.holdings.map<SearchCommand>((holding) => ({
       id: `holding:${holding.provider}:${holding.account_name}:${holding.symbol}`,
       label: `${holding.symbol} · ${holding.name || holding.account_name}`,
       group: 'Holdings',
-      to: `/workspace/holdings/${encodeURIComponent(holding.symbol)}`,
+      to: `/deck/holdings/${encodeURIComponent(holding.symbol)}`,
       holding,
     })),
   ]
@@ -223,11 +223,11 @@ export function AppShell({ children, onExitDemo }: { children: ReactNode; onExit
           <div className="portfolio-menu-content">
           <span className="portfolio-menu-label">My portfolios</span>
           <button type="button" role="menuitem" aria-current="true" onClick={() => setPortfolioMenuOpen(false)}><Brand compact /><span><strong>All Portfolios</strong><small>{bundle.holdings.length} holdings · AUD</small></span><Check size={14} /></button>
-          <button type="button" role="menuitem" onClick={() => openCommand('/workspace/settings')}><Settings size={14}/><span>Manage portfolios</span><ChevronRight size={14}/></button>
+          <button type="button" role="menuitem" onClick={() => openCommand('/deck/settings')}><Settings size={14}/><span>Manage portfolios</span><ChevronRight size={14}/></button>
           </div>
         </MotionPopover>
       </div>
-      {trialActive && !hasPaidPlan && <NavLink className="sidebar-trial" to="/workspace/billing" onClick={() => setMobileOpen(false)}><span>Trial · {trialDaysRemaining} {trialDaysRemaining === 1 ? 'day' : 'days'} left</span><strong>Upgrade</strong></NavLink>}
+      {trialActive && !hasPaidPlan && <NavLink className="sidebar-trial" to="/deck/billing" onClick={() => setMobileOpen(false)}><span>Trial · {trialDaysRemaining} {trialDaysRemaining === 1 ? 'day' : 'days'} left</span><strong>Upgrade</strong></NavLink>}
       <nav className="side-nav" aria-label="Portfolio navigation">
         <div className="nav-section">
           <span className="nav-group-label">Portfolio</span>
@@ -239,14 +239,14 @@ export function AppShell({ children, onExitDemo }: { children: ReactNode; onExit
         </div>
 
         <div className="nav-section nav-expanded-section">
-          <span className="nav-group-label">Reports</span>
-          <button className="nav-parent" type="button" aria-expanded={performanceOpen} onClick={() => setPerformanceOpen(!performanceOpen)}><LineChart size={15}/><span>Performance</span><ChevronDown className="section-chevron" size={13}/></button>
+          <span className="nav-group-label">Insights</span>
+          <button className="nav-parent" type="button" aria-expanded={performanceOpen} onClick={() => setPerformanceOpen(!performanceOpen)}><LineChart size={15}/><span>Returns</span><ChevronDown className="section-chevron" size={13}/></button>
           <div className={`nav-branch ${performanceOpen ? 'open' : ''}`} aria-hidden={!performanceOpen} inert={!performanceOpen}><div className="nav-branch-content">{reportItems.map(({ to, label, icon: Icon, subGroup, end }) => <div className="nav-child-wrap" key={to}>
             {subGroup && <span className="nav-subgroup-label">{subGroup}</span>}
             <NavLink className="nav-child" to={to} end={end} onClick={() => setMobileOpen(false)}><Icon size={15}/><span>{label}</span></NavLink>
           </div>)}</div></div>
 
-          <button className="nav-parent nav-tax-parent" type="button" aria-expanded={taxOpen} onClick={() => setTaxOpen(!taxOpen)}><FileText size={15}/><span>Tax Reporting</span><ChevronDown className="section-chevron" size={13}/></button>
+          <button className="nav-parent nav-tax-parent" type="button" aria-expanded={taxOpen} onClick={() => setTaxOpen(!taxOpen)}><FileText size={15}/><span>Tax centre</span><ChevronDown className="section-chevron" size={13}/></button>
           <div className={`nav-branch ${taxOpen ? 'open' : ''}`} aria-hidden={!taxOpen} inert={!taxOpen}><div className="nav-branch-content">{taxItems.map(({ to, label, icon: Icon, subGroup, end }) => <div className="nav-child-wrap" key={to}>
             {subGroup && <span className="nav-subgroup-label">{subGroup}</span>}
             <NavLink className="nav-child" to={to} end={end} onClick={() => setMobileOpen(false)}><Icon size={15}/><span>{label}</span></NavLink>
@@ -259,12 +259,12 @@ export function AppShell({ children, onExitDemo }: { children: ReactNode; onExit
         </div>
 
         <div className="nav-section nav-settings-section">
-          <NavLink to="/workspace/settings" onClick={() => setMobileOpen(false)}><Settings size={15}/><span>Settings</span></NavLink>
+          <NavLink to="/deck/settings" onClick={() => setMobileOpen(false)}><Settings size={15}/><span>Account settings</span></NavLink>
         </div>
       </nav>
       <div className="sidebar-foot">
 
-        <NavLink className="sidebar-feedback" to="/workspace/settings"><MessageSquare size={15}/><span>Feedback</span></NavLink>
+        <NavLink className="sidebar-feedback" to="/deck/settings"><MessageSquare size={15}/><span>Send feedback</span></NavLink>
         <button className="sidebar-collapse-toggle" type="button" aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'} onClick={() => setSidebarCollapsed(!sidebarCollapsed)}>{sidebarCollapsed ? <ChevronsRight size={15}/> : <ChevronsLeft size={15}/>}<span>{sidebarCollapsed ? 'Expand' : 'Collapse'}</span></button>
       </div>
     </>
@@ -284,7 +284,7 @@ export function AppShell({ children, onExitDemo }: { children: ReactNode; onExit
         <header className="topbar">
           <div className="topbar-title">
             <IconButton label="Open navigation" aria-expanded={mobileOpen} onClick={() => setMobileOpen(true)}><Menu size={20} /></IconButton>
-            <div><strong>{current.label}</strong><span>{demo ? 'Illustrative demo data' : 'Live private workspace'}</span></div>
+            <div><strong>{current.label}</strong><span>{demo ? 'Illustrative demo data' : 'Live private portfolio'}</span></div>
           </div>
           <div className="topbar-actions">
             <button className="global-search" type="button" aria-label={`Search ticker, company, or page (${searchShortcut})`} onClick={() => { setSearchQuery(''); setActiveCommandIndex(0); setSearchOpen(true) }}><Search size={15}/><span>Search ticker, company, or page…</span><kbd>{searchShortcut}</kbd></button>
@@ -293,12 +293,12 @@ export function AppShell({ children, onExitDemo }: { children: ReactNode; onExit
               <div className={`notifications-wrap menu-anchor ${notificationsOpen ? 'is-open' : ''}`}><IconButton label="Notifications" onClick={() => { setNotificationsOpen((open) => !open); setPortfolioMenuOpen(false); setAccountMenuOpen(false) }}><Bell size={17}/></IconButton><MotionPopover open={notificationsOpen} className="notifications-menu" role="status"><header><strong>Notifications</strong><button onClick={() => setNotificationsOpen(false)} aria-label="Close notifications"><X size={14}/></button></header><div><span><Bell size={17}/></span><strong>You’re all caught up</strong><p>Sync alerts and portfolio updates will appear here.</p></div></MotionPopover></div>
               <IconButton label={`Use ${theme === 'light' ? 'dark' : 'light'} theme`} onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}>{theme === 'light' ? <Moon size={17}/> : <Sun size={17}/>}</IconButton>
               <div className={`account-menu-wrap menu-anchor ${accountMenuOpen ? 'is-open' : ''}`}><button className="topbar-avatar" type="button" title={profile?.email || undefined} aria-label="Open account menu" aria-haspopup="menu" aria-expanded={accountMenuOpen} onClick={() => { setAccountMenuOpen((open) => !open); setPortfolioMenuOpen(false); setNotificationsOpen(false) }}>{profile?.avatar_url ? <img src={profile.avatar_url} alt="" referrerPolicy="no-referrer" /> : (profile?.full_name || profile?.email || 'M').slice(0, 1).toUpperCase()}</button><MotionPopover open={accountMenuOpen} className="account-menu" role="menu">
-                <header><span className="account-avatar"><UserRound size={18}/></span><span><strong>{profile?.full_name || 'Masterdeck investor'}</strong><small>{profile?.email || (demo ? 'Demo workspace' : 'Private workspace')}</small></span></header>
+                <header><span className="account-avatar"><UserRound size={18}/></span><span><strong>{profile?.full_name || 'Masterdeck investor'}</strong><small>{profile?.email || (demo ? 'Demo portfolio' : 'Private portfolio')}</small></span></header>
                 <button role="menuitem" onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}><Moon size={15}/><span>Dark mode</span><span className={`menu-switch ${theme === 'dark' ? 'on' : ''}`} aria-hidden="true"/></button>
-                <button role="menuitem" onClick={() => openCommand('/workspace/settings')}><Settings size={15}/><span>Settings</span></button>
-                <button role="menuitem" onClick={() => openCommand('/workspace/billing')}><ArrowUpRight size={15}/><span>Change Plan</span></button>
-                <button role="menuitem" onClick={() => openCommand('/workspace/billing')}><CreditCard size={15}/><span>Billing &amp; Subscription</span></button>
-                <button role="menuitem" onClick={() => openCommand('/workspace/referrals')}><Gift size={15}/><span>Refer a Friend</span></button>
+                <button role="menuitem" onClick={() => openCommand('/deck/settings')}><Settings size={15}/><span>Account settings</span></button>
+                <button role="menuitem" onClick={() => openCommand('/deck/billing')}><ArrowUpRight size={15}/><span>Change Plan</span></button>
+                <button role="menuitem" onClick={() => openCommand('/deck/billing')}><CreditCard size={15}/><span>Billing &amp; Subscription</span></button>
+                <button role="menuitem" onClick={() => openCommand('/deck/referrals')}><Gift size={15}/><span>Refer a Friend</span></button>
                 <button role="menuitem" onClick={signOut}><LogOut size={15}/><span>Log out</span></button>
               </MotionPopover></div>
             </div>
@@ -339,7 +339,7 @@ export function AppShell({ children, onExitDemo }: { children: ReactNode; onExit
       </nav>
       <AnimatePresence initial={false}>{notice && <Toast key={notice.message} tone={notice.tone} message={notice.message} onClose={() => setNotice(null)} />}</AnimatePresence>
       {searchOpen && <div className="command-backdrop" role="presentation" onMouseDown={() => setSearchOpen(false)}>
-        <div ref={commandPaletteRef} className="command-palette" role="dialog" aria-modal="true" aria-label="Search workspace" onMouseDown={(event) => event.stopPropagation()}>
+        <div ref={commandPaletteRef} className="command-palette" role="dialog" aria-modal="true" aria-label="Search your deck" onMouseDown={(event) => event.stopPropagation()}>
           <label><Search size={17}/><input autoFocus value={searchQuery} onChange={(event) => { setSearchQuery(event.target.value); setActiveCommandIndex(0) }} onKeyDown={(event) => {
             if (event.key === 'ArrowDown') { event.preventDefault(); setActiveCommandIndex((index) => searchCommands.length ? (index + 1) % searchCommands.length : 0) }
             if (event.key === 'ArrowUp') { event.preventDefault(); setActiveCommandIndex((index) => searchCommands.length ? (index - 1 + searchCommands.length) % searchCommands.length : 0) }
@@ -348,7 +348,7 @@ export function AppShell({ children, onExitDemo }: { children: ReactNode; onExit
             if (event.key === 'Enter' && searchCommands[activeCommandIndex]) { event.preventDefault(); openCommand(searchCommands[activeCommandIndex].to) }
             if (event.key === 'Escape') { event.preventDefault(); setSearchOpen(false) }
           }} placeholder="Search ticker, company, or page…" aria-label="Search or jump to" aria-activedescendant={searchCommands[activeCommandIndex] ? `command-result-${activeCommandIndex}` : undefined}/><kbd>ESC</kbd></label>
-          <div className="command-results">{searchCommands.length ? ['Holdings', 'Navigation', 'Tax Reporting', 'Settings'].map((group) => {
+          <div className="command-results">{searchCommands.length ? ['Holdings', 'Navigation', 'Tax centre', 'Settings'].map((group) => {
             const items = searchCommands.filter((item) => item.group === group)
             if (!items.length) return null
             return <section key={group}><span>{group}</span>{items.map((item) => {

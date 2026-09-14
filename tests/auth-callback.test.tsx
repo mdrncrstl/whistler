@@ -6,7 +6,7 @@ import { AuthCallback } from '../src/components/AuthCallback'
 const auth = vi.hoisted(() => ({ getSession: vi.fn(), exchangeCodeForSession: vi.fn() }))
 vi.mock('../src/lib/supabase', () => ({ authClient: { auth } }))
 afterEach(() => { cleanup(); vi.clearAllMocks() })
-const renderCallback = () => render(<StrictMode><MemoryRouter initialEntries={['/auth/callback']}><Routes><Route path="/auth/callback" element={<AuthCallback/>}/><Route path="/workspace" element={<h1>Portfolio ready</h1>}/></Routes></MemoryRouter></StrictMode>)
+const renderCallback = () => render(<StrictMode><MemoryRouter initialEntries={['/auth/callback']}><Routes><Route path="/auth/callback" element={<AuthCallback/>}/><Route path="/deck" element={<h1>Portfolio ready</h1>}/></Routes></MemoryRouter></StrictMode>)
 describe('OAuth callback', () => {
   it('opens the app using the session already exchanged by Supabase', async () => {
     auth.getSession.mockResolvedValue({ data: { session: { access_token: 'test' } }, error: null })

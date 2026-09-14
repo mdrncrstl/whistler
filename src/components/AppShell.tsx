@@ -10,13 +10,13 @@ import { Brand, Button, IconButton, Toast } from './ui'
 export { AppShell } from './AppShell-Wifi-G'
 
 const navigation = [
-  { to: '/workspace', label: 'Overview', icon: BarChart3, end: true },
-  { to: '/workspace/holdings', label: 'Holdings', icon: BriefcaseBusiness },
-  { to: '/workspace/transactions', label: 'Transactions', icon: TableProperties },
-  { to: '/workspace/income', label: 'Income', icon: CircleDollarSign },
-  { to: '/workspace/tax', label: 'Tax centre', icon: Landmark },
-  { to: '/workspace/connections', label: 'Connections', icon: WalletCards },
-  { to: '/workspace/settings', label: 'Settings', icon: Settings },
+  { to: '/deck', label: 'Portfolio overview', icon: BarChart3, end: true },
+  { to: '/deck/holdings', label: 'Holdings', icon: BriefcaseBusiness },
+  { to: '/deck/transactions', label: 'Activity', icon: TableProperties },
+  { to: '/deck/income', label: 'Income', icon: CircleDollarSign },
+  { to: '/deck/tax', label: 'Tax centre', icon: Landmark },
+  { to: '/deck/connections', label: 'Connections', icon: WalletCards },
+  { to: '/deck/settings', label: 'Account settings', icon: Settings },
 ]
 
 export function LegacyAppShell({ children, onExitDemo }: { children: ReactNode; onExitDemo: () => void }) {
@@ -62,7 +62,7 @@ export function LegacyAppShell({ children, onExitDemo }: { children: ReactNode; 
         <header className="topbar">
           <div className="topbar-title">
             <IconButton label="Open navigation" onClick={() => setMobileOpen(true)}><Menu size={20} /></IconButton>
-            <div><strong>{current.label}</strong><span>{demo ? 'Illustrative demo data' : 'Live private workspace'}</span></div>
+            <div><strong>{current.label}</strong><span>{demo ? 'Illustrative demo data' : 'Live private portfolio'}</span></div>
           </div>
           <div className="topbar-actions">
             <Button variant="ghost" icon={RefreshCw} busy={action === 'refresh-quotes'} onClick={() => refreshQuotes()}>Refresh prices</Button>

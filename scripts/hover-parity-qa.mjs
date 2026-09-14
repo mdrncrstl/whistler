@@ -26,7 +26,7 @@ async function open(theme) {
   const page = await ctx.newPage()
   await page.goto(base, { waitUntil: 'domcontentloaded' })
   await page.evaluate((t) => { sessionStorage.setItem('masterdeck-demo', 'true'); if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark') }, theme)
-  await page.goto(base + '/workspace', { waitUntil: 'networkidle' })
+  await page.goto(base + '/deck', { waitUntil: 'networkidle' })
   await page.evaluate((t) => { if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark') }, theme)
   await page.waitForSelector('.portfolio-metrics .metric-tab')
   await page.waitForTimeout(900)
@@ -87,7 +87,7 @@ for (const theme of ['light', 'dark']) {
   check(`[${theme}] row hover changes background`, idleRow !== hotRow, `${idleRow} -> ${hotRow}`)
 
   // --- chart colour ----------------------------------------------------------
-  await page.goto(base + '/workspace', { waitUntil: 'networkidle' })
+  await page.goto(base + '/deck', { waitUntil: 'networkidle' })
   await page.evaluate((t) => { if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark') }, theme)
   await page.waitForSelector('.portfolio-main-chart path.recharts-area-curve', { timeout: 15000 })
   const stroke = await page.evaluate(() => {

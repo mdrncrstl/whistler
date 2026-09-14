@@ -44,7 +44,7 @@ Deno.serve(async (request) => {
         metadata: { user_id: user.id, plan: selected.plan, billing_interval: interval },
       },
       metadata: { user_id: user.id, plan: selected.plan, billing_interval: interval },
-      success_url: `${origin}/workspace/billing?checkout=success`, cancel_url: `${origin}/workspace/billing?checkout=cancelled`,
+      success_url: `${origin}/deck/billing?checkout=success`, cancel_url: `${origin}/deck/billing?checkout=cancelled`,
     })
     return json({ url: session.url }, 200, requestOrigin)
   } catch (error) { return json({ error: error instanceof Error ? error.message : 'Checkout could not start.' }, 400, requestOrigin) }

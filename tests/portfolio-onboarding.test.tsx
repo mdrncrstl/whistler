@@ -30,7 +30,7 @@ function LocationReadout() {
 }
 
 function renderScreen(node: ReactNode) {
-  return render(<MemoryRouter initialEntries={['/workspace']}>{node}<LocationReadout /></MemoryRouter>)
+  return render(<MemoryRouter initialEntries={['/deck']}>{node}<LocationReadout /></MemoryRouter>)
 }
 
 describe('first portfolio onboarding', () => {
@@ -46,25 +46,25 @@ describe('first portfolio onboarding', () => {
   ])('shows clear setup choices on the empty %s screen', (_name, node) => {
     renderScreen(node)
     expect(screen.getByRole('heading', { name: 'Build your portfolio' })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /Import portfolio records/ })).toHaveAttribute('href', '/workspace/connections?setup=import')
-    expect(screen.getByRole('link', { name: /Browse broker guides/ })).toHaveAttribute('href', '/workspace/connections')
+    expect(screen.getByRole('link', { name: /Import portfolio records/ })).toHaveAttribute('href', '/deck/connections?setup=import')
+    expect(screen.getByRole('link', { name: /Browse broker guides/ })).toHaveAttribute('href', '/deck/connections')
     expect(screen.getByText(/cannot place or modify trades/i)).toBeInTheDocument()
   })
 
   it('takes the import action to the exact connection setup state', () => {
     renderScreen(<Overview />)
     fireEvent.click(screen.getByRole('link', { name: /Import portfolio records/ }))
-    expect(screen.getByLabelText('Current location')).toHaveTextContent('/workspace/connections?setup=import')
+    expect(screen.getByLabelText('Current location')).toHaveTextContent('/deck/connections?setup=import')
   })
 
   it('opens the IBKR form when that setup path is selected', () => {
-    render(<GoogleOAuthProvider clientId="test-client"><MemoryRouter initialEntries={['/workspace/connections?setup=ibkr']}><Connections /></MemoryRouter></GoogleOAuthProvider>)
+    render(<GoogleOAuthProvider clientId="test-client"><MemoryRouter initialEntries={['/deck/connections?setup=ibkr']}><Connections /></MemoryRouter></GoogleOAuthProvider>)
     expect(screen.getByRole('dialog', { name: 'Connect a direct read-only sync' })).toBeInTheDocument()
     expect(screen.getByLabelText('Flex Web Service token')).toBeInTheDocument()
   })
 
   it('focuses the report uploader when the import path is selected', async () => {
-    render(<GoogleOAuthProvider clientId="test-client"><MemoryRouter initialEntries={['/workspace/connections?setup=import']}><Connections /></MemoryRouter></GoogleOAuthProvider>)
+    render(<GoogleOAuthProvider clientId="test-client"><MemoryRouter initialEntries={['/deck/connections?setup=import']}><Connections /></MemoryRouter></GoogleOAuthProvider>)
     expect(await screen.findByRole('button', { name: 'Choose CSV file' })).toHaveFocus()
   })
 })

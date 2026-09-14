@@ -4,13 +4,23 @@
   "cleanUrls": true,
   "redirects": [
     {
+      "source": "/workspace",
+      "destination": "/deck",
+      "permanent": true
+    },
+    {
+      "source": "/workspace/:path*",
+      "destination": "/deck/:path*",
+      "permanent": true
+    },
+    {
       "source": "/app",
-      "destination": "/workspace",
+      "destination": "/deck",
       "permanent": true
     },
     {
       "source": "/app/:path*",
-      "destination": "/workspace/:path*",
+      "destination": "/deck/:path*",
       "permanent": true
     }
   ],

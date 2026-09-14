@@ -20,7 +20,7 @@ describe('Navexa-depth workspace routes', () => {
   afterEach(() => { cleanup(); vi.useRealTimers(); vi.unstubAllGlobals() })
 
   it('scopes the tax income ledger to the selected financial year', () => {
-    renderRoute('/workspace/tax/taxable-income', '/workspace/tax/:report', <TaxCentre/>)
+    renderRoute('/deck/tax/taxable-income', '/deck/tax/:report', <TaxCentre/>)
     fireEvent.change(screen.getByLabelText('Financial year'), {target:{value:'2026/27'}})
     expect(screen.getByRole('row', {name:/Open VGS holding/})).toBeInTheDocument()
     expect(screen.queryByRole('row', {name:/Open AAPL holding/})).not.toBeInTheDocument()
@@ -29,10 +29,10 @@ describe('Navexa-depth workspace routes', () => {
   })
 
   it('does not invent franking amounts or annualised portfolio returns', () => {
-    const tax = renderRoute('/workspace/tax/mytax', '/workspace/tax/:report', <TaxCentre/>)
+    const tax = renderRoute('/deck/tax/mytax', '/deck/tax/:report', <TaxCentre/>)
     expect(screen.getByRole('row', {name:'11U Franking credits Not supplied Annual statement'})).toBeInTheDocument()
     tax.unmount()
-    renderRoute('/workspace', '/workspace', <Overview/>)
+    renderRoute('/deck', '/deck', <Overview/>)
     expect(screen.queryByText('p.a.')).not.toBeInTheDocument()
     expect(within(screen.getByRole('row', {name:'Open AAPL holding'})).getByText('$7,797.40')).toBeInTheDocument()
     fireEvent.click(screen.getByRole('tab', {name:/Capital Gain/}))
@@ -40,51 +40,51 @@ describe('Navexa-depth workspace routes', () => {
   })
 
   it('matches the tax return flow with an expandable capital breakdown', () => {
-    renderRoute('/workspace/tax/mytax?from=2025-07-01&to=2026-06-30', '/workspace/tax/:report', <TaxCentre/>)
+    renderRoute('/deck/tax/mytax?from=2025-07-01&to=2026-06-30', '/deck/tax/:report', <TaxCentre/>)
     expect(screen.getByLabelText('Financial year')).toHaveValue('2025/26')
     const breakdown = screen.getByRole('button', { name: /Capital Gains Tax Breakdown/ })
     expect(breakdown).toHaveAttribute('aria-expanded', 'false')
     fireEvent.click(breakdown)
     expect(breakdown).toHaveAttribute('aria-expanded', 'true')
     expect(screen.getByText('Shares in Australian listed companies')).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /Go to CGT report/ })).toHaveAttribute('href', '/workspace/tax/capital-gains')
-    expect(screen.getByRole('link', { name: /Go to Taxable Income report/ })).toHaveAttribute('href', '/workspace/tax/taxable-income')
+    expect(screen.getByRole('link', { name: /Go to CGT report/ })).toHaveAttribute('href', '/deck/tax/capital-gains')
+    expect(screen.getByRole('link', { name: /Go to Taxable Income report/ })).toHaveAttribute('href', '/deck/tax/taxable-income')
     expect(screen.getByRole('button', { name: 'Export' })).toBeInTheDocument()
   })
 
   it('renders the full nested report and tax sidebar hierarchy', () => {
-    render(<MemoryRouter initialEntries={['/workspace']}><PortfolioProvider session={null} demo><AppShell onExitDemo={() => undefined}><div>Workspace</div></AppShell></PortfolioProvider></MemoryRouter>)
+    render(<MemoryRouter initialEntries={['/deck']}><PortfolioProvider session={null} demo><AppShell onExitDemo={() => undefined}><div>Workspace</div></AppShell></PortfolioProvider></MemoryRouter>)
     const nav = screen.getByRole('navigation', { name: 'Portfolio navigation' })
-    expect(within(nav).getByText('Performance')).toBeInTheDocument()
-    expect(within(nav).getByRole('link', { name: 'Benchmark Analysis' })).toBeInTheDocument()
-    expect(within(nav).getByText('Tax Reports')).toBeInTheDocument()
-    expect(within(nav).getByRole('link', { name: 'Recorded Cost' })).toBeInTheDocument()
+    expect(within(nav).getByText('Returns')).toBeInTheDocument()
+    expect(within(nav).getByRole('link', { name: 'Benchmarks' })).toBeInTheDocument()
+    expect(within(nav).getByText('Tax records')).toBeInTheDocument()
+    expect(within(nav).getByRole('link', { name: 'Cost base' })).toBeInTheDocument()
     expect(within(nav).queryByRole('link', { name: 'Holdings' })).not.toBeInTheDocument()
     expect(within(nav).queryByRole('link', { name: 'Connections' })).not.toBeInTheDocument()
   })
 
   it('collapses report sections and the complete sidebar rail', () => {
-    const { container } = render(<MemoryRouter initialEntries={['/workspace']}><PortfolioProvider session={null} demo><AppShell onExitDemo={() => undefined}><div>Workspace</div></AppShell></PortfolioProvider></MemoryRouter>)
+    const { container } = render(<MemoryRouter initialEntries={['/deck']}><PortfolioProvider session={null} demo><AppShell onExitDemo={() => undefined}><div>Workspace</div></AppShell></PortfolioProvider></MemoryRouter>)
     const nav = screen.getByRole('navigation', { name: 'Portfolio navigation' })
-    fireEvent.click(within(nav).getByRole('button', { name: 'Performance' }))
-    expect(within(nav).getByRole('button', { name: 'Performance' })).toHaveAttribute('aria-expanded', 'false')
-    expect(within(nav).queryByRole('link', { name: 'Benchmark Analysis' })).not.toBeInTheDocument()
+    fireEvent.click(within(nav).getByRole('button', { name: 'Returns' }))
+    expect(within(nav).getByRole('button', { name: 'Returns' })).toHaveAttribute('aria-expanded', 'false')
+    expect(within(nav).queryByRole('link', { name: 'Benchmarks' })).not.toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'Collapse sidebar' }))
     expect(container.querySelector('.app-shell')).toHaveClass('sidebar-collapsed')
     expect(screen.getByRole('button', { name: 'Expand sidebar' })).toBeInTheDocument()
   })
 
   it('opens the portfolio selector and keyboard command palette', () => {
-    render(<MemoryRouter initialEntries={['/workspace']}><PortfolioProvider session={null} demo><AppShell onExitDemo={() => undefined}><div>Workspace</div></AppShell></PortfolioProvider></MemoryRouter>)
+    render(<MemoryRouter initialEntries={['/deck']}><PortfolioProvider session={null} demo><AppShell onExitDemo={() => undefined}><div>Workspace</div></AppShell></PortfolioProvider></MemoryRouter>)
     fireEvent.click(screen.getByRole('button', { name: /All Portfolios/i }))
     expect(screen.getByRole('menuitem', { name: /Manage portfolios/ })).toBeInTheDocument()
     fireEvent.keyDown(window, { key: 'k', ctrlKey: true })
-    expect(screen.getByRole('dialog', { name: 'Search workspace' })).toBeInTheDocument()
+    expect(screen.getByRole('dialog', { name: 'Search your deck' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Add holdings/ })).toBeInTheDocument()
   })
 
   it('supports keyboard selection in the command palette and closes the mobile drawer', async () => {
-    const { container } = render(<MemoryRouter initialEntries={['/workspace']}><PortfolioProvider session={null} demo><AppShell onExitDemo={() => undefined}><div>Workspace</div></AppShell></PortfolioProvider></MemoryRouter>)
+    const { container } = render(<MemoryRouter initialEntries={['/deck']}><PortfolioProvider session={null} demo><AppShell onExitDemo={() => undefined}><div>Workspace</div></AppShell></PortfolioProvider></MemoryRouter>)
     fireEvent.keyDown(window, { key: 'k', ctrlKey: true })
     const input = screen.getByRole('textbox', { name: 'Search or jump to' })
     fireEvent.change(input, { target: { value: 'port' } })
@@ -101,7 +101,7 @@ describe('Navexa-depth workspace routes', () => {
   })
 
   it('opens the complete account menu and changes theme without leaving the page', () => {
-    render(<MemoryRouter initialEntries={['/workspace']}><PortfolioProvider session={null} demo><AppShell onExitDemo={() => undefined}><div>Workspace</div></AppShell></PortfolioProvider></MemoryRouter>)
+    render(<MemoryRouter initialEntries={['/deck']}><PortfolioProvider session={null} demo><AppShell onExitDemo={() => undefined}><div>Workspace</div></AppShell></PortfolioProvider></MemoryRouter>)
     fireEvent.click(screen.getByRole('button', { name: 'Open account menu' }))
     expect(screen.getByRole('menuitem', { name: /Billing & Subscription/ })).toBeInTheDocument()
     expect(screen.getByRole('menuitem', { name: /Refer a Friend/ })).toBeInTheDocument()
@@ -110,7 +110,7 @@ describe('Navexa-depth workspace routes', () => {
   })
 
   it('makes the portfolio filter, chart, groups and columns interactive', () => {
-    renderRoute('/workspace', '/workspace', <Overview/>)
+    renderRoute('/deck', '/deck', <Overview/>)
     fireEvent.click(screen.getByRole('button', { name: 'All Time' }))
     fireEvent.click(screen.getByRole('button', { name: 'Custom range' }))
     expect(screen.getByRole('region', { name: 'Custom date range' })).toBeInTheDocument()
@@ -137,7 +137,7 @@ describe('Navexa-depth workspace routes', () => {
   })
 
   it('opens a full holding route with working tabs instead of a modal', () => {
-    renderRoute('/workspace/holdings/AAPL', '/workspace/holdings/:symbol', <HoldingDetail/>)
+    renderRoute('/deck/holdings/AAPL', '/deck/holdings/:symbol', <HoldingDetail/>)
     expect(screen.getByRole('heading', { name: 'Apple Inc.' })).toBeInTheDocument()
     const capitalMetric = screen.getByText('Capital Gain').closest('article')!
     const oneYearCapital = within(capitalMetric).getByText(/\$/).textContent
@@ -160,14 +160,14 @@ describe('Navexa-depth workspace routes', () => {
     fireEvent.change(screen.getByPlaceholderText(/Add a note about AAPL/), { target: { value: 'Review allocation' } })
     fireEvent.click(screen.getByRole('button', { name: 'Save note' }))
     expect(window.localStorage.getItem('masterdeck-note-AAPL')).toBe('Review allocation')
-    expect(screen.getByRole('link', { name: /View supply chain/ })).toHaveAttribute('href', '/workspace/tools/supply-chain/AAPL')
+    expect(screen.getByRole('link', { name: /View supply chain/ })).toHaveAttribute('href', '/deck/tools/supply-chain/AAPL')
     fireEvent.click(screen.getByRole('button', { name: 'Overview' }))
     expect(screen.getByRole('heading', { name: 'Company relationships' })).toBeInTheDocument()
     expect(screen.getByRole('group', { name: 'Relationship filters' })).toBeInTheDocument()
   })
 
   it('renders the performance controls, metrics and grouped ledger', async () => {
-    renderRoute('/workspace/reports/performance', '/workspace/reports/:report', <Reports/>)
+    renderRoute('/deck/reports/performance', '/deck/reports/:report', <Reports/>)
     expect(await screen.findByRole('heading', { name: 'Performance breakdown' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Total return' })).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'Income return' }))
@@ -177,7 +177,7 @@ describe('Navexa-depth workspace routes', () => {
   })
 
   it('renders and navigates the selectable daily movement calendar', async () => {
-    renderRoute('/workspace/reports/income-calendar', '/workspace/reports/:report', <Reports/>)
+    renderRoute('/deck/reports/income-calendar', '/deck/reports/:report', <Reports/>)
     expect(await screen.findByRole('heading', { name: 'Income calendar' })).toBeInTheDocument()
     const calendar = screen.getByRole('grid', { name: 'August 2026 portfolio movement' })
     expect(within(calendar).getByRole('gridcell', { name: /1 August 2026, \+\$8,455/ })).toBeInTheDocument()
@@ -190,20 +190,20 @@ describe('Navexa-depth workspace routes', () => {
   })
 
   it('opens a holding when any diversification row cell is clicked', async () => {
-    render(<MemoryRouter initialEntries={['/workspace/reports/diversification']}><PortfolioProvider session={null} demo><Routes><Route path="/workspace/reports/:report" element={<Reports/>}/><Route path="/workspace/holdings/:symbol" element={<HoldingDetail/>}/></Routes></PortfolioProvider></MemoryRouter>)
+    render(<MemoryRouter initialEntries={['/deck/reports/diversification']}><PortfolioProvider session={null} demo><Routes><Route path="/deck/reports/:report" element={<Reports/>}/><Route path="/deck/holdings/:symbol" element={<HoldingDetail/>}/></Routes></PortfolioProvider></MemoryRouter>)
     const appleRow = await screen.findByRole('row', { name: /Open AAPL holding/ })
     fireEvent.click(within(appleRow).getAllByRole('cell').at(-1)!)
     expect(await screen.findByRole('heading', { name: 'Apple Inc.' })).toBeInTheDocument()
   })
 
   it('opens report assets from the keyboard and exposes holdings in global search', async () => {
-    const { unmount } = render(<MemoryRouter initialEntries={['/workspace/reports/performance']}><PortfolioProvider session={null} demo><Routes><Route path="/workspace/reports/:report" element={<Reports/>}/><Route path="/workspace/holdings/:symbol" element={<HoldingDetail/>}/></Routes></PortfolioProvider></MemoryRouter>)
+    const { unmount } = render(<MemoryRouter initialEntries={['/deck/reports/performance']}><PortfolioProvider session={null} demo><Routes><Route path="/deck/reports/:report" element={<Reports/>}/><Route path="/deck/holdings/:symbol" element={<HoldingDetail/>}/></Routes></PortfolioProvider></MemoryRouter>)
     const appleRow = await screen.findByRole('row', { name: /Open AAPL holding/ })
     fireEvent.keyDown(appleRow, { key: 'Enter' })
     expect(await screen.findByRole('heading', { name: 'Apple Inc.' })).toBeInTheDocument()
     unmount()
 
-    render(<MemoryRouter initialEntries={['/workspace']}><PortfolioProvider session={null} demo><AppShell onExitDemo={() => undefined}><div>Workspace</div></AppShell></PortfolioProvider></MemoryRouter>)
+    render(<MemoryRouter initialEntries={['/deck']}><PortfolioProvider session={null} demo><AppShell onExitDemo={() => undefined}><div>Workspace</div></AppShell></PortfolioProvider></MemoryRouter>)
     fireEvent.keyDown(window, { key: 'k', ctrlKey: true })
     const searchInput = screen.getByRole('textbox', { name: 'Search or jump to' })
     fireEvent.change(searchInput, { target: { value: 'AAPL' } })
@@ -215,7 +215,7 @@ describe('Navexa-depth workspace routes', () => {
   })
 
   it('renders the tax overview finalisation and full report index', async () => {
-    renderRoute('/workspace/tax', '/workspace/tax/:report?', <TaxCentre/>)
+    renderRoute('/deck/tax', '/deck/tax/:report?', <TaxCentre/>)
     expect(await screen.findByRole('heading', { name: 'Tax overview' })).toBeInTheDocument()
     expect(screen.getByText(/items to review/)).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /ATO myTax/ })).toBeInTheDocument()
@@ -223,8 +223,8 @@ describe('Navexa-depth workspace routes', () => {
   })
 
   it('answers a Deck AI portfolio question in the chat', async () => {
-    window.history.pushState({}, '', '/workspace/tools/assistant')
-    renderRoute('/workspace/tools/assistant', '/workspace/tools/:tool', <Tools/>)
+    window.history.pushState({}, '', '/deck/tools/assistant')
+    renderRoute('/deck/tools/assistant', '/deck/tools/:tool', <Tools/>)
     const suggestion = await screen.findByRole('button', { name: /Show my portfolio value/ })
     vi.useFakeTimers()
     fireEvent.click(suggestion)
@@ -237,8 +237,8 @@ describe('Navexa-depth workspace routes', () => {
   })
 
   it('cancels pending answers on stop and new chat', async () => {
-    window.history.pushState({}, '', '/workspace/tools/assistant')
-    renderRoute('/workspace/tools/assistant', '/workspace/tools/:tool', <Tools/>)
+    window.history.pushState({}, '', '/deck/tools/assistant')
+    renderRoute('/deck/tools/assistant', '/deck/tools/:tool', <Tools/>)
     const suggestion = await screen.findByRole('button', { name: /Show my portfolio value/ })
     vi.useFakeTimers()
     fireEvent.click(suggestion)
@@ -254,8 +254,8 @@ describe('Navexa-depth workspace routes', () => {
   })
 
   it('does not append a remote answer after a cancelled research request resolves', async () => {
-    window.history.pushState({}, '', '/workspace/tools/assistant')
-    renderRoute('/workspace/tools/assistant', '/workspace/tools/:tool', <Tools/>)
+    window.history.pushState({}, '', '/deck/tools/assistant')
+    renderRoute('/deck/tools/assistant', '/deck/tools/:tool', <Tools/>)
     await screen.findByRole('button', { name: /Show my portfolio value/ })
     let finish!: (value: Response) => void
     let requestSignal: AbortSignal | undefined
@@ -287,7 +287,7 @@ describe('Navexa-depth workspace routes', () => {
       return new Response(JSON.stringify({ company: active, companies: [active, related], relationships: [{ id: `sec-${active.id}-${related.id}`, from: active.id, to: related.id, type: 'partner', note: `${related.name} is named in partner context.`, confidence: 'High', source: '10-K filed 2025-10-31', sourceKind: 'live-sec', sourceUrl: 'https://www.sec.gov/example', updated: '2025-10-31' }], filing: { form: '10-K', filedAt: '2025-10-31', accession: 'test', primaryDocument: 'test.htm', url: 'https://www.sec.gov/example' }, coverage: 'live-sec-filing', generatedAt: '2026-08-29T00:00:00.000Z' }), { status: 200, headers: { 'Content-Type': 'application/json' } })
     })
     vi.stubGlobal('fetch', fetchMock)
-    renderRoute('/workspace/tools/supply-chain/AAPL', '/workspace/tools/supply-chain/:symbol?', <SupplyChain />)
+    renderRoute('/deck/tools/supply-chain/AAPL', '/deck/tools/supply-chain/:symbol?', <SupplyChain />)
     expect(screen.getByRole('heading', { name: 'Supply chain intelligence' })).toBeInTheDocument()
     expect(await screen.findByText('Filing', { exact: true })).toBeInTheDocument()
     expect(screen.getByRole('checkbox', { name: /Include curated background/ })).not.toBeChecked()

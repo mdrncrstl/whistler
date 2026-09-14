@@ -132,6 +132,7 @@ function AppContent() {
         {marketingPages.map(page => <Route key={page.path} path={page.path} element={<Landing page={page} onDemo={enterDemo} signedIn={authenticated} onOpenApp={() => window.location.assign(canonicalAppUrl(workspaceBasePath))} />} />)}
         <Route path="/pricing" element={<Landing page="pricing" onDemo={enterDemo} signedIn={authenticated} onOpenApp={() => window.location.assign(canonicalAppUrl(workspaceBasePath))} />} />
         <Route path="/auth/callback" element={<AuthCallback />} />
+        <Route path="/workspace/*" element={<LegacyWorkspaceRedirect />} />
         <Route path="/app/*" element={<LegacyWorkspaceRedirect />} />
         <Route path="/*" element={authenticated ? <AccountAccessProvider session={session || null} demo={demo}><AccountRoutes session={session || null} demo={demo} onExitDemo={exitDemo} /></AccountAccessProvider> : <Navigate to="/" replace />} />
         <Route path="*" element={<Navigate to={authenticated ? workspaceBasePath : '/'} replace />} />

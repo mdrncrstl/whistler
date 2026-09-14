@@ -19,7 +19,7 @@ describe('new account onboarding', () => {
   afterEach(cleanup)
 
   it('lets users skip setup and go directly to importing holdings', async () => {
-    render(<MemoryRouter initialEntries={['/welcome?preview=1']}><Routes><Route path="/welcome" element={<Onboarding/>}/><Route path="/workspace/connections" element={<p>Add your holdings</p>}/></Routes></MemoryRouter>)
+    render(<MemoryRouter initialEntries={['/welcome?preview=1']}><Routes><Route path="/welcome" element={<Onboarding/>}/><Route path="/deck/connections" element={<p>Add your holdings</p>}/></Routes></MemoryRouter>)
     expect(screen.queryByText('Workspace setup')).not.toBeInTheDocument()
     expect(document.querySelector('.onboarding-rail')).toBeNull()
     fireEvent.click(screen.getByRole('button', { name: 'Skip and add holdings' }))
@@ -27,7 +27,7 @@ describe('new account onboarding', () => {
   })
 
   it('completes three setup choices and clearly presents the no-card trial', async () => {
-    render(<MemoryRouter initialEntries={['/welcome?preview=1']}><Routes><Route path="/welcome" element={<Onboarding/>}/><Route path="/workspace/connections" element={<p>Portfolio workspace</p>}/></Routes></MemoryRouter>)
+    render(<MemoryRouter initialEntries={['/welcome?preview=1']}><Routes><Route path="/welcome" element={<Onboarding/>}/><Route path="/deck/connections" element={<p>Portfolio workspace</p>}/></Routes></MemoryRouter>)
 
     expect(screen.getByRole('heading', { name: /What do you want to see first/i })).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: /BothPerformance/i }))

@@ -20,8 +20,8 @@ export function AuthCallback() {
       if (!alive) return
       window.clearTimeout(timeout)
       if (data.session) {
-        if (window.location.origin === canonicalAppOrigin()) navigate('/workspace', { replace: true })
-        else window.location.replace(canonicalAppUrl('/workspace'))
+        if (window.location.origin === canonicalAppOrigin()) navigate('/deck', { replace: true })
+        else window.location.replace(canonicalAppUrl('/deck'))
       }
       else setError(providerError || sessionError?.message || 'This sign-in link has expired or was cancelled. Please try again.')
     }).catch(() => {

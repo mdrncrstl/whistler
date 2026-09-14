@@ -19,7 +19,7 @@ function watchConsole(page, label) {
 
 async function enterDemo(page) {
   page.setDefaultTimeout(5_000)
-  await page.goto(`${baseUrl}/workspace`, { waitUntil: 'networkidle' })
+  await page.goto(`${baseUrl}/deck`, { waitUntil: 'networkidle' })
   await page.getByRole('textbox', { name: 'Filter holdings' }).waitFor()
   await page.waitForTimeout(1_000)
 }

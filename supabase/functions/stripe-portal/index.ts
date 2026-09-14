@@ -10,7 +10,7 @@ Deno.serve(async (request) => {
     const { data, error } = await admin.from('billing_customers').select('stripe_customer_id').eq('user_id', user.id).single()
     if (error || !data?.stripe_customer_id) return json({ error: 'No Stripe billing profile exists yet.' }, 404, requestOrigin)
     const body = await request.json().catch(() => ({}))
-    const session = await stripe.billingPortal.sessions.create({ customer: data.stripe_customer_id, return_url: `${safeReturnOrigin(body.returnUrl)}/workspace/billing` })
+    const session = await stripe.billingPortal.sessions.create({ customer: data.stripe_customer_id, return_url: `${safeReturnOrigin(body.returnUrl)}/deck/billing` })
     return json({ url: session.url }, 200, requestOrigin)
   } catch (error) { return json({ error: error instanceof Error ? error.message : 'Billing portal could not open.' }, 400, requestOrigin) }
 })
