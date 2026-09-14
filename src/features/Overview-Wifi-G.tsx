@@ -4,7 +4,7 @@ import { Fragment, useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { usePortfolio } from '../context/PortfolioContext'
 import { holdingCapitalGain, holdingCurrencyGain, incomeTransactions, summarisePortfolio } from '../lib/portfolio'
-import { marketFreshnessLabel } from '../lib/marketDataApi'
+import { fetchMarketHistory, marketFreshnessLabel, type MarketHistoryPoint } from '../lib/marketDataApi'
 import { date, downloadCsv, money } from '../lib/format'
 import { EmptyState, MotionDialogSurface, MotionExpand, MotionPopover, PrivateMoney } from '../components/ui'
 import { PortfolioSetupGuide } from '../components/PortfolioSetupGuide'
@@ -12,17 +12,35 @@ import { HoldingLogo } from '../components/HoldingLogo'
 import { HoldingNavigationRow } from '../components/HoldingNavigation'
 import { useDailyPortfolioHistory } from '../hooks/useDailyPortfolioHistory'
 import { FinanceChart } from '../components/FinanceChart'
-import { FinanceProToggle, FinanceProToolbar } from '../components/FinanceProToolbar'
+import { FinanceProToggle, FinanceProToolbar, type FinanceComparisonOption } from '../components/FinanceProToolbar'
 import { FinancePeriodSelector } from '../components/FinancePeriodSelector'
 import type { FinanceChartStyle, FinanceIndicatorId } from '../components/financeChartUtils'
 import { filterFinancePoints, type FinancePeriod } from '../lib/financePeriods'
-import type { Position, Transaction } from '../types'
+import type { PortfolioSnapshot, Position, Transaction } from '../types'
 
 type GroupBy = 'Exchange' | 'Sector' | 'Currency' | 'Holding Type'
 type SortKey = 'symbol' | ColumnKey
 type FilterField = '' | GroupBy
 type PortfolioFilter = { id: number; field: FilterField; operator: 'is' | 'is not'; value: string }
 type ColumnKey = 'price' | 'average_cost' | 'quantity' | 'value' | 'capital_gain' | 'capital_gain_pct' | 'income_return' | 'income_return_pct' | 'currency_gain' | 'currency_gain_pct' | 'total_return' | 'total_return_pct'
+type OverviewMetricId = 'portfolio' | 'capital' | 'income' | 'currency' | 'total'
+
+const overviewMetricOptions: Array<{ id: OverviewMetricId; label: string }> = [
+  { id: 'portfolio', label: 'Portfolio Value' },
+  { id: 'capital', label: 'Capital Gain' },
+  { id: 'income', label: 'Income Return' },
+  { id: 'currency', label: 'Currency Gain' },
+  { id: 'total', label: 'Total Return' },
+]
+
+function metricSnapshotValue(item: PortfolioSnapshot, metric: OverviewMetricId, income: number) {
+  const value = metric === 'portfolio' ? item.value_aud
+    : metric === 'income' ? (Number.isFinite(item.income_aud) ? item.income_aud! : income)
+    : metric === 'capital' ? item.capital_gain_aud
+    : metric === 'currency' ? item.currency_gain_aud
+    : item.total_return_aud
+  return Number.isFinite(value) ? Number(value) : null
+}
 
 const rangeOptions: Record<string, number> = {
   Today: 1, 'Today (from yesterday open)': 2, 'Last 7 Days': 7, 'Last 30 Days': 30,
@@ -83,7 +101,8 @@ export function Overview() {
   const defaultColumns = useMemo(() => columns.filter((item) => item.defaultVisible).map((item) => item.key), [])
   const [visibleColumns, setVisibleColumns] = useState<ColumnKey[]>(defaultColumns); const [pendingColumns, setPendingColumns] = useState<ColumnKey[]>(defaultColumns); const [draggedColumn, setDraggedColumn] = useState<ColumnKey | null>(null); const [exportOpen, setExportOpen] = useState(false)
   const [sort, setSort] = useState<{ key: SortKey; direction: 'ascending' | 'descending' }>({ key: 'symbol', direction: 'ascending' }); const [rowMenu, setRowMenu] = useState<string | null>(null)
-  const [activeMetric, setActiveMetric] = useState<'portfolio' | 'capital' | 'income' | 'currency' | 'total'>('portfolio')
+  const [activeMetric, setActiveMetric] = useState<OverviewMetricId>('portfolio')
+  const [comparisonData, setComparisonData] = useState<{ symbol: string; points: MarketHistoryPoint[] }>({ symbol: '', points: [] })
   const pageRef = useRef<HTMLDivElement>(null)
   useEffect(() => {
     if (!rangeOpen && !filterOpen && !positionsOpen && !groupOpen && !exportOpen && !rowMenu) return
@@ -114,23 +133,6 @@ export function Overview() {
   }, [exportOpen, filterOpen, groupOpen, positionsOpen, rangeOpen, rowMenu])
   const summary = useMemo(() => summarisePortfolio(bundle), [bundle])
   const chartData = useMemo(() => { const ordered = [...snapshots].sort((a,b) => a.date.localeCompare(b.date)); const latest = ordered.at(-1)?.date ? new Date(ordered.at(-1)!.date).getTime() : 0; const days = rangeOptions[range] ?? Infinity; const rows = ordered.filter((item) => { const time = new Date(item.date).getTime(); if (range === 'Custom range') return (!customStart || time >= new Date(customStart).getTime()) && (!customEnd || time <= new Date(customEnd).getTime()); return days === Infinity || time >= latest - days * 86_400_000 }); const periodRows = filterFinancePoints(rows, chartPeriod); const first = periodRows[0]?.value_aud || 0; return periodRows.map((item, index) => ({ ...item, percent: first ? ((item.value_aud - first) / first) * 100 : 0, change: index ? item.value_aud - periodRows[index - 1].value_aud : 0 })) }, [snapshots, chartPeriod, customEnd, customStart, range])
-  const renderedChartData = useMemo(() => {
-    const recordedIncome = incomeTransactions(bundle.transactions)
-    return chartData.map((item, index) => {
-      const fallbackIncome = recordedIncome.filter(t => new Date(t.date).getTime() <= new Date(item.date).getTime()).reduce((sum,t) => sum + Math.abs(t.amount * t.fx_rate), 0)
-      const metricValue = activeMetric === 'portfolio' ? item.value_aud
-        : activeMetric === 'income' ? (Number.isFinite(item.income_aud) ? item.income_aud! : fallbackIncome)
-        : activeMetric === 'capital' ? item.capital_gain_aud
-        : activeMetric === 'currency' ? item.currency_gain_aud
-        : item.total_return_aud
-      const previousValue = index ? chartData[index - 1] : null
-      const previousMetricValue = previousValue ? (activeMetric === 'portfolio' ? previousValue.value_aud : activeMetric === 'income' ? (Number.isFinite(previousValue.income_aud) ? previousValue.income_aud! : recordedIncome.filter(t => new Date(t.date).getTime() <= new Date(previousValue.date).getTime()).reduce((sum,t) => sum + Math.abs(t.amount * t.fx_rate), 0)) : activeMetric === 'capital' ? previousValue.capital_gain_aud : activeMetric === 'currency' ? previousValue.currency_gain_aud : previousValue.total_return_aud) : null
-      return { ...item, metricValue: Number.isFinite(metricValue) ? metricValue! : null, percent: activeMetric === 'portfolio' ? item.percent : summary.cost && Number.isFinite(metricValue) ? metricValue! / summary.cost * 100 : 0, change: Number.isFinite(metricValue) && Number.isFinite(previousMetricValue) ? metricValue! - previousMetricValue! : 0, comparison: activeMetric === 'portfolio' && comparison === 'benchmark' && Number.isFinite(item.benchmark_value_aud) ? item.benchmark_value_aud! : undefined }
-    })
-  }, [activeMetric, chartData, bundle.transactions, comparison, summary.cost])
-  const metricHistoryAvailable = renderedChartData.length > 1 && renderedChartData.every(item => item.metricValue !== null)
-  const filtered = useMemo(() => bundle.holdings.filter((item) => { if (!`${item.symbol} ${item.name} ${item.market} ${item.account_name}`.toLowerCase().includes(query.toLowerCase())) return false; if ((positionsMode === 'Open Positions Only' || hideClosed) && item.quantity <= 0) return false; return filters.every((filter) => { if (!filter.field || !filter.value) return true; const matches = groupValue(item, filter.field).toLowerCase() === filter.value.toLowerCase(); return filter.operator === 'is' ? matches : !matches }) }), [bundle.holdings, filters, hideClosed, positionsMode, query])
-  const groups = useMemo(() => { const output = new Map<string, Position[]>(); filtered.forEach((item) => { const key = groupValue(item, groupBy); output.set(key, [...(output.get(key) || []), item]) }); const direction = sort.direction === 'ascending' ? 1 : -1; return [...output.entries()].map(([key, items]) => [key, [...items].sort((a, b) => { const av = sortableHoldingValue(a,sort.key,bundle.transactions); const bv = sortableHoldingValue(b,sort.key,bundle.transactions); return (typeof av === 'string' ? av.localeCompare(String(bv)) : Number(av) - Number(bv)) * direction })] as [string, Position[]]) }, [filtered, groupBy, sort, bundle.transactions])
   const totalReturn = summary.unrealised + summary.income; const totalReturnPct = summary.cost ? (totalReturn / summary.cost) * 100 : 0
   const metrics = [
     { id: 'portfolio' as const, label: 'Portfolio Value', value: summary.total, percent: totalReturnPct, description: 'The current AUD value of holdings and cash recorded in this portfolio.' },
@@ -139,6 +141,67 @@ export function Overview() {
     { id: 'currency' as const, label: 'Currency Gain', value: summary.currencyGain, percent: summary.cost ? summary.currencyGain / summary.cost * 100 : 0, description: 'The unrealised gain or loss caused by exchange-rate movement on holdings with a recorded cost basis.' },
     { id: 'total' as const, label: 'Total Return', value: totalReturn, percent: totalReturnPct, description: 'Unrealised holding gain or loss plus recorded income, measured against the recorded cost base.' },
   ]
+  const recordedIncome = useMemo(() => incomeTransactions(bundle.transactions), [bundle.transactions])
+  const incomeAt = (dateValue: string) => recordedIncome.filter(t => new Date(t.date).getTime() <= new Date(dateValue).getTime()).reduce((sum,t) => sum + Math.abs(t.amount * t.fx_rate), 0)
+  const comparisonOptions = useMemo(() => {
+    const options: FinanceComparisonOption[] = overviewMetricOptions.map(item => ({ id: `metric:${item.id}`, label: item.label, detail: 'Portfolio history' }))
+    if (activeMetric === 'portfolio' && chartData.some(item => Number.isFinite(item.benchmark_value_aud))) options.push({ id: 'benchmark', label: 'Portfolio benchmark', detail: 'Recorded benchmark history' })
+    const holdingOptions = [...new Map(bundle.holdings.map(holding => {
+      const id = holding.symbol.toUpperCase()
+      return [id, { id, label: id, detail: `${holding.name || 'Holding'} · ${holding.market || 'Market'}`, market: holding.market || '' }] as const
+    })).values()]
+    return [...options, ...holdingOptions]
+  }, [activeMetric, bundle.holdings, chartData])
+  const selectedComparison = comparisonOptions.find(item => item.id === comparison)
+  const comparisonSymbol = comparison !== 'none' && comparison !== 'benchmark' && !comparison.startsWith('metric:') ? comparison.toUpperCase() : null
+  useEffect(() => {
+    if (!proGraphMode || !comparisonSymbol) return
+    const controller = new AbortController()
+    void fetchMarketHistory(comparisonSymbol, selectedComparison?.market || '', controller.signal)
+      .then(result => setComparisonData({ symbol: comparisonSymbol, points: result.points }))
+      .catch(error => {
+        if ((error as { name?: string })?.name !== 'AbortError') setComparisonData(current => current.symbol === comparisonSymbol ? { symbol: comparisonSymbol, points: [] } : current)
+      })
+    return () => controller.abort()
+  }, [comparisonSymbol, proGraphMode, selectedComparison?.market])
+  const comparisonSeries = useMemo(() => (comparisonData.symbol === comparisonSymbol ? comparisonData.points : [])
+    .map(point => ({ time: Date.parse(point.date.slice(0, 10)), value: Number(point.adjustedPrice ?? point.price) }))
+    .filter(point => Number.isFinite(point.time) && Number.isFinite(point.value) && point.value > 0)
+    .sort((a, b) => a.time - b.time), [comparisonData, comparisonSymbol])
+  const primaryScaleValue = (chartData
+    .map(item => metricSnapshotValue(item, activeMetric, incomeAt(item.date)))
+    .find(value => value !== null && Math.abs(value) > Number.EPSILON) ?? summary.cost) || 1
+  const primaryScale = Math.abs(primaryScaleValue)
+  const externalComparisonValues = useMemo(() => {
+    if (!comparisonSymbol || !comparisonSeries.length || !chartData.length) return []
+    const aligned = chartData.map(item => {
+      const time = Date.parse(item.date)
+      return comparisonSeries.reduce<number | undefined>((latest, point) => point.time <= time ? point.value : latest, undefined)
+    })
+    const base = aligned.find(value => value !== undefined && Math.abs(value) > Number.EPSILON)
+    if (base === undefined) return []
+    return aligned.map(value => value === undefined ? undefined : { amount: value / base * primaryScale, percent: (value / base - 1) * 100 })
+  }, [chartData, comparisonSeries, comparisonSymbol, primaryScale])
+  const renderedChartData = useMemo(() => {
+    const comparisonMetricId = comparison.startsWith('metric:') ? comparison.slice('metric:'.length) : null
+    const comparisonMetric = overviewMetricOptions.some(item => item.id === comparisonMetricId) ? comparisonMetricId as OverviewMetricId : null
+    const cumulativeIncome = (dateValue: string) => recordedIncome.filter(t => new Date(t.date).getTime() <= new Date(dateValue).getTime()).reduce((sum,t) => sum + Math.abs(t.amount * t.fx_rate), 0)
+    const firstComparisonMetricValue = comparisonMetric && chartData[0] ? metricSnapshotValue(chartData[0], comparisonMetric, cumulativeIncome(chartData[0].date)) : null
+    const firstBenchmarkValue = comparison === 'benchmark' ? chartData.find(item => Number.isFinite(item.benchmark_value_aud))?.benchmark_value_aud ?? null : null
+    const relativePercent = (value: number | null | undefined, base: number | null | undefined) => value !== null && value !== undefined && base !== null && base !== undefined && Math.abs(base) > Number.EPSILON ? (value - base) / Math.abs(base) * 100 : 0
+    return chartData.map((item, index) => {
+      const fallbackIncome = cumulativeIncome(item.date)
+      const metricValue = metricSnapshotValue(item, activeMetric, fallbackIncome)
+      const previousValue = index ? chartData[index - 1] : null
+      const previousMetricValue = previousValue ? metricSnapshotValue(previousValue, activeMetric, cumulativeIncome(previousValue.date)) : null
+      const comparisonValue = comparisonMetric ? metricSnapshotValue(item, comparisonMetric, fallbackIncome) : comparison === 'benchmark' && Number.isFinite(item.benchmark_value_aud) ? item.benchmark_value_aud! : comparisonSymbol ? externalComparisonValues[index]?.amount : undefined
+      const comparisonPercent = comparisonMetric ? comparisonMetric === 'portfolio' ? relativePercent(comparisonValue, firstComparisonMetricValue) : summary.cost && comparisonValue !== null && comparisonValue !== undefined ? comparisonValue / summary.cost * 100 : 0 : comparison === 'benchmark' ? relativePercent(comparisonValue, firstBenchmarkValue) : comparisonSymbol ? externalComparisonValues[index]?.percent : undefined
+      return { ...item, metricValue, percent: activeMetric === 'portfolio' ? item.percent : metricValue !== null && summary.cost ? metricValue / summary.cost * 100 : 0, change: metricValue !== null && previousMetricValue !== null ? metricValue - previousMetricValue : 0, comparisonValue, comparisonPercent }
+    })
+  }, [activeMetric, chartData, comparison, comparisonSymbol, externalComparisonValues, recordedIncome, summary.cost])
+  const metricHistoryAvailable = renderedChartData.length > 1 && renderedChartData.every(item => item.metricValue !== null)
+  const filtered = useMemo(() => bundle.holdings.filter((item) => { if (!`${item.symbol} ${item.name} ${item.market} ${item.account_name}`.toLowerCase().includes(query.toLowerCase())) return false; if ((positionsMode === 'Open Positions Only' || hideClosed) && item.quantity <= 0) return false; return filters.every((filter) => { if (!filter.field || !filter.value) return true; const matches = groupValue(item, filter.field).toLowerCase() === filter.value.toLowerCase(); return filter.operator === 'is' ? matches : !matches }) }), [bundle.holdings, filters, hideClosed, positionsMode, query])
+  const groups = useMemo(() => { const output = new Map<string, Position[]>(); filtered.forEach((item) => { const key = groupValue(item, groupBy); output.set(key, [...(output.get(key) || []), item]) }); const direction = sort.direction === 'ascending' ? 1 : -1; return [...output.entries()].map(([key, items]) => [key, [...items].sort((a, b) => { const av = sortableHoldingValue(a,sort.key,bundle.transactions); const bv = sortableHoldingValue(b,sort.key,bundle.transactions); return (typeof av === 'string' ? av.localeCompare(String(bv)) : Number(av) - Number(bv)) * direction })] as [string, Position[]]) }, [filtered, groupBy, sort, bundle.transactions])
   const isFirstRun = !bundle.holdings.length && !bundle.transactions.length && !bundle.connections.length
   const addFilter = () => setFilters((current) => [...current, { id: Date.now(), field: '', operator: 'is', value: '' }]); const updateFilter = (id: number, changes: Partial<PortfolioFilter>) => setFilters((current) => current.map((item) => item.id === id ? { ...item, ...changes } : item))
   const toggleSort = (key: SortKey) => setSort((current) => ({ key, direction: current.key === key && current.direction === 'ascending' ? 'descending' : 'ascending' })); const togglePendingColumn = (key: ColumnKey) => setPendingColumns((current) => current.includes(key) ? current.filter((item) => item !== key) : [...current, key])
@@ -164,9 +227,9 @@ export function Overview() {
         <div className="chart-mode-row"><div><button className={valueMode === 'Amount' ? 'active' : ''} onClick={() => setValueMode('Amount')}>Amount</button><button className={valueMode === 'Percent' ? 'active' : ''} onClick={() => { setValueMode('Percent'); setChartType('Line') }}>Percent</button></div>{valueMode === 'Amount' && <div><button className={chartType === 'Line' ? 'active' : ''} onClick={() => setChartType('Line')}>Line</button><button className={chartType === 'Bar' ? 'active' : ''} onClick={() => setChartType('Bar')}>Bar</button></div>}</div>
       </MotionExpand>
       <MotionExpand open={proGraphMode} className="finance-pro-reveal">
-        <FinanceProToolbar chartStyle={proStyle} onChartStyleChange={setProStyle} comparison={comparison} onComparisonChange={setComparison} comparisonOptions={activeMetric === 'portfolio' ? [{ id: 'benchmark', label: 'Portfolio benchmark', detail: 'Recorded benchmark history' }] : []} indicators={indicators} onIndicatorsChange={setIndicators} candleAvailable={false} barAvailable/>
+        <FinanceProToolbar chartStyle={proStyle} onChartStyleChange={setProStyle} comparison={comparison} onComparisonChange={setComparison} comparisonOptions={comparisonOptions} comparisonHeading="Portfolio series and holdings" indicators={indicators} onIndicatorsChange={setIndicators} candleAvailable={false} barAvailable allowSymbolSearch/>
       </MotionExpand>
-      {!metricHistoryAvailable ? <div className="portfolio-chart-empty"><EmptyState icon={TrendingUp} title={history.loading ? 'Loading daily return history' : ['portfolio','income'].includes(activeMetric) ? 'Performance history begins after your first sync' : 'Historical return components are not available'} description={history.loading ? 'Preparing daily market closes for this portfolio.' : ['portfolio','income'].includes(activeMetric) ? 'Daily portfolio snapshots will build the return chart without inventing historical values.' : 'This series needs daily market data and a complete recorded cost basis.'}/></div> : <FinanceChart resolution={history.daily ? 'daily' : 'recorded'} points={renderedChartData.map(item => ({ date: item.date, value: proGraphMode && proStyle === 'bar' && valueMode === 'Amount' || !proGraphMode && chartType === 'Bar' && valueMode === 'Amount' ? item.change : valueMode === 'Percent' ? item.percent : item.metricValue!, measurementValue: item.metricValue!, comparison: proGraphMode && proStyle !== 'bar' ? item.comparison : undefined }))} label={proGraphMode && proStyle === 'bar' || !proGraphMode && chartType === 'Bar' ? 'Daily change' : metrics.find(metric => metric.id === activeMetric)?.label || 'Portfolio'} bars={!proGraphMode && chartType === 'Bar' && valueMode === 'Amount'} formatValue={v => valueMode === 'Percent' ? `${v.toFixed(2)}%` : money(v, 'AUD', 2)} formatAxis={v => valueMode === 'Percent' ? `${v.toFixed(0)}%` : `$${Intl.NumberFormat('en', { notation: 'compact', maximumFractionDigits: 1 }).format(v)}`} chartStyle={proGraphMode ? proStyle : chartType === 'Bar' ? 'bar' : 'area'} indicators={proGraphMode ? indicators : []} comparisonLabel="Portfolio benchmark"/>}<FinancePeriodSelector value={chartPeriod} onChange={setChartPeriod} ariaLabel="Portfolio chart period"/></section>
+      {!metricHistoryAvailable ? <div className="portfolio-chart-empty"><EmptyState icon={TrendingUp} title={history.loading ? 'Loading daily return history' : ['portfolio','income'].includes(activeMetric) ? 'Performance history begins after your first sync' : 'Historical return components are not available'} description={history.loading ? 'Preparing daily market closes for this portfolio.' : ['portfolio','income'].includes(activeMetric) ? 'Daily portfolio snapshots will build the return chart without inventing historical values.' : 'This series needs daily market data and a complete recorded cost basis.'}/></div> : <FinanceChart resolution={history.daily ? 'daily' : 'recorded'} points={renderedChartData.map(item => ({ date: item.date, value: proGraphMode && proStyle === 'bar' && valueMode === 'Amount' || !proGraphMode && chartType === 'Bar' && valueMode === 'Amount' ? item.change : valueMode === 'Percent' ? item.percent : item.metricValue!, measurementValue: item.metricValue!, comparison: proGraphMode && proStyle !== 'bar' && comparison !== 'none' ? valueMode === 'Percent' ? item.comparisonPercent ?? undefined : item.comparisonValue ?? undefined : undefined }))} label={proGraphMode && proStyle === 'bar' || !proGraphMode && chartType === 'Bar' ? 'Daily change' : metrics.find(metric => metric.id === activeMetric)?.label || 'Portfolio'} bars={!proGraphMode && chartType === 'Bar' && valueMode === 'Amount'} formatValue={v => valueMode === 'Percent' ? `${v.toFixed(2)}%` : money(v, 'AUD', 2)} formatAxis={v => valueMode === 'Percent' ? `${v.toFixed(0)}%` : `$${Intl.NumberFormat('en', { notation: 'compact', maximumFractionDigits: 1 }).format(v)}`} chartStyle={proGraphMode ? proStyle : chartType === 'Bar' ? 'bar' : 'area'} indicators={proGraphMode ? indicators : []} comparisonLabel={selectedComparison?.label || (comparison !== 'none' ? comparison : 'Comparison')}/>}<FinancePeriodSelector value={chartPeriod} onChange={setChartPeriod} ariaLabel="Portfolio chart period"/></section>
 
     <section className="portfolio-holdings"><div className="holdings-head"><h2>Holdings</h2><div><div className={`control-popover-wrap menu-anchor ${groupOpen ? 'is-open' : ''}`}><button className="with-tooltip" data-tooltip="Group by Category" aria-label={groupBy} aria-haspopup="menu" aria-expanded={groupOpen} onClick={() => setGroupOpen(!groupOpen)}>{groupBy}<ChevronDown size={13}/></button><MotionPopover open={groupOpen} className="control-menu" role="menu" ariaLabel="Group holdings" origin="top left">{(['Exchange','Sector','Currency','Holding Type'] as GroupBy[]).map((item) => <button key={item} onClick={() => { setGroupBy(item); setCollapsedGroups(new Set()); setGroupOpen(false) }}>{groupBy === item && <Check size={13}/>}<span>{item}</span></button>)}</MotionPopover></div><button className={`${hideClosed ? 'active-control ' : ''}with-tooltip tooltip-wide`} data-tooltip="Hide or show closed positions in the table only. Totals and returns do not change." aria-label="Hide Closed" aria-pressed={hideClosed} onClick={() => setHideClosed(!hideClosed)}><EyeOff size={14}/>Hide Closed</button><button className="with-tooltip" data-tooltip="Column Settings" aria-label="Columns" aria-haspopup="dialog" aria-expanded={columnsOpen} onClick={() => { setPendingColumns(visibleColumns); setColumnSearch(''); setColumnsOpen(true) }}><Columns3 size={14}/>Columns</button><div className={`control-popover-wrap menu-anchor ${exportOpen ? 'is-open' : ''}`}><button aria-haspopup="menu" aria-expanded={exportOpen} onClick={() => setExportOpen(!exportOpen)}><Download size={14}/>Export<ChevronDown size={13}/></button><MotionPopover open={exportOpen} className="control-menu export-menu" role="menu" ariaLabel="Export holdings" origin="top right"><button onClick={() => { exportHoldings(); setExportOpen(false) }}><Download size={14}/><span>CSV</span></button><button onClick={() => { window.print(); setExportOpen(false) }}><Printer size={14}/><span>PDF</span></button></MotionPopover></div></div></div>
       {groups.length ? <div className="portfolio-table-scroll"><table><thead><tr><th aria-sort={sort.key === 'symbol' ? sort.direction : 'none'}><button onClick={() => toggleSort('symbol')}>Symbol{sort.key === 'symbol' ? (sort.direction === 'ascending' ? <ArrowUp size={11}/> : <ArrowDown size={11}/>) : null}</button></th>{visibleColumns.map(headerFor)}<th/></tr></thead><tbody>{groups.map(([market, items]) => { const value = items.reduce((sum,item) => sum + item.value_aud,0); const gain = items.reduce((sum,item) => sum + item.unrealised_gain_aud,0); const cost = items.reduce((sum,item) => sum + item.cost_aud,0); const income = items.reduce((sum,item) => sum + recordedHoldingIncome(item,bundle.transactions),0); const collapsed = collapsedGroups.has(market); return <Fragment key={market}><tr className="market-row"><td colSpan={visibleColumns.length + 2}><button aria-expanded={!collapsed} onClick={() => setCollapsedGroups((current) => { const next = new Set(current); if (next.has(market)) next.delete(market); else next.add(market); return next })}>{collapsed ? <ChevronRight size={13}/> : <ChevronDown size={13}/>}<span>{market}</span></button></td></tr>{!collapsed && <>{items.map((item) => <HoldingRow key={`${item.account_name}-${item.symbol}`} item={item} income={recordedHoldingIncome(item, bundle.transactions)} visibleColumns={visibleColumns} menuOpen={rowMenu === `${item.account_name}-${item.symbol}`} onMenu={() => setRowMenu(rowMenu === `${item.account_name}-${item.symbol}` ? null : `${item.account_name}-${item.symbol}`)}/>)}<tr className="subtotal-row"><td>Total</td>{visibleColumns.map((key) => <td key={key} className={`numeric ${positiveColumn(key) ? (gain >= 0 ? 'positive' : 'negative') : ''}`}>{key === 'value' ? money(value,'AUD',2) : key === 'capital_gain' ? money(gain,'AUD',2) : key === 'income_return' ? money(income,'AUD',2) : key === 'total_return' ? money(gain+income,'AUD',2) : key === 'capital_gain_pct' ? displayPercent(cost ? gain/cost*100 : 0) : key === 'total_return_pct' ? displayPercent(cost ? (gain+income)/cost*100 : 0) : ''}</td>)}<td/></tr></>}</Fragment> })}<tr className="grand-total"><td>Grand Total</td>{visibleColumns.map((key) => <td key={key} className={`numeric ${positiveColumn(key) ? (totalReturn >= 0 ? 'positive' : 'negative') : ''}`}>{key === 'value' ? money(summary.invested,'AUD',2) : key === 'capital_gain' ? money(summary.unrealised,'AUD',2) : key === 'capital_gain_pct' ? displayPercent(summary.returnPct) : key === 'total_return' ? money(totalReturn,'AUD',2) : key === 'total_return_pct' ? displayPercent(totalReturnPct) : ''}</td>)}<td/></tr></tbody></table></div> : <EmptyState title="No holdings match" description="Clear your search or filters, or import a portfolio to populate this table."/>}<p className="portfolio-footnote">* All values displayed in AUD unless otherwise specified.</p></section>

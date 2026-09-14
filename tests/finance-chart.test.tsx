@@ -101,6 +101,20 @@ describe('Finance chart comparisons', () => {
     cleanup()
   })
 
+  it('renders comparison series supplied by the owning chart', () => {
+    render(<FinanceProToolbar chartStyle="area" onChartStyleChange={vi.fn()} comparisonHeading="Portfolio series and holdings" comparisonOptions={[
+      { id: 'metric:income', label: 'Income Return', detail: 'Portfolio history' },
+      { id: 'AAPL', label: 'AAPL', detail: 'Apple Inc · NASDAQ (US)' },
+    ]} comparison="none" onComparisonChange={vi.fn()} indicators={[]} onIndicatorsChange={vi.fn()}/>)
+
+    fireEvent.click(screen.getByRole('button', { name: /Compare/ }))
+    expect(screen.getByText('Portfolio series and holdings')).toBeInTheDocument()
+    expect(screen.getByRole('menuitemradio', { name: /Income Return/ })).toBeInTheDocument()
+    expect(screen.getByRole('menuitemradio', { name: /AAPL/ })).toBeInTheDocument()
+    expect(screen.queryByText(/No comparison series available/)).toBeNull()
+    cleanup()
+  })
+
   it('renders selected moving average, envelope and MACD series', () => {
     const points = Array.from({ length: 30 }, (_, index) => ({ date: `2026-01-${String(index + 1).padStart(2, '0')}`, value: 100 + index + Math.sin(index) }))
     render(<FinanceChart points={points} chartStyle="area" indicators={['sma', 'envelope', 'macd']} formatValue={format}/>)

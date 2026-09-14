@@ -39,6 +39,7 @@ export function FinanceProToolbar({
   comparison = 'none',
   onComparisonChange,
   comparisonOptions = [],
+  comparisonHeading = 'All symbols',
   indicators: selectedIndicators,
   onIndicatorsChange,
   candleAvailable = false,
@@ -50,6 +51,7 @@ export function FinanceProToolbar({
   comparison?: string
   onComparisonChange: (value: string) => void
   comparisonOptions?: FinanceComparisonOption[]
+  comparisonHeading?: string
   indicators: FinanceIndicatorId[]
   onIndicatorsChange: (values: FinanceIndicatorId[]) => void
   candleAvailable?: boolean
@@ -110,11 +112,11 @@ export function FinanceProToolbar({
         </button>
         <MotionPopover open={open === 'compare'} className="finance-pro-menu-panel finance-pro-compare-panel" role="menu" ariaLabel="Compare to financial entity" origin="top left">
           <label className="finance-pro-search"><Search size={16}/><input ref={compareSearchRef} aria-label="Search for a symbol" placeholder="Search for a symbol…" value={query} onChange={event => setQuery(event.target.value)}/><button type="button" aria-label="Clear symbol search" onClick={() => setQuery('')}><X size={15}/></button></label>
-          <span className="finance-pro-menu-heading">All symbols</span>
+          <span className="finance-pro-menu-heading">{comparisonHeading}</span>
           <button type="button" role="menuitemradio" aria-checked={comparison === 'none'} className={comparison === 'none' ? 'is-selected' : ''} onClick={() => { onComparisonChange('none'); setOpen(null) }}><span>None</span>{comparison === 'none' && <Check size={15}/>}</button>
           {filteredComparisons.map(item => <button type="button" role="menuitemradio" aria-checked={comparison === item.id} className={comparison === item.id ? 'is-selected' : ''} key={item.id} onClick={() => { onComparisonChange(item.id); setOpen(null) }}><span><strong>{item.label}</strong>{item.detail && <small>{item.detail}</small>}</span>{comparison === item.id && <Check size={15}/>}</button>)}
           {allowSymbolSearch && query.trim() && /^[A-Z0-9.^=-]{1,15}$/i.test(query.trim()) && !comparisonOptions.some(item => item.id.toUpperCase() === query.trim().toUpperCase()) && <button type="button" role="menuitemradio" aria-checked={comparison === query.trim().toUpperCase()} className={comparison === query.trim().toUpperCase() ? 'is-selected' : ''} onClick={() => { onComparisonChange(query.trim().toUpperCase()); setOpen(null) }}><span><strong>{query.trim().toUpperCase()}</strong><small>Load market history</small></span>{comparison === query.trim().toUpperCase() && <Check size={15}/>}</button>}
-          {!filteredComparisons.length && !(allowSymbolSearch && query.trim() && /^[A-Z0-9.^=-]{1,15}$/i.test(query.trim())) && <p className="finance-pro-empty">No comparison data for this chart.</p>}
+          {!filteredComparisons.length && !(allowSymbolSearch && query.trim() && /^[A-Z0-9.^=-]{1,15}$/i.test(query.trim())) && <p className="finance-pro-empty">No comparison series available for this chart.</p>}
         </MotionPopover>
       </div>
 
