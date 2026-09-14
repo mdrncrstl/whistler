@@ -3,7 +3,7 @@
 .md-menu-group { position: relative; }
 .md-menu-group > button { display: flex; align-items: center; gap: 6px; padding: 16px 0; border: 0; background: none; color: inherit; font: inherit; font-weight: 600; cursor: pointer; }
 .md-pricing-link { text-decoration: none; color: inherit; }
-.md-menu-panel { position: absolute; z-index: 90; top: 100%; left: 0; width: min(350px,calc(100vw - 32px)); padding: 8px; border: 1px solid #d7e4dd; border-radius: 14px; background: #fcfdfb; color: #102c22; box-shadow: 0 18px 42px rgb(0 30 20 / 14%), 0 2px 8px rgb(0 30 20 / 5%); overflow: hidden; transform-origin: top left; animation: menu-open 120ms ease-out both; }
+.md-menu-panel { position: absolute; z-index: 90; top: 100%; left: 0; width: min(350px,calc(100vw - 32px)); padding: 8px; border: 1px solid #d7e4dd; border-radius: 14px; background: #fcfdfb; color: #102c22; box-shadow: 0 18px 42px rgb(0 30 20 / 14%), 0 2px 8px rgb(0 30 20 / 5%); overflow: hidden; }
 .md-menu-links { display: grid; grid-template-columns: 1fr; gap: 2px; }
 .md-menu-links a { min-width: 0; display: flex; align-items: start; gap: 10px; padding: 11px 12px; border-radius: 9px; color: #102c22 !important; text-decoration: none; transition: background-color 140ms ease, color 140ms ease; }
 .md-menu-links a:hover { background: #eaf4ee; }
@@ -53,7 +53,6 @@
 .md-public-plans ul { list-style: none; margin: 12px 0 0; padding: 0; }
 .md-public-plans li { display: flex; gap: 8px; align-items: start; margin: 15px 0; font-size: 13px; }
 .md-price-note { font-size: 12px !important; margin-top: 28px; }
-@keyframes menu-open { from { opacity: 0; } to { opacity: 1; } }
 @media (max-width: 1100px) { .md-site-menu,.md-menu-group { gap: 16px; } .md-menu-group > button { font-size: 12px; } .md-public-plans article { padding: 20px; } }
 @media (max-width: 860px) {
   .md-site-menu.is-mobile { display: grid; gap: 0; width: 100%; }
@@ -70,7 +69,6 @@
   .md-public-body article { gap: 14px; }
   .md-public-body h2 { font-size: 24px; }
 }
-@media (prefers-reduced-motion: reduce) { .md-menu-panel { animation: none; } }
 .cloud-footer-grid { grid-template-columns: 1.3fr 1fr 1fr 1fr .8fr; gap: 28px; }
 .cloud-header.is-at-top .cloud-desktop-nav .md-site-menu { color: #edfff6; }
 .cloud-header.is-at-top .cloud-mobile-nav .md-site-menu { color: #173d2d; }

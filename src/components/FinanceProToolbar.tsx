@@ -65,8 +65,15 @@ export function FinanceProToolbar({
     const close = (event: MouseEvent) => {
       if (!root.current?.contains(event.target as Node)) setOpen(null)
     }
+    const escape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setOpen(null)
+    }
     document.addEventListener('mousedown', close)
-    return () => document.removeEventListener('mousedown', close)
+    document.addEventListener('keydown', escape)
+    return () => {
+      document.removeEventListener('mousedown', close)
+      document.removeEventListener('keydown', escape)
+    }
   }, [])
 
   useEffect(() => {

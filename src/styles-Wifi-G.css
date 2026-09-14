@@ -1616,11 +1616,10 @@ body { font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-s
 .advanced-zoom-controls { margin-left: 4px; }
 .advanced-zoom-controls button { width: 26px; min-width: 26px; padding: 0; }
 .advanced-range-presets button:focus-visible,.advanced-chart-actions button:focus-visible,.advanced-custom-range input:focus-visible,.advanced-custom-range button:focus-visible,.advanced-navigator input:focus-visible + input { outline: 3px solid color-mix(in srgb, var(--green) 20%, transparent); outline-offset: 2px; }
-.advanced-custom-range { padding: 10px 12px; border-bottom: 1px solid var(--line); display: flex; align-items: end; justify-content: flex-end; gap: 9px; background: var(--surface-2); animation: advanced-range-in .18s var(--ease-out); }
+.advanced-custom-range { padding: 10px 12px; border-bottom: 1px solid var(--line); display: flex; align-items: end; justify-content: flex-end; gap: 9px; background: var(--surface-2); }
 .advanced-custom-range label { display: grid; gap: 4px; color: var(--muted); font-size: 9px; font-weight: 650; text-transform: uppercase; letter-spacing: .05em; }
 .advanced-custom-range input { height: 31px; padding: 0 8px; border: 1px solid var(--line); border-radius: 5px; background: var(--surface); color: var(--text); font: inherit; font-size: 10px; }
 .advanced-custom-range button { height: 31px; padding: 0 13px; border: 1px solid var(--green); border-radius: 5px; background: var(--green); color: #fff; font: inherit; font-size: 10px; font-weight: 700; cursor: pointer; }
-@keyframes advanced-range-in { from { opacity: 0; transform: translateY(-4px); } }
 .advanced-chart-stage { position: relative; height: 410px; min-height: 300px; overflow: hidden; background: var(--surface); }
 .advanced-chart-canvas { position: absolute; inset: 0; }
 .advanced-chart-canvas canvas { display: block; }
@@ -6939,13 +6938,18 @@ html { scrollbar-gutter: stable; }
 /* transitions.dev integration: one small press response for the workspace controls. */
 .app-shell button:not(:disabled),
 .md-site-menu button:not(:disabled),
-.funnel-page button:not(:disabled) {
+.funnel-page button:not(:disabled),
+.cloud-page button:not(:disabled),
+.onboarding-page button:not(:disabled) {
+  transition-property: color, background-color, border-color, box-shadow, opacity, transform;
   transition-duration: var(--duration-quick);
   transition-timing-function: var(--ease-smooth-out);
 }
 .app-shell button:not(:disabled):not(.global-search):active,
 .md-site-menu button:not(:disabled):active,
-.funnel-page button:not(:disabled):active {
+.funnel-page button:not(:disabled):active,
+.cloud-page button:not(:disabled):active,
+.onboarding-page button:not(:disabled):active {
   transform: scale(.98);
 }
 
@@ -6957,7 +6961,7 @@ html { scrollbar-gutter: stable; }
   top: 100%;
   right: -6px;
   width: calc(100% + 12px);
-  height: 12px;
+  height: 16px;
   z-index: 1;
   pointer-events: none;
   background: transparent;

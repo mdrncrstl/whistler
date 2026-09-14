@@ -12,6 +12,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "qa:visual": "node scripts/visual-qa.mjs",
+    "qa:transitions": "node scripts/transition-qa.mjs",
     "deploy": "vercel --prod --yes"
   },
   "dependencies": {

@@ -15,6 +15,7 @@ import { CalendarDays, Crosshair, Minus, Plus, RotateCcw, Scale, SlidersHorizont
 import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
 import { date, money } from '../lib/format'
 import { FINANCE_PERIODS } from '../lib/financePeriods'
+import { MotionPopover } from './ui'
 
 export type PerformanceRangePreset = '1D' | '5D' | '1M' | '3M' | '6M' | 'YTD' | '1Y' | '3Y' | '5Y' | 'MAX' | 'CUSTOM'
 export type PerformanceMode = 'Amount' | 'Percent'
@@ -507,7 +508,7 @@ export function AdvancedPerformanceChart({
       </div>
     </div>
 
-    {customOpen && <div className="advanced-custom-range" role="group" aria-label="Custom chart date range"><label>From<input type="date" value={customStart} min={isoDay(sortedPoints[0].date)} max={customEnd || isoDay(sortedPoints.at(-1)!.date)} onChange={(event) => setCustomStart(event.target.value)}/></label><label>To<input type="date" value={customEnd} min={customStart || isoDay(sortedPoints[0].date)} max={isoDay(sortedPoints.at(-1)!.date)} onChange={(event) => setCustomEnd(event.target.value)}/></label><button type="button" onClick={applyCustomRange}>Apply range</button></div>}
+    <MotionPopover open={customOpen} className="advanced-custom-range" role="group" ariaLabel="Custom chart date range" origin="top left"><label>From<input type="date" value={customStart} min={isoDay(sortedPoints[0].date)} max={customEnd || isoDay(sortedPoints.at(-1)!.date)} onChange={(event) => setCustomStart(event.target.value)}/></label><label>To<input type="date" value={customEnd} min={customStart || isoDay(sortedPoints[0].date)} max={isoDay(sortedPoints.at(-1)!.date)} onChange={(event) => setCustomEnd(event.target.value)}/></label><button type="button" onClick={applyCustomRange}>Apply range</button></MotionPopover>
 
     <div className={`advanced-chart-stage ${measureActive ? 'is-measuring' : ''}`}>
       <div ref={chartContainerRef} className="advanced-chart-canvas"/>

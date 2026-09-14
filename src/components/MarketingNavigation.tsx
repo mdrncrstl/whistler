@@ -1,6 +1,7 @@
 import { Fragment, useEffect, useRef, useState } from 'react'
 import { ArrowUpRight, ChevronDown } from 'lucide-react'
 import { marketingGroups, marketingPages } from '../lib/marketingPages'
+import { MotionPopover } from './ui'
 
 export function MarketingNavigation({ mobile = false, onNavigate }: { mobile?: boolean; onNavigate?: () => void }) {
   const [open, setOpen] = useState<string | null>(null)
@@ -39,7 +40,7 @@ export function MarketingNavigation({ mobile = false, onNavigate }: { mobile?: b
       {marketingGroups.map(group => <Fragment key={group}>
         {group === 'Company' && <a className="md-pricing-link" href="/pricing" onClick={onNavigate}>Pricing</a>}
         <div className={`md-menu-group menu-anchor ${open === group ? 'is-open' : ''}`} onPointerLeave={hoverClose}>
-        <button data-group={group} aria-expanded={open === group} aria-controls={`${mobile ? 'mobile' : 'desktop'}-${group.replaceAll(' ','-')}`}
+        <button data-group={group} aria-haspopup="menu" aria-expanded={open === group} aria-controls={`${mobile ? 'mobile' : 'desktop'}-${group.replaceAll(' ','-')}`}
           onPointerEnter={event => { if (event.pointerType === 'mouse' && hoverCapable() && !inTriangle(event.clientX, event.clientY)) { cancelClose(); setOpen(group) } }}
           onPointerLeave={event => {
             if (!hoverCapable() || open !== group) return
@@ -47,11 +48,11 @@ export function MarketingNavigation({ mobile = false, onNavigate }: { mobile?: b
             if (panel && event.clientY <= panel.top) corridor.current = { x: event.clientX, y: event.clientY - 4, left: panel.left - 8, right: panel.right + 8, bottom: panel.top + 24, until: Date.now() + 1500 }
             hoverClose()
           }}
-          onKeyDown={event => { if (event.key === 'ArrowDown') { event.preventDefault(); cancelClose(); setOpen(group); requestAnimationFrame(() => root.current?.querySelector<HTMLAnchorElement>('.md-menu-panel a')?.focus()) } }}
+          onKeyDown={event => { if (event.key === 'ArrowDown') { event.preventDefault(); cancelClose(); setOpen(group); requestAnimationFrame(() => requestAnimationFrame(() => root.current?.querySelector<HTMLAnchorElement>('.md-menu-panel.is-open a')?.focus())) } }}
           onClick={event => { cancelClose(); setOpen(hoverCapable() && event.detail > 0 ? group : open === group ? null : group) }}>{group}<ChevronDown size={14} aria-hidden="true"/></button>
-      {open === group && <div className="md-menu-panel" onPointerEnter={cancelClose} onFocus={cancelClose} id={`${mobile ? 'mobile' : 'desktop'}-${group.replaceAll(' ','-')}`}>
+      <MotionPopover open={open === group} className="md-menu-panel" role="menu" ariaLabel={`${group} navigation`} id={`${mobile ? 'mobile' : 'desktop'}-${group.replaceAll(' ','-')}`} origin="top left" onPointerEnter={cancelClose} onFocus={cancelClose}>
         <div className="md-menu-links">{marketingPages.filter(page => page.group === group).map(page => <a key={page.path} href={page.path} onClick={() => { cancelClose(); setOpen(null); onNavigate?.() }}><span><strong>{page.label}</strong><small>{page.description}</small></span><ArrowUpRight size={16} aria-hidden="true"/></a>)}</div>
-      </div>}
+      </MotionPopover>
     </div></Fragment>)}
   </div>
 }

@@ -1,6 +1,6 @@
 import { AlertCircle, Check, ChevronDown, LoaderCircle, Search, X, type LucideIcon } from 'lucide-react'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
-import { useEffect, useRef, useState, type AriaRole, type ButtonHTMLAttributes, type InputHTMLAttributes, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type AriaRole, type ButtonHTMLAttributes, type FocusEventHandler, type InputHTMLAttributes, type PointerEventHandler, type ReactNode } from 'react'
 import { money } from '../lib/format'
 
 const easeOut = [0.23, 1, 0.32, 1] as const
@@ -22,7 +22,7 @@ function scheduleFrame(callback: () => void) {
   return () => window.clearTimeout(timeout)
 }
 
-export function MotionPopover({ open, children, className, origin = 'top right', role, ariaLabel }: { open: boolean; children: ReactNode; className: string; origin?: string; role?: AriaRole; ariaLabel?: string }) {
+export function MotionPopover({ open, children, className, origin = 'top right', role, ariaLabel, id, onPointerEnter, onFocus }: { open: boolean; children: ReactNode; className: string; origin?: string; role?: AriaRole; ariaLabel?: string; id?: string; onPointerEnter?: PointerEventHandler<HTMLDivElement>; onFocus?: FocusEventHandler<HTMLDivElement> }) {
   const reduceMotion = useReducedMotion()
   const mountedRef = useRef(open)
   const [mounted, setMounted] = useState(open)
@@ -56,12 +56,15 @@ export function MotionPopover({ open, children, className, origin = 'top right',
   const dropdownClass = [className, 't-dropdown', isOpen ? 'is-open' : '', state === 'closing' ? 'is-closing' : ''].filter(Boolean).join(' ')
   return <div
     className={dropdownClass}
+    id={id}
     data-origin={origin.trim().toLowerCase().replace(/\s+/g, '-')}
     role={role}
     aria-label={ariaLabel}
     aria-hidden={open ? undefined : true}
     inert={!open}
     style={{ transformOrigin: origin }}
+    onPointerEnter={onPointerEnter}
+    onFocus={onFocus}
   >{children}</div>
 }
 
