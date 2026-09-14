@@ -7038,3 +7038,34 @@ html { scrollbar-gutter: stable; }
   .mytax-review-item { grid-template-columns: 24px minmax(0, 1fr); }
   .mytax-review-item .badge { grid-column: 2; justify-self: start; }
 }
+
+/* transitions.dev integration: one small press response for the workspace controls. */
+.app-shell button:not(:disabled),
+.md-site-menu button:not(:disabled),
+.funnel-page button:not(:disabled) {
+  transition-duration: var(--duration-quick);
+  transition-timing-function: var(--ease-smooth-out);
+}
+.app-shell button:not(:disabled):not(.global-search):active,
+.md-site-menu button:not(:disabled):active,
+.funnel-page button:not(:disabled):active {
+  transform: scale(.98);
+}
+
+/* Keep a forgiving triangle of pointer space between a menu trigger and its panel. */
+.menu-anchor { position: relative; }
+.menu-anchor::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  right: -6px;
+  width: calc(100% + 12px);
+  height: 12px;
+  z-index: 1;
+  pointer-events: none;
+  background: transparent;
+  clip-path: polygon(0 0, 100% 0, 82% 100%, 18% 100%);
+}
+.menu-anchor.is-open::after { pointer-events: auto; }
+.drawer-panel .menu-anchor::after,
+.md-site-menu.is-mobile .menu-anchor::after { display: none; }

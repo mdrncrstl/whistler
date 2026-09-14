@@ -1,29 +1,68 @@
 import { AlertCircle, Check, ChevronDown, LoaderCircle, Search, X, type LucideIcon } from 'lucide-react'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
-import { useEffect, useRef, type AriaRole, type ButtonHTMLAttributes, type InputHTMLAttributes, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type AriaRole, type ButtonHTMLAttributes, type InputHTMLAttributes, type ReactNode } from 'react'
 import { money } from '../lib/format'
 
 const easeOut = [0.23, 1, 0.32, 1] as const
 const popoverIdentity = 'translateY(0px) scale(1)'
 const toastIdentity = 'translateY(0%)'
 
+function readMotionDuration(variable: string, fallback: number) {
+  if (typeof window === 'undefined') return fallback
+  const value = Number.parseFloat(window.getComputedStyle(document.documentElement).getPropertyValue(variable))
+  return Number.isFinite(value) ? value : fallback
+}
+
+function scheduleFrame(callback: () => void) {
+  if (typeof window.requestAnimationFrame === 'function') {
+    const frame = window.requestAnimationFrame(callback)
+    return () => window.cancelAnimationFrame(frame)
+  }
+  const timeout = window.setTimeout(callback, 0)
+  return () => window.clearTimeout(timeout)
+}
+
 export function MotionPopover({ open, children, className, origin = 'top right', role, ariaLabel }: { open: boolean; children: ReactNode; className: string; origin?: string; role?: AriaRole; ariaLabel?: string }) {
   const reduceMotion = useReducedMotion()
-  const hiddenTransform = reduceMotion ? popoverIdentity : 'translateY(-4px) scale(0.97)'
-  return (
-    <AnimatePresence initial={false}>
-      {open && <motion.div
-        className={className}
-        role={role}
-        aria-label={ariaLabel}
-        style={{ transformOrigin: origin }}
-        initial={{ opacity: 0, transform: hiddenTransform }}
-        animate={{ opacity: 1, transform: popoverIdentity }}
-        exit={{ opacity: 0, transform: hiddenTransform, transition: { duration: reduceMotion ? 0.1 : 0.11, ease: easeOut } }}
-        transition={{ duration: reduceMotion ? 0.12 : 0.16, ease: easeOut }}
-      >{children}</motion.div>}
-    </AnimatePresence>
-  )
+  const mountedRef = useRef(open)
+  const [mounted, setMounted] = useState(open)
+  const [state, setState] = useState<'closed' | 'open' | 'closing'>(open ? 'open' : 'closed')
+
+  useEffect(() => {
+    if (open) {
+      if (!mountedRef.current) {
+        mountedRef.current = true
+        setMounted(true)
+        setState('closed')
+        return scheduleFrame(() => setState('open'))
+      }
+      setState('open')
+      return
+    }
+
+    if (!mountedRef.current) return
+    setState('closing')
+    const closeMs = reduceMotion ? 0 : readMotionDuration('--dropdown-close-dur', 150)
+    const timeout = window.setTimeout(() => {
+      mountedRef.current = false
+      setMounted(false)
+      setState('closed')
+    }, closeMs)
+    return () => window.clearTimeout(timeout)
+  }, [open, reduceMotion])
+
+  if (!mounted) return null
+  const isOpen = state === 'open' && open
+  const dropdownClass = [className, 't-dropdown', isOpen ? 'is-open' : '', state === 'closing' ? 'is-closing' : ''].filter(Boolean).join(' ')
+  return <div
+    className={dropdownClass}
+    data-origin={origin.trim().toLowerCase().replace(/\s+/g, '-')}
+    role={role}
+    aria-label={ariaLabel}
+    aria-hidden={open ? undefined : true}
+    inert={!open}
+    style={{ transformOrigin: origin }}
+  >{children}</div>
 }
 
 export function MotionDialogSurface({ open, className, labelledBy, onClose, children }: { open: boolean; className: string; labelledBy: string; onClose: () => void; children: ReactNode }) {

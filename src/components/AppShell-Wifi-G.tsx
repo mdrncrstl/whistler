@@ -1,4 +1,4 @@
-import { ArrowLeftRight, ArrowUpRight, BarChart3, Bell, BriefcaseBusiness, CalendarDays, Check, ChevronsLeft, ChevronsRight, ChevronDown, ChevronRight, CircleDollarSign, Command, CreditCard, FileText, Gift, History, Layers3, LineChart, ListTree, LogOut, Menu, MessageSquare, Moon, Network, PieChart, Plus, RefreshCw, Scale, Search, Settings, Sparkles, Sun, Table2, Target, TrendingUp, UserRound, WalletCards, X, type LucideIcon } from 'lucide-react'
+import { ArrowLeftRight, ArrowUpRight, BarChart3, Bell, BriefcaseBusiness, CalendarDays, Check, ChevronsLeft, ChevronsRight, ChevronDown, ChevronRight, CircleDollarSign, CreditCard, FileText, Gift, History, Layers3, LineChart, ListTree, LogOut, Menu, MessageSquare, Moon, Network, PieChart, Plus, RefreshCw, Scale, Search, Settings, Sparkles, Sun, Table2, Target, TrendingUp, UserRound, WalletCards, X, type LucideIcon } from 'lucide-react'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { NavLink, useLocation, useNavigate } from 'react-router-dom'
@@ -81,6 +81,8 @@ export function AppShell({ children, onExitDemo }: { children: ReactNode; onExit
   const location = useLocation()
   const navigate = useNavigate()
   const reduceMotion = useReducedMotion()
+  const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad|iPod/.test(navigator.platform)
+  const searchShortcut = isMac ? '⌘ K' : 'Ctrl K'
   const pageKey = `${location.pathname}${location.search}${location.hash}`
   const current = [...flatNavigation].sort((a, b) => b.to.length - a.to.length).find((item) => item.end ? location.pathname === item.to : location.pathname.startsWith(item.to)) || flatNavigation[0]
   const profile = bundle.profile
@@ -147,15 +149,17 @@ export function AppShell({ children, onExitDemo }: { children: ReactNode; onExit
   }, [searchOpen])
 
   useEffect(() => {
-    if (!portfolioMenuOpen) return
+    if (!portfolioMenuOpen && !notificationsOpen && !accountMenuOpen) return
     const onPointerDown = (event: PointerEvent) => {
       const target = event.target
-      if (target instanceof Element && target.closest('.portfolio-switcher-wrap')) return
+      if (target instanceof Element && target.closest('.menu-anchor')) return
       setPortfolioMenuOpen(false)
+      setNotificationsOpen(false)
+      setAccountMenuOpen(false)
     }
     window.addEventListener('pointerdown', onPointerDown)
     return () => window.removeEventListener('pointerdown', onPointerDown)
-  }, [portfolioMenuOpen])
+  }, [accountMenuOpen, notificationsOpen, portfolioMenuOpen])
 
   const searchTerm = searchQuery.trim().toLowerCase()
   const searchCommands: SearchCommand[] = [
@@ -213,8 +217,8 @@ export function AppShell({ children, onExitDemo }: { children: ReactNode; onExit
 
   const nav = (
     <>
-      <div className={`portfolio-switcher-wrap ${portfolioMenuOpen ? 'is-open' : ''}`}>
-        <button type="button" className="portfolio-switcher" aria-haspopup="menu" aria-expanded={portfolioMenuOpen} onClick={() => setPortfolioMenuOpen((open) => !open)}><Brand compact /><span><strong>All Portfolios</strong><small>{bundle.holdings.length} holdings · AUD</small></span><ChevronDown size={14} /></button>
+      <div className={`portfolio-switcher-wrap menu-anchor ${portfolioMenuOpen ? 'is-open' : ''}`}>
+        <button type="button" className="portfolio-switcher" aria-haspopup="menu" aria-expanded={portfolioMenuOpen} onClick={() => { setPortfolioMenuOpen((open) => !open); setNotificationsOpen(false); setAccountMenuOpen(false) }}><Brand compact /><span><strong>All Portfolios</strong><small>{bundle.holdings.length} holdings · AUD</small></span><ChevronDown size={14} /></button>
         <MotionPopover open={portfolioMenuOpen} className="portfolio-menu" role="menu" ariaLabel="Portfolio switcher" origin="top center">
           <div className="portfolio-menu-content">
           <span className="portfolio-menu-label">My portfolios</span>
@@ -283,12 +287,12 @@ export function AppShell({ children, onExitDemo }: { children: ReactNode; onExit
             <div><strong>{current.label}</strong><span>{demo ? 'Illustrative demo data' : 'Live private workspace'}</span></div>
           </div>
           <div className="topbar-actions">
-            <button className="global-search" type="button" onClick={() => { setSearchQuery(''); setActiveCommandIndex(0); setSearchOpen(true) }}><Search size={15}/><span>Search ticker, company, or page…</span><kbd><Command size={10}/>K</kbd></button>
+            <button className="global-search" type="button" aria-label={`Search ticker, company, or page (${searchShortcut})`} onClick={() => { setSearchQuery(''); setActiveCommandIndex(0); setSearchOpen(true) }}><Search size={15}/><span>Search ticker, company, or page…</span><kbd>{searchShortcut}</kbd></button>
             <div className="topbar-tools">
               <Button variant="ghost" icon={RefreshCw} busy={action === 'refresh-quotes'} onClick={() => refreshQuotes()}>Refresh prices</Button>
-              <div className="notifications-wrap"><IconButton label="Notifications" onClick={() => setNotificationsOpen(!notificationsOpen)}><Bell size={17}/></IconButton><MotionPopover open={notificationsOpen} className="notifications-menu" role="status"><header><strong>Notifications</strong><button onClick={() => setNotificationsOpen(false)} aria-label="Close notifications"><X size={14}/></button></header><div><span><Bell size={17}/></span><strong>You’re all caught up</strong><p>Sync alerts and portfolio updates will appear here.</p></div></MotionPopover></div>
+              <div className={`notifications-wrap menu-anchor ${notificationsOpen ? 'is-open' : ''}`}><IconButton label="Notifications" onClick={() => { setNotificationsOpen((open) => !open); setPortfolioMenuOpen(false); setAccountMenuOpen(false) }}><Bell size={17}/></IconButton><MotionPopover open={notificationsOpen} className="notifications-menu" role="status"><header><strong>Notifications</strong><button onClick={() => setNotificationsOpen(false)} aria-label="Close notifications"><X size={14}/></button></header><div><span><Bell size={17}/></span><strong>You’re all caught up</strong><p>Sync alerts and portfolio updates will appear here.</p></div></MotionPopover></div>
               <IconButton label={`Use ${theme === 'light' ? 'dark' : 'light'} theme`} onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}>{theme === 'light' ? <Moon size={17}/> : <Sun size={17}/>}</IconButton>
-              <div className="account-menu-wrap"><button className="topbar-avatar" type="button" title={profile?.email || undefined} aria-label="Open account menu" aria-haspopup="menu" aria-expanded={accountMenuOpen} onClick={() => setAccountMenuOpen(!accountMenuOpen)}>{profile?.avatar_url ? <img src={profile.avatar_url} alt="" referrerPolicy="no-referrer" /> : (profile?.full_name || profile?.email || 'M').slice(0, 1).toUpperCase()}</button><MotionPopover open={accountMenuOpen} className="account-menu" role="menu">
+              <div className={`account-menu-wrap menu-anchor ${accountMenuOpen ? 'is-open' : ''}`}><button className="topbar-avatar" type="button" title={profile?.email || undefined} aria-label="Open account menu" aria-haspopup="menu" aria-expanded={accountMenuOpen} onClick={() => { setAccountMenuOpen((open) => !open); setPortfolioMenuOpen(false); setNotificationsOpen(false) }}>{profile?.avatar_url ? <img src={profile.avatar_url} alt="" referrerPolicy="no-referrer" /> : (profile?.full_name || profile?.email || 'M').slice(0, 1).toUpperCase()}</button><MotionPopover open={accountMenuOpen} className="account-menu" role="menu">
                 <header><span className="account-avatar"><UserRound size={18}/></span><span><strong>{profile?.full_name || 'Masterdeck investor'}</strong><small>{profile?.email || (demo ? 'Demo workspace' : 'Private workspace')}</small></span></header>
                 <button role="menuitem" onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}><Moon size={15}/><span>Dark mode</span><span className={`menu-switch ${theme === 'dark' ? 'on' : ''}`} aria-hidden="true"/></button>
                 <button role="menuitem" onClick={() => openCommand('/app/settings')}><Settings size={15}/><span>Settings</span></button>

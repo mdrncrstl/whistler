@@ -38,7 +38,7 @@ export function MarketingNavigation({ mobile = false, onNavigate }: { mobile?: b
     >
       {marketingGroups.map(group => <Fragment key={group}>
         {group === 'Company' && <a className="md-pricing-link" href="/pricing" onClick={onNavigate}>Pricing</a>}
-        <div className="md-menu-group" onPointerLeave={hoverClose}>
+        <div className={`md-menu-group menu-anchor ${open === group ? 'is-open' : ''}`} onPointerLeave={hoverClose}>
         <button data-group={group} aria-expanded={open === group} aria-controls={`${mobile ? 'mobile' : 'desktop'}-${group.replaceAll(' ','-')}`}
           onPointerEnter={event => { if (event.pointerType === 'mouse' && hoverCapable() && !inTriangle(event.clientX, event.clientY)) { cancelClose(); setOpen(group) } }}
           onPointerLeave={event => {

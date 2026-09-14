@@ -1,6 +1,7 @@
 import { Activity, AreaChart, BarChart3, CandlestickChart, Check, ChevronDown, ChartLine, GitCompareArrows, Search, X } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import type { FinanceChartStyle, FinanceIndicatorId } from './financeChartUtils'
+import { MotionPopover } from './ui'
 
 export interface FinanceComparisonOption {
   id: string
@@ -56,6 +57,7 @@ export function FinanceProToolbar({
   allowSymbolSearch?: boolean
 }) {
   const root = useRef<HTMLDivElement>(null)
+  const compareSearchRef = useRef<HTMLInputElement>(null)
   const [open, setOpen] = useState<'style' | 'compare' | 'indicator' | null>(null)
   const [query, setQuery] = useState('')
 
@@ -67,6 +69,12 @@ export function FinanceProToolbar({
     return () => document.removeEventListener('mousedown', close)
   }, [])
 
+  useEffect(() => {
+    if (open !== 'compare') return
+    const focusTimer = window.setTimeout(() => compareSearchRef.current?.focus(), 0)
+    return () => window.clearTimeout(focusTimer)
+  }, [open])
+
   const toggleIndicator = (id: FinanceIndicatorId) => {
     onIndicatorsChange(selectedIndicators.includes(id) ? selectedIndicators.filter(value => value !== id) : [...selectedIndicators, id])
   }
@@ -75,41 +83,41 @@ export function FinanceProToolbar({
 
   return <div className="finance-pro-tools" ref={root}>
     <div className="finance-pro-toolbar" role="toolbar" aria-label="Pro chart controls">
-      <div className="finance-pro-menu">
+      <div className={`finance-pro-menu menu-anchor ${open === 'style' ? 'is-open' : ''}`}>
         <button type="button" className="finance-pro-menu-trigger" aria-haspopup="menu" aria-expanded={open === 'style'} onClick={() => setOpen(open === 'style' ? null : 'style')}>
           {chartStyle === 'line' ? <ChartLine size={17}/> : chartStyle === 'area' ? <AreaChart size={17}/> : chartStyle === 'candle' ? <CandlestickChart size={17}/> : <BarChart3 size={17}/>}<span>{styleLabel}</span><ChevronDown size={15}/>
         </button>
-        {open === 'style' && <div className="finance-pro-menu-panel finance-pro-style-panel" role="menu" aria-label="Chart type">
+        <MotionPopover open={open === 'style'} className="finance-pro-menu-panel finance-pro-style-panel" role="menu" ariaLabel="Chart type" origin="top left">
           {chartStyles.map(({ id, label, icon: Icon }) => {
             const disabled = id === 'candle' ? !candleAvailable : id === 'bar' ? !barAvailable : false
             return <button type="button" key={id} role="menuitemradio" aria-checked={chartStyle === id} disabled={disabled} className={chartStyle === id ? 'is-selected' : ''} onClick={() => { onChartStyleChange(id); setOpen(null) }}>
               <Icon size={17}/><span>{label}</span>{chartStyle === id && <Check size={15}/>} {disabled && <small>Requires OHLC data</small>}
             </button>
           })}
-        </div>}
+        </MotionPopover>
       </div>
 
-      <div className="finance-pro-menu">
+      <div className={`finance-pro-menu menu-anchor ${open === 'compare' ? 'is-open' : ''}`}>
         <button type="button" className="finance-pro-menu-trigger" aria-haspopup="menu" aria-expanded={open === 'compare'} onClick={() => setOpen(open === 'compare' ? null : 'compare')}>
           <GitCompareArrows size={17}/><span>Compare</span><ChevronDown size={15}/>
         </button>
-        {open === 'compare' && <div className="finance-pro-menu-panel finance-pro-compare-panel" role="menu" aria-label="Compare to financial entity">
-          <label className="finance-pro-search"><Search size={16}/><input autoFocus aria-label="Search for a symbol" placeholder="Search for a symbol…" value={query} onChange={event => setQuery(event.target.value)}/><button type="button" aria-label="Clear symbol search" onClick={() => setQuery('')}><X size={15}/></button></label>
+        <MotionPopover open={open === 'compare'} className="finance-pro-menu-panel finance-pro-compare-panel" role="menu" ariaLabel="Compare to financial entity" origin="top left">
+          <label className="finance-pro-search"><Search size={16}/><input ref={compareSearchRef} aria-label="Search for a symbol" placeholder="Search for a symbol…" value={query} onChange={event => setQuery(event.target.value)}/><button type="button" aria-label="Clear symbol search" onClick={() => setQuery('')}><X size={15}/></button></label>
           <span className="finance-pro-menu-heading">All symbols</span>
           <button type="button" role="menuitemradio" aria-checked={comparison === 'none'} className={comparison === 'none' ? 'is-selected' : ''} onClick={() => { onComparisonChange('none'); setOpen(null) }}><span>None</span>{comparison === 'none' && <Check size={15}/>}</button>
           {filteredComparisons.map(item => <button type="button" role="menuitemradio" aria-checked={comparison === item.id} className={comparison === item.id ? 'is-selected' : ''} key={item.id} onClick={() => { onComparisonChange(item.id); setOpen(null) }}><span><strong>{item.label}</strong>{item.detail && <small>{item.detail}</small>}</span>{comparison === item.id && <Check size={15}/>}</button>)}
           {allowSymbolSearch && query.trim() && /^[A-Z0-9.^=-]{1,15}$/i.test(query.trim()) && !comparisonOptions.some(item => item.id.toUpperCase() === query.trim().toUpperCase()) && <button type="button" role="menuitemradio" aria-checked={comparison === query.trim().toUpperCase()} className={comparison === query.trim().toUpperCase() ? 'is-selected' : ''} onClick={() => { onComparisonChange(query.trim().toUpperCase()); setOpen(null) }}><span><strong>{query.trim().toUpperCase()}</strong><small>Load market history</small></span>{comparison === query.trim().toUpperCase() && <Check size={15}/>}</button>}
           {!filteredComparisons.length && !(allowSymbolSearch && query.trim() && /^[A-Z0-9.^=-]{1,15}$/i.test(query.trim())) && <p className="finance-pro-empty">No comparison data for this chart.</p>}
-        </div>}
+        </MotionPopover>
       </div>
 
-      <div className="finance-pro-menu">
+      <div className={`finance-pro-menu menu-anchor ${open === 'indicator' ? 'is-open' : ''}`}>
         <button type="button" className="finance-pro-menu-trigger" aria-haspopup="menu" aria-expanded={open === 'indicator'} onClick={() => setOpen(open === 'indicator' ? null : 'indicator')}>
           <BarChart3 size={17}/><span>Indicators</span><ChevronDown size={15}/>
         </button>
-        {open === 'indicator' && <div className="finance-pro-menu-panel finance-pro-indicator-panel" role="menu" aria-label="Technical indicators">
+        <MotionPopover open={open === 'indicator'} className="finance-pro-menu-panel finance-pro-indicator-panel" role="menu" ariaLabel="Technical indicators" origin="top left">
           {indicators.map(item => <button type="button" role="menuitemcheckbox" aria-checked={selectedIndicators.includes(item.id)} className={selectedIndicators.includes(item.id) ? 'is-selected' : ''} key={item.id} onClick={() => toggleIndicator(item.id)}><span>{item.label}</span>{selectedIndicators.includes(item.id) && <Check size={15}/>}</button>)}
-        </div>}
+        </MotionPopover>
       </div>
     </div>
     {!!selectedIndicators.length && <div className="finance-indicator-chips" aria-label="Active indicators">

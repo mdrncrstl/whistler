@@ -1,10 +1,10 @@
-import { fireEvent, render, screen } from '@testing-library/react'
+import { act, fireEvent, render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import { LoadingScreen, MotionDialogSurface, MotionPopover } from '../src/components/ui'
 
 describe('motion UI primitives', () => {
   it('keeps popovers accessible and anchored to their trigger edge', () => {
-    const { rerender } = render(
+    const { container, rerender } = render(
       <MotionPopover open className="test-menu" origin="top left" role="menu" ariaLabel="Test actions">
         <button role="menuitem">Open report</button>
       </MotionPopover>,
@@ -12,13 +12,23 @@ describe('motion UI primitives', () => {
 
     const menu = screen.getByRole('menu', { name: 'Test actions' })
     expect(menu).toHaveStyle({ transformOrigin: 'top left' })
+    expect(menu).toHaveClass('t-dropdown', 'is-open')
+    expect(menu).toHaveAttribute('data-origin', 'top-left')
     expect(screen.getByRole('menuitem', { name: 'Open report' })).toBeVisible()
 
-    rerender(
-      <MotionPopover open={false} className="test-menu" origin="top left" role="menu" ariaLabel="Test actions">
-        <button role="menuitem">Open report</button>
-      </MotionPopover>,
-    )
+    vi.useFakeTimers()
+    try {
+      rerender(
+        <MotionPopover open={false} className="test-menu" origin="top left" role="menu" ariaLabel="Test actions">
+          <button role="menuitem">Open report</button>
+        </MotionPopover>,
+      )
+      expect(container.querySelector('.t-dropdown.is-closing')).toBeInTheDocument()
+      act(() => { vi.advanceTimersByTime(150) })
+      expect(container.querySelector('.t-dropdown')).not.toBeInTheDocument()
+    } finally {
+      vi.useRealTimers()
+    }
   })
 
   it('preserves outside-click dismissal for animated dialogs', () => {
