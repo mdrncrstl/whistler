@@ -6171,3 +6171,46 @@ html { scrollbar-gutter: stable; }
 
 /* Keep page hierarchy in the headings and remove redundant eyebrow tags. */
 .section-label { display:none !important; }
+
+/* Render Google's official Identity Services control so the provider mark,
+   typography and popup behavior come from Google rather than a recreated icon. */
+.masterdeck-google-signin {
+  position: relative;
+  width: 100%;
+  min-height: 50px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  display: flex;
+  align-items: center;
+  background: transparent;
+  box-shadow: none;
+  overflow: visible;
+}
+.masterdeck-google-signin > div:not(.masterdeck-google-busy) {
+  width: 100% !important;
+  min-width: 0 !important;
+  height: 40px !important;
+  min-height: 40px !important;
+  display: block;
+}
+.masterdeck-google-signin iframe {
+  display: block;
+  width: 100% !important;
+  max-width: 100% !important;
+  height: 40px !important;
+  border: 0;
+}
+.masterdeck-google-signin .masterdeck-google-busy {
+  position: absolute;
+  inset: 5px 0;
+  min-height: 40px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #cddbd4;
+  border-radius: 4px;
+  background: rgb(255 255 255 / 96%);
+  color: #466057;
+  font-size: 12px;
+  font-weight: 700;
+}

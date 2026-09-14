@@ -1,11 +1,12 @@
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
+import { GoogleOAuthProvider } from '@react-oauth/google'
 import { Landing } from '../src/components/Landing-Wifi-G'
 
 describe('Masterdeck public conversion funnel', () => {
   afterEach(cleanup)
   it('renders the complete product, pricing, connections and FAQ journey', () => {
-    render(<Landing onDemo={vi.fn()} signedIn onOpenApp={vi.fn()} />)
+    render(<GoogleOAuthProvider clientId="test-client"><Landing onDemo={vi.fn()} signedIn onOpenApp={vi.fn()} /></GoogleOAuthProvider>)
     expect(screen.getByRole('heading', { name: /Every investment. One clear view/i })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: /More perspective. Less piecing things together/i })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: /Clear pricing. Try it before you pay/i })).toBeInTheDocument()
@@ -16,7 +17,7 @@ describe('Masterdeck public conversion funnel', () => {
   })
 
   it('switches billing periods and expands FAQ answers', async () => {
-    render(<Landing onDemo={vi.fn()} signedIn onOpenApp={vi.fn()} />)
+    render(<GoogleOAuthProvider clientId="test-client"><Landing onDemo={vi.fn()} signedIn onOpenApp={vi.fn()} /></GoogleOAuthProvider>)
     const annual = screen.getByRole('button', { name: /Annual/i })
     const monthly = screen.getByRole('button', { name: 'Monthly' })
     expect(annual).toHaveAttribute('aria-pressed', 'true')
@@ -33,7 +34,7 @@ describe('Masterdeck public conversion funnel', () => {
   })
 
   it('links each visual feature card to an existing product page', () => {
-    render(<Landing onDemo={vi.fn()} signedIn onOpenApp={vi.fn()} />)
+    render(<GoogleOAuthProvider clientId="test-client"><Landing onDemo={vi.fn()} signedIn onOpenApp={vi.fn()} /></GoogleOAuthProvider>)
     const features = within(screen.getByRole('region', { name: 'Explore Masterdeck features' }))
     expect(features.getAllByRole('link')).toHaveLength(4)
     expect(features.getByRole('link', { name: /Your portfolio, together/ })).toHaveAttribute('href', '/features/portfolio-tracking')
@@ -43,7 +44,7 @@ describe('Masterdeck public conversion funnel', () => {
   })
 
   it('shows a real app screenshot with clear demo attribution', () => {
-    render(<Landing onDemo={vi.fn()} signedIn onOpenApp={vi.fn()} />)
+    render(<GoogleOAuthProvider clientId="test-client"><Landing onDemo={vi.fn()} signedIn onOpenApp={vi.fn()} /></GoogleOAuthProvider>)
     expect(screen.getByRole('img', { name: /Actual Masterdeck portfolio with demo holdings/ })).toHaveAttribute('src', '/marketing/masterdeck-portfolio-hero.png')
     expect(screen.getByText('Actual Masterdeck app · Demo portfolio')).toBeInTheDocument()
     expect(screen.getByText('named broker guides', { exact: true })).toBeInTheDocument()
@@ -51,7 +52,7 @@ describe('Masterdeck public conversion funnel', () => {
   })
 
   it('has a working accessible mobile navigation menu', async () => {
-    render(<Landing onDemo={vi.fn()} signedIn onOpenApp={vi.fn()} />)
+    render(<GoogleOAuthProvider clientId="test-client"><Landing onDemo={vi.fn()} signedIn onOpenApp={vi.fn()} /></GoogleOAuthProvider>)
     const toggle = screen.getByRole('button', { name: 'Toggle mobile menu' })
     expect(toggle).toHaveAttribute('aria-expanded', 'false')
     fireEvent.click(toggle)
@@ -69,7 +70,7 @@ describe('Masterdeck public conversion funnel', () => {
     Object.defineProperty(document.documentElement, 'scrollTop', { configurable: true, get: () => pageScrollY })
     const raf = vi.spyOn(window, 'requestAnimationFrame').mockImplementation((callback) => window.setTimeout(() => callback(0), 0))
     const cancelRaf = vi.spyOn(window, 'cancelAnimationFrame').mockImplementation((handle) => window.clearTimeout(handle))
-    render(<Landing onDemo={vi.fn()} signedIn onOpenApp={vi.fn()} />)
+    render(<GoogleOAuthProvider clientId="test-client"><Landing onDemo={vi.fn()} signedIn onOpenApp={vi.fn()} /></GoogleOAuthProvider>)
     const header = screen.getByRole('banner')
 
     pageScrollY = 240

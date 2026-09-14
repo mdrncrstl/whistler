@@ -4,13 +4,25 @@ import { Landing } from '../src/components/Landing-Wifi-G'
 
 const authMocks = vi.hoisted(() => ({
   signInWithOAuth: vi.fn().mockResolvedValue({ data: { provider: 'google', url: 'https://accounts.google.com/' }, error: null }),
+  signInWithIdToken: vi.fn().mockResolvedValue({ data: { session: { access_token: 'test' } }, error: null }),
   signInWithPassword: vi.fn().mockResolvedValue({ error: null }),
   signUp: vi.fn().mockResolvedValue({ data: { session: null }, error: null }),
+}))
+
+vi.mock('@react-oauth/google', () => ({
+  GoogleLogin: ({ onSuccess, click_listener }: {
+    onSuccess: (response: { credential: string; select_by: 'btn' }) => void
+    click_listener?: () => void
+  }) => <button type="button" data-testid="google-provider-button" onClick={() => {
+    click_listener?.()
+    onSuccess({ credential: 'test-google-id-token', select_by: 'btn' })
+  }}>Continue with Google</button>,
 }))
 
 vi.mock('../src/lib/supabase', () => ({
   authClient: { auth: {
     signInWithOAuth: authMocks.signInWithOAuth,
+    signInWithIdToken: authMocks.signInWithIdToken,
     signInWithPassword: authMocks.signInWithPassword,
     signUp: authMocks.signUp,
   } },
@@ -31,24 +43,21 @@ describe('Masterdeck authentication', () => {
     vi.clearAllMocks()
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => ({ external: { apple: false } }) }))
     authMocks.signInWithOAuth.mockResolvedValue({ data: { provider: 'google', url: 'https://accounts.google.com/' }, error: null })
+    authMocks.signInWithIdToken.mockResolvedValue({ data: { session: { access_token: 'test' } }, error: null })
     authMocks.signInWithPassword.mockResolvedValue({ error: null })
     authMocks.signUp.mockResolvedValue({ data: { session: null }, error: null })
   })
 
-  it('starts Google OAuth with the app callback', async () => {
-    render(<Landing onDemo={vi.fn()} onOpenApp={vi.fn()} />)
+  it('uses the official Google button and exchanges its ID token with Supabase', async () => {
+    const onOpenApp = vi.fn()
+    render(<Landing onDemo={vi.fn()} onOpenApp={onOpenApp} />)
 
     fireEvent.click(screen.getAllByRole('button', { name: /try masterdeck free/i })[0])
     expect(await screen.findByRole('dialog', { name: 'Continue to Masterdeck' })).toBeInTheDocument()
 
     fireEvent.click(screen.getByRole('button', { name: 'Continue with Google' }))
-    await waitFor(() => expect(authMocks.signInWithOAuth).toHaveBeenCalledWith({
-      provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-        queryParams: { prompt: 'select_account' },
-      },
-    }))
+    await waitFor(() => expect(authMocks.signInWithIdToken).toHaveBeenCalledWith({ provider: 'google', token: 'test-google-id-token' }))
+    expect(onOpenApp).toHaveBeenCalledOnce()
   })
 
   it('signs an existing user in with email and password', async () => {
