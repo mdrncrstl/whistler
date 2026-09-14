@@ -18,6 +18,7 @@
   .portfolio-page { min-width: 0; }
   .portfolio-metrics { padding-block: 18px 12px; gap: 0; grid-template-columns: repeat(5, minmax(0, 190px)); }
   .portfolio-metrics .metric-tab { min-height: 84px; padding: 11px 12px; }
+  .portfolio-metrics .metric-info-button { top: 7px; right: 7px; }
   .portfolio-metrics strong { font-size: 22px; }
   .portfolio-metrics .metric-tab-label { font-size: 10px; letter-spacing: .045em; }
   .portfolio-metrics small { font-size: 11px; }

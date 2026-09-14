@@ -15,6 +15,16 @@ try {
   await page.goto(`${baseUrl}/app`, { waitUntil: 'networkidle' })
   await page.getByRole('heading', { name: 'Portfolio overview' }).waitFor()
 
+  const incomeTab = page.getByRole('tab', { name: /Income Return/ })
+  await page.getByRole('button', { name: 'About Income Return' }).click()
+  const incomeDefinition = page.getByRole('tooltip', { name: 'Income Return definition' })
+  await incomeDefinition.waitFor({ state: 'visible' })
+  assert.match(await incomeDefinition.innerText(), /Recorded dividends, distributions and interest/, 'income return info explains the metric')
+  assert.equal(await incomeTab.getAttribute('aria-selected'), 'false', 'info control does not switch the chart metric')
+  await page.screenshot({ path: join(tmpdir(), 'masterdeck-income-return-info.png') })
+  await page.keyboard.press('Escape')
+  await incomeDefinition.waitFor({ state: 'hidden' })
+
   const openAndClose = async (trigger, panel = page.locator('.t-dropdown.is-open').last()) => {
     await trigger.click()
     await page.waitForTimeout(20)
@@ -65,6 +75,15 @@ try {
   assert.equal(await drawerPortfolio.evaluate(element => element.classList.contains('is-open')), true, 'mobile portfolio menu opens')
   assert.equal(await drawerPortfolio.evaluate(element => getComputedStyle(element, '::after').display), 'none', 'mobile drawer does not reserve a hover triangle')
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1), true, 'mobile app has no horizontal overflow')
+  await page.keyboard.press('Escape')
+  await drawer.waitFor({ state: 'hidden' })
+  await page.getByRole('button', { name: 'About Income Return' }).click()
+  const mobileIncomeDefinition = page.getByRole('tooltip', { name: 'Income Return definition' })
+  await mobileIncomeDefinition.waitFor({ state: 'visible' })
+  assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1), true, 'mobile income definition has no horizontal overflow')
+  await page.screenshot({ path: join(tmpdir(), 'masterdeck-income-return-info-mobile.png') })
+  await page.keyboard.press('Escape')
+  await mobileIncomeDefinition.waitFor({ state: 'hidden' })
   await page.screenshot({ path: join(tmpdir(), 'masterdeck-transition-mobile.png') })
 
   assert.deepEqual(errors, [], `no page errors: ${errors.join('; ')}`)
