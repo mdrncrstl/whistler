@@ -1,10 +1,11 @@
 /* eslint-disable react-refresh/only-export-components */
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import type { Session } from '@supabase/supabase-js'
 import { demoBundle } from '../data/demo'
 import { LoadingScreen } from '../components/ui'
 import { portfolioApi } from '../lib/api'
-import type { MarketDataState } from '../lib/marketDataApi'
+import { fetchMarketSnapshot, type MarketDataState } from '../lib/marketDataApi'
+import { applyMarketSnapshot } from '../lib/repricePortfolio'
 import type { PortfolioBundle, Profile, SuperheroReport } from '../types'
 
 interface Notice {
@@ -36,66 +37,143 @@ const PortfolioContext = createContext<PortfolioContextValue | null>(null)
 
 const idleMarketData: MarketDataState = { status: 'idle', source: null, generatedAt: null, updated: 0, failed: 0, message: null }
 
-export function PortfolioProvider({ session, demo, children }: { session: Session | null; demo: boolean; children: ReactNode }) {
-  const [bundle, setBundle] = useState<PortfolioBundle>(() => {
-    const initial = structuredClone(demoBundle)
-    if (demo && initial.profile) {
-      try {
-        const stored = window.sessionStorage.getItem('masterdeck-demo-settings')
-        if (stored) initial.profile.settings = { ...initial.profile.settings, ...JSON.parse(stored) }
-      } catch {
-        // Demo preferences are best-effort and remain local to this browser session.
-      }
+const emptyLiveBundle: PortfolioBundle = {
+  profile: null,
+  holdings: [],
+  transactions: [],
+  cash: [],
+  snapshots: [],
+  connections: [],
+  syncRuns: [],
+  demo: false,
+}
+
+function createDemoBundle() {
+  const initial = structuredClone(demoBundle)
+  if (initial.profile) {
+    try {
+      const stored = window.sessionStorage.getItem('masterdeck-demo-settings')
+      if (stored) initial.profile.settings = { ...initial.profile.settings, ...JSON.parse(stored) }
+    } catch {
+      // Demo preferences are best-effort and remain local to this browser session.
     }
-    return initial
-  })
+  }
+  return initial
+}
+
+export function PortfolioProvider({ session, demo, children }: { session: Session | null; demo: boolean; children: ReactNode }) {
+  const [bundle, setBundle] = useState<PortfolioBundle>(() => demo ? createDemoBundle() : structuredClone(emptyLiveBundle))
   const [loading, setLoading] = useState(!demo)
   const [action, setAction] = useState<string | null>(null)
   const [notice, setNotice] = useState<Notice | null>(null)
-  const [marketData] = useState<MarketDataState>(idleMarketData)
+  const [marketData, setMarketData] = useState<MarketDataState>(idleMarketData)
+  const sessionRef = useRef(session)
   const [hasHydrated, setHasHydrated] = useState(demo)
+  const hasHydratedRef = useRef(demo)
+  const providerKey = `${session?.user?.id || 'anonymous'}:${demo ? 'demo' : 'live'}`
+  const previousProviderKey = useRef(providerKey)
+
+  useEffect(() => {
+    if (previousProviderKey.current === providerKey) return
+    previousProviderKey.current = providerKey
+    hasHydratedRef.current = demo
+    setHasHydrated(demo)
+    setLoading(!demo)
+    setBundle(demo ? createDemoBundle() : structuredClone(emptyLiveBundle))
+    setMarketData(idleMarketData)
+  }, [demo, providerKey])
+
+  useEffect(() => {
+    sessionRef.current = session
+  }, [session])
 
   const requireSession = useCallback(() => {
-    if (!session) throw new Error('Sign in to use a live connection.')
-    return session
-  }, [session])
+    if (!sessionRef.current) throw new Error('Sign in to use a live connection.')
+    return sessionRef.current
+  }, [])
+
+  const loadMarketData = useCallback(async (baseBundle: PortfolioBundle, force = false) => {
+    if (!baseBundle.holdings.length) {
+      setMarketData({ ...idleMarketData, status: 'ready', generatedAt: new Date().toISOString(), message: 'No open holdings to price.' })
+      return baseBundle
+    }
+    if (baseBundle.demo) {
+      setMarketData({ status: 'ready', source: 'Illustrative demo snapshot', generatedAt: new Date().toISOString(), updated: 0, failed: 0, message: 'Demo prices are illustrative; connect a broker for live quotes.' })
+      return baseBundle
+    }
+    setMarketData((current) => ({ ...current, status: 'loading', message: null }))
+    const controller = new AbortController()
+    const timeout = window.setTimeout(() => controller.abort(), 12000)
+    try {
+      const snapshot = await fetchMarketSnapshot(baseBundle.holdings, controller.signal, force)
+      const result = applyMarketSnapshot(baseBundle, snapshot)
+      const status = result.failed || snapshot.failures.length ? 'partial' : 'ready'
+      setBundle(result.bundle)
+      setMarketData({ status, source: snapshot.source, generatedAt: snapshot.generatedAt, updated: result.updated, failed: Math.max(result.failed, snapshot.failures.length), message: null })
+      return result.bundle
+    } catch (error) {
+      const message = error instanceof Error && error.name === 'AbortError'
+        ? 'Market data request timed out.'
+        : error instanceof Error ? error.message : 'Market data is unavailable.'
+      setMarketData((current) => ({ ...current, status: 'error', message }))
+      if (force) throw new Error(message, { cause: error })
+      return baseBundle
+    } finally {
+      window.clearTimeout(timeout)
+    }
+  }, [])
 
   const refresh = useCallback(async () => {
     if (demo) {
-      setBundle((current) => ({ ...current, demo: true }))
+      const baseBundle = createDemoBundle()
+      setBundle(baseBundle)
+      hasHydratedRef.current = true
       setHasHydrated(true)
       setLoading(false)
+      void loadMarketData(baseBundle)
       return
     }
-    setLoading(true)
+    if (!hasHydratedRef.current) setLoading(true)
     try {
-      setBundle(await portfolioApi.bundle(requireSession()))
+      const baseBundle = await portfolioApi.bundle(requireSession())
+      setBundle(baseBundle)
+      void loadMarketData(baseBundle)
     } catch (error) {
       setNotice({ tone: 'error', message: error instanceof Error ? error.message : 'Could not load the portfolio.' })
       throw error
     } finally {
+      hasHydratedRef.current = true
       setHasHydrated(true)
       setLoading(false)
     }
-  }, [demo, requireSession])
+  }, [demo, loadMarketData, requireSession])
 
   const run = useCallback(async (name: string, work: () => Promise<{ message?: string } | void>) => {
     setAction(name)
     try {
       const result = await work()
       setNotice({ tone: 'success', message: result?.message || 'Done.' })
-      if (!demo) setBundle(await portfolioApi.bundle(requireSession()))
+      if (!demo) {
+        const baseBundle = await portfolioApi.bundle(requireSession())
+        setBundle(baseBundle)
+        void loadMarketData(baseBundle)
+      }
     } catch (error) {
       setNotice({ tone: 'error', message: error instanceof Error ? error.message : 'The request failed.' })
       throw error
     } finally {
       setAction(null)
     }
-  }, [demo, requireSession])
+  }, [demo, loadMarketData, requireSession])
 
   useEffect(() => {
     Promise.resolve().then(refresh).catch(() => undefined)
-  }, [refresh])
+  }, [refresh, session?.user?.id])
+
+  const refreshQuotes = useCallback(async () => {
+    if (demo) return run('refresh-quotes', async () => ({ message: 'Demo prices are illustrative and were not sent anywhere.' }))
+    return run('refresh-quotes', () => portfolioApi.refreshQuotes(requireSession()))
+  }, [demo, requireSession, run])
 
   const value = useMemo<PortfolioContextValue>(() => ({
     bundle,
@@ -112,9 +190,7 @@ export function PortfolioProvider({ session, demo, children }: { session: Sessio
     importSuperhero: (report) => run('import-superhero', () => portfolioApi.importSuperhero(requireSession(), report)),
     connectGmail: (accessToken) => run('connect-gmail', () => portfolioApi.storeGmailToken(requireSession(), accessToken)),
     syncGmail: (connectionId) => run(`sync-${connectionId}`, () => portfolioApi.syncGmail(requireSession(), connectionId)),
-    refreshQuotes: () => demo
-      ? run('refresh-quotes', async () => ({ message: 'Demo prices are illustrative and were not sent anywhere.' }))
-      : run('refresh-quotes', () => portfolioApi.refreshQuotes(requireSession())),
+    refreshQuotes,
     disconnect: (connectionId) => run(`disconnect-${connectionId}`, () => portfolioApi.disconnect(requireSession(), connectionId)),
     updateProfile: (profile) => demo
       ? run('save-profile', async () => {
@@ -123,7 +199,7 @@ export function PortfolioProvider({ session, demo, children }: { session: Sessio
           return { message: 'Demo preferences updated for this session.' }
         })
       : run('save-profile', () => portfolioApi.updateProfile(requireSession(), profile)),
-  }), [action, bundle, demo, loading, marketData, notice, refresh, requireSession, run, session])
+  }), [action, bundle, demo, loading, marketData, notice, refresh, refreshQuotes, requireSession, run, session])
 
   return <PortfolioContext.Provider value={value}>{loading && !hasHydrated ? <LoadingScreen /> : children}</PortfolioContext.Provider>
 }

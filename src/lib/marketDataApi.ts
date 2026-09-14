@@ -98,9 +98,13 @@ export async function fetchMarketSnapshot(holdings: Position[], signal?: AbortSi
 }
 
 export function marketFreshnessLabel(state: MarketDataState) {
+  if (state.status === 'idle') return 'Preparing market data…'
   if (state.status === 'loading') return 'Refreshing market data…'
   if (state.status === 'error') return 'Market data unavailable'
-  if (!state.generatedAt || !state.source) return 'Waiting for market data'
+  if (state.status === 'ready' && state.message && !state.source) {
+    return state.message === 'No open holdings to price.' ? 'No holdings to price' : state.message
+  }
+  if (!state.generatedAt || !state.source) return 'Market data unavailable'
   const ageMinutes = Math.max(0, Math.floor((Date.now() - new Date(state.generatedAt).getTime()) / 60000))
   const age = ageMinutes < 1 ? 'Just now' : ageMinutes === 1 ? '1 min ago' : `${ageMinutes} min ago`
   return `${age}${state.failed ? ` · ${state.failed} unavailable` : ''}`
