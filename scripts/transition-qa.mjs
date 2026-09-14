@@ -12,7 +12,12 @@ try {
   const page = await context.newPage()
   const errors = []
   page.on('pageerror', error => errors.push(error.message))
-  await page.goto(`${baseUrl}/app`, { waitUntil: 'networkidle' })
+  await page.goto(`${baseUrl}/app/tax/mytax?from=2025-07-01&to=2026-06-30#summary`, { waitUntil: 'networkidle' })
+  const legacyLocation = new URL(page.url())
+  assert.equal(legacyLocation.pathname, '/workspace/tax/mytax', 'legacy workspace route redirects to the canonical path')
+  assert.equal(legacyLocation.search, '?from=2025-07-01&to=2026-06-30', 'legacy route keeps its query string')
+  assert.equal(legacyLocation.hash, '#summary', 'legacy route keeps its hash')
+  await page.goto(`${baseUrl}/workspace`, { waitUntil: 'networkidle' })
   await page.getByRole('heading', { name: 'Portfolio overview' }).waitFor()
 
   const incomeTab = page.getByRole('tab', { name: /Income Return/ })
@@ -58,14 +63,14 @@ try {
   await page.waitForTimeout(10)
   assert.equal(await page.locator('.t-dropdown.is-open').count(), 0, 'Escape closes the pro chart menu')
 
-  await page.goto(`${baseUrl}/app/holdings/AAPL`, { waitUntil: 'networkidle' })
+  await page.goto(`${baseUrl}/workspace/holdings/AAPL`, { waitUntil: 'networkidle' })
   await page.getByRole('heading', { name: 'Apple Inc.', exact: true, level: 1 }).waitFor()
   const holdingPro = page.getByRole('button', { name: 'Pro graph', exact: true }).first()
   await holdingPro.click()
   await openAndClose(page.locator('.finance-pro-menu-trigger').first())
 
   await page.setViewportSize({ width: 390, height: 844 })
-  await page.goto(`${baseUrl}/app`, { waitUntil: 'networkidle' })
+  await page.goto(`${baseUrl}/workspace`, { waitUntil: 'networkidle' })
   await page.getByRole('button', { name: 'Open navigation' }).click()
   const drawer = page.locator('.drawer-panel')
   await drawer.waitFor({ state: 'visible' })
@@ -87,7 +92,7 @@ try {
   await page.screenshot({ path: join(tmpdir(), 'masterdeck-transition-mobile.png') })
 
   assert.deepEqual(errors, [], `no page errors: ${errors.join('; ')}`)
-  console.log('App popovers, pointer triangles, Escape dismissal and pro chart menus passed')
+  console.log('Canonical workspace route, legacy redirect, app popovers, pointer triangles, Escape dismissal and pro chart menus passed')
 } finally {
   await browser.close()
 }

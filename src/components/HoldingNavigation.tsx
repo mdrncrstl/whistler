@@ -9,7 +9,7 @@ function canOpenHolding(symbol?: string | null) {
 }
 
 function holdingPath(symbol: string) {
-  return `/app/holdings/${encodeURIComponent(symbol.trim().toUpperCase())}`
+  return `/workspace/holdings/${encodeURIComponent(symbol.trim().toUpperCase())}`
 }
 
 function startedFromInteractiveControl(target: EventTarget | null) {

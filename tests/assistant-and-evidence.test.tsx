@@ -8,10 +8,10 @@ import type { MarketMovement } from '../src/lib/marketDataApi'
 
 describe('deterministic portfolio answers', () => {
   it('routes distinct intents to their calculations and reports', () => {
-    expect(portfolioAnswer('Where am I concentrated?', demoBundle).href).toBe('/app/reports/diversification')
+    expect(portfolioAnswer('Where am I concentrated?', demoBundle).href).toBe('/workspace/reports/diversification')
     expect(portfolioAnswer('income', demoBundle).text).toContain('recorded income transactions')
     expect(portfolioAnswer('tax', demoBundle).text).toContain('not realised capital gains')
-    expect(portfolioAnswer('AAPL', demoBundle).href).toBe('/app/holdings/AAPL')
+    expect(portfolioAnswer('AAPL', demoBundle).href).toBe('/workspace/holdings/AAPL')
   })
   it('does not substitute a generic portfolio answer for unsupported questions or periods', () => {
     expect(portfolioAnswer('Explain quantum physics', demoBundle).title).toBe('Try a portfolio question')
@@ -19,7 +19,7 @@ describe('deterministic portfolio answers', () => {
     expect(portfolioAnswer('Income last month', demoBundle).title).toBe('Choose a reporting period')
   })
   it('handles an empty workspace without example balances', () => {
-    expect(portfolioAnswer('portfolio value', { ...demoBundle, holdings: [], transactions: [], cash: [] }).href).toBe('/app/connections')
+    expect(portfolioAnswer('portfolio value', { ...demoBundle, holdings: [], transactions: [], cash: [] }).href).toBe('/workspace/connections')
   })
 })
 

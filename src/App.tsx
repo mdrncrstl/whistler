@@ -12,7 +12,7 @@ import { AccountAccessProvider, useAccountAccess } from './context/AccountAccess
 import { PortfolioProvider } from './context/PortfolioContext'
 import { useBillingStatus } from './hooks/useBillingStatus'
 import { authClient } from './lib/supabase'
-import { canonicalAppUrl } from './lib/app-origin'
+import { canonicalAppUrl, legacyWorkspaceDestination, workspaceBasePath } from './lib/app-origin'
 
 const Overview = lazy(() => import('./features/Overview-Wifi-G').then((module) => ({ default: module.Overview })))
 const Holdings = lazy(() => import('./features/Holdings-Wifi-G').then((module) => ({ default: module.Holdings })))
@@ -46,11 +46,16 @@ function PortfolioRoutes({ onExitDemo }: { onExitDemo: () => void }) {
           <Route path="settings" element={<Settings onExitDemo={onExitDemo} />} />
           <Route path="billing" element={<Billing />} />
           <Route path="referrals" element={<Referrals />} />
-          <Route path="*" element={<Navigate to="/app" replace />} />
+          <Route path="*" element={<Navigate to={workspaceBasePath} replace />} />
         </Routes>
       </Suspense>
     </AppShell>
   )
+}
+
+function LegacyWorkspaceRedirect() {
+  const location = useLocation()
+  return <Navigate to={legacyWorkspaceDestination(location)} replace />
 }
 
 const subscriptionAllowsAccess = new Set(['active', 'trialing', 'past_due', 'unpaid'])
@@ -69,17 +74,17 @@ function AccountRoutes({ session, demo, onExitDemo }: { session: Session | null;
   if (accessLoading) return onboardingPath ? <main className="onboarding-page onboarding-page-waiting" aria-busy="true" /> : <LoadingScreen />
 
   const routes = <Routes>
-    <Route path="/app/*" element={onboardingRequired
+    <Route path={`${workspaceBasePath}/*`} element={onboardingRequired
       ? <Navigate to="/welcome" replace />
-      : trialExpired && !paid && access?.access_mode !== 'grandfathered' && location.pathname !== '/app/billing'
-        ? <Navigate to="/app/billing?trial=ended" replace />
+      : trialExpired && !paid && access?.access_mode !== 'grandfathered' && location.pathname !== `${workspaceBasePath}/billing`
+        ? <Navigate to={`${workspaceBasePath}/billing?trial=ended`} replace />
         : <PortfolioRoutes onExitDemo={onExitDemo} />} />
-    <Route path="/welcome" element={previewingOnboarding || demo || onboardingRequired ? <Onboarding /> : <Navigate to="/app" replace />} />
-    <Route path="*" element={<Navigate to="/app" replace />} />
+    <Route path="/welcome" element={previewingOnboarding || demo || onboardingRequired ? <Onboarding /> : <Navigate to={workspaceBasePath} replace />} />
+    <Route path="*" element={<Navigate to={workspaceBasePath} replace />} />
   </Routes>
 
-  const workspacePath = location.pathname === '/app' || location.pathname.startsWith('/app/')
-  return workspacePath && !onboardingRequired ? <PortfolioProvider session={session} demo={demo}>{routes}</PortfolioProvider> : routes
+  const isWorkspacePath = location.pathname === workspaceBasePath || location.pathname.startsWith(`${workspaceBasePath}/`)
+  return isWorkspacePath && !onboardingRequired ? <PortfolioProvider session={session} demo={demo}>{routes}</PortfolioProvider> : routes
 }
 
 function AppContent() {
@@ -123,12 +128,13 @@ function AppContent() {
     <>
       <PointerChartEnhancer />
       <Routes>
-        <Route path="/" element={<Landing onDemo={enterDemo} signedIn={authenticated} onOpenApp={() => window.location.assign(canonicalAppUrl('/app'))} />} />
-        {marketingPages.map(page => <Route key={page.path} path={page.path} element={<Landing page={page} onDemo={enterDemo} signedIn={authenticated} onOpenApp={() => window.location.assign(canonicalAppUrl('/app'))} />} />)}
-        <Route path="/pricing" element={<Landing page="pricing" onDemo={enterDemo} signedIn={authenticated} onOpenApp={() => window.location.assign(canonicalAppUrl('/app'))} />} />
+        <Route path="/" element={<Landing onDemo={enterDemo} signedIn={authenticated} onOpenApp={() => window.location.assign(canonicalAppUrl(workspaceBasePath))} />} />
+        {marketingPages.map(page => <Route key={page.path} path={page.path} element={<Landing page={page} onDemo={enterDemo} signedIn={authenticated} onOpenApp={() => window.location.assign(canonicalAppUrl(workspaceBasePath))} />} />)}
+        <Route path="/pricing" element={<Landing page="pricing" onDemo={enterDemo} signedIn={authenticated} onOpenApp={() => window.location.assign(canonicalAppUrl(workspaceBasePath))} />} />
         <Route path="/auth/callback" element={<AuthCallback />} />
+        <Route path="/app/*" element={<LegacyWorkspaceRedirect />} />
         <Route path="/*" element={authenticated ? <AccountAccessProvider session={session || null} demo={demo}><AccountRoutes session={session || null} demo={demo} onExitDemo={exitDemo} /></AccountAccessProvider> : <Navigate to="/" replace />} />
-        <Route path="*" element={<Navigate to={authenticated ? '/app' : '/'} replace />} />
+        <Route path="*" element={<Navigate to={authenticated ? workspaceBasePath : '/'} replace />} />
       </Routes>
     </>
   )

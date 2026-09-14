@@ -59,7 +59,7 @@ export function Onboarding() {
     try {
       const complete = step === 3
       await persist(complete)
-      if (complete) navigate('/app/connections?welcome=1', { replace: true })
+      if (complete) navigate('/workspace/connections?welcome=1', { replace: true })
       else setStep((current) => Math.min(3, current + 1))
     } catch (nextError) {
       setError(nextError instanceof Error ? nextError.message : 'Your setup could not be saved.')
@@ -71,7 +71,7 @@ export function Onboarding() {
     setError('')
     try {
       await persist(true)
-      navigate('/app/connections?welcome=1', { replace: true })
+      navigate('/workspace/connections?welcome=1', { replace: true })
     } catch (skipError) {
       setError(skipError instanceof Error ? skipError.message : 'Your setup could not be saved.')
     } finally { setBusy(false) }

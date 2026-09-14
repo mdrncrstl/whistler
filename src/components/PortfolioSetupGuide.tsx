@@ -13,10 +13,10 @@ export function PortfolioSetupGuide({ compact = false }: { compact?: boolean }) 
         </div>
       </div>
       <div className="portfolio-setup-options" aria-label="Ways to add investments">
-        <Link className="portfolio-setup-option primary" to="/app/connections?setup=import">
+        <Link className="portfolio-setup-option primary" to="/workspace/connections?setup=import">
           <span><FileSpreadsheet size={19} /></span><div><strong>Import portfolio records</strong><small>CSV exports or supported PDF statements from any broker</small></div><ArrowRight size={17} />
         </Link>
-        <Link className="portfolio-setup-option" to="/app/connections">
+        <Link className="portfolio-setup-option" to="/workspace/connections">
           <span><Globe2 size={19} /></span><div><strong>Browse broker guides</strong><small>Use a named guide, direct sync, or the universal CSV mapper</small></div><ArrowRight size={17} />
         </Link>
       </div>

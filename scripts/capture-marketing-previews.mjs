@@ -23,9 +23,9 @@ page.on('console', (message) => {
 page.on('pageerror', (error) => consoleIssues.push(`pageerror: ${error.message}`))
 
 const captures = [
-  { route: '/app', ready: '.portfolio-page', file: 'portfolio-focus.png', clipY: 110 },
-  { route: '/app/reports/performance', ready: 'h1', file: 'performance-focus.png', clipY: 32 },
-  { route: '/app/tax/capital-gains', ready: 'h1', file: 'tax-focus.png', clipY: 32 },
+  { route: '/workspace', ready: '.portfolio-page', file: 'portfolio-focus.png', clipY: 110 },
+  { route: '/workspace/reports/performance', ready: 'h1', file: 'performance-focus.png', clipY: 32 },
+  { route: '/workspace/tax/capital-gains', ready: 'h1', file: 'tax-focus.png', clipY: 32 },
 ]
 
 for (const capture of captures) {

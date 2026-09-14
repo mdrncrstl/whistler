@@ -1,6 +1,14 @@
 export const productionAppOrigin = 'https://masterdeck.app'
+export const workspaceBasePath = '/workspace'
+export const legacyWorkspaceBasePath = '/app'
 
 type AppLocation = Pick<Location, 'origin' | 'hostname' | 'pathname' | 'search' | 'hash'>
+type WorkspaceLocation = Pick<Location, 'pathname' | 'search' | 'hash'>
+
+export function legacyWorkspaceDestination(location: WorkspaceLocation) {
+  const nestedPath = location.pathname.replace(new RegExp(`^${legacyWorkspaceBasePath}(?=/|$)`), '') || ''
+  return `${workspaceBasePath}${nestedPath}${location.search}${location.hash}`
+}
 
 const localHostnames = new Set(['localhost', '127.0.0.1', '[::1]'])
 

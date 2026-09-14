@@ -32,7 +32,7 @@ export function Billing() {
   useEffect(() => {
     const checkout = new URLSearchParams(window.location.search).get('checkout')
     if (!checkout) return
-    window.history.replaceState({}, '', '/app/billing')
+    window.history.replaceState({}, '', '/workspace/billing')
     if (checkout === 'cancelled') {
       setNotice({ tone: 'info', message: 'Checkout was cancelled. Your plan has not changed.' })
       return

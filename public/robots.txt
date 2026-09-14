@@ -1,5 +1,7 @@
 User-agent: *
 Allow: /
+Disallow: /workspace
+Disallow: /workspace/
 Disallow: /app
 Disallow: /app/
 Disallow: /auth

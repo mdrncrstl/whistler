@@ -10,13 +10,13 @@ import { Brand, Button, IconButton, Toast } from './ui'
 export { AppShell } from './AppShell-Wifi-G'
 
 const navigation = [
-  { to: '/app', label: 'Overview', icon: BarChart3, end: true },
-  { to: '/app/holdings', label: 'Holdings', icon: BriefcaseBusiness },
-  { to: '/app/transactions', label: 'Transactions', icon: TableProperties },
-  { to: '/app/income', label: 'Income', icon: CircleDollarSign },
-  { to: '/app/tax', label: 'Tax centre', icon: Landmark },
-  { to: '/app/connections', label: 'Connections', icon: WalletCards },
-  { to: '/app/settings', label: 'Settings', icon: Settings },
+  { to: '/workspace', label: 'Overview', icon: BarChart3, end: true },
+  { to: '/workspace/holdings', label: 'Holdings', icon: BriefcaseBusiness },
+  { to: '/workspace/transactions', label: 'Transactions', icon: TableProperties },
+  { to: '/workspace/income', label: 'Income', icon: CircleDollarSign },
+  { to: '/workspace/tax', label: 'Tax centre', icon: Landmark },
+  { to: '/workspace/connections', label: 'Connections', icon: WalletCards },
+  { to: '/workspace/settings', label: 'Settings', icon: Settings },
 ]
 
 export function LegacyAppShell({ children, onExitDemo }: { children: ReactNode; onExitDemo: () => void }) {

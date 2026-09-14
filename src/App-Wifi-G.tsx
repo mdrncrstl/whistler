@@ -11,7 +11,7 @@ import { PortfolioProvider } from './context/PortfolioContext'
 import { useBillingStatus } from './hooks/useBillingStatus'
 import { authClient } from './lib/supabase'
 import { captureReferralFromLocation, claimStoredReferral } from './lib/referrals'
-import { canonicalAppUrl } from './lib/app-origin'
+import { canonicalAppUrl, legacyWorkspaceDestination, workspaceBasePath } from './lib/app-origin'
 
 const Overview = lazy(() => import('./features/Overview').then((module) => ({ default: module.Overview })))
 const Holdings = lazy(() => import('./features/Holdings').then((module) => ({ default: module.Holdings })))
@@ -65,11 +65,16 @@ function PortfolioRoutes({ onExitDemo }: { onExitDemo: () => void }) {
           <Route path="settings" element={<Settings onExitDemo={onExitDemo} />} />
           <Route path="billing" element={<Billing />} />
           <Route path="referrals" element={<Referrals />} />
-          <Route path="*" element={<Navigate to="/app" replace />} />
+          <Route path="*" element={<Navigate to={workspaceBasePath} replace />} />
         </Routes>
       </Suspense>
     </AppShell>
   )
+}
+
+function LegacyWorkspaceRedirect() {
+  const location = useLocation()
+  return <Navigate to={legacyWorkspaceDestination(location)} replace />
 }
 
 const subscriptionAllowsAccess = new Set(['active', 'trialing', 'past_due', 'unpaid'])
@@ -82,17 +87,17 @@ function AccountRoutes({ session, demo, onExitDemo }: { session: Session | null;
   const paid = Boolean(subscription && subscriptionAllowsAccess.has(subscription.status))
 
   const routes = <Routes>
-    <Route path="/welcome" element={previewingOnboarding || demo || onboardingRequired ? <Onboarding /> : <Navigate to="/app" replace />} />
-    <Route path="/app/*" element={onboardingRequired
+    <Route path="/welcome" element={previewingOnboarding || demo || onboardingRequired ? <Onboarding /> : <Navigate to={workspaceBasePath} replace />} />
+    <Route path={`${workspaceBasePath}/*`} element={onboardingRequired
       ? <Navigate to="/welcome" replace />
-      : trialExpired && !paid && access?.access_mode !== 'grandfathered' && location.pathname !== '/app/billing'
-        ? <Navigate to="/app/billing?trial=ended" replace />
+      : trialExpired && !paid && access?.access_mode !== 'grandfathered' && location.pathname !== `${workspaceBasePath}/billing`
+        ? <Navigate to={`${workspaceBasePath}/billing?trial=ended`} replace />
         : <PortfolioRoutes onExitDemo={onExitDemo} />} />
-    <Route path="*" element={<Navigate to={onboardingRequired ? '/welcome' : '/app'} replace />} />
+    <Route path="*" element={<Navigate to={onboardingRequired ? '/welcome' : workspaceBasePath} replace />} />
   </Routes>
 
-  const workspacePath = location.pathname === '/app' || location.pathname.startsWith('/app/')
-  return workspacePath && !onboardingRequired
+  const isWorkspacePath = location.pathname === workspaceBasePath || location.pathname.startsWith(`${workspaceBasePath}/`)
+  return isWorkspacePath && !onboardingRequired
     ? <PortfolioProvider session={session} demo={demo}>{routes}</PortfolioProvider>
     : routes
 }
@@ -134,10 +139,11 @@ export default function App() {
   const authenticated = Boolean(session || demo)
   return (
     <Routes>
-      <Route path="/" element={<Landing onDemo={enterDemo} signedIn={authenticated} onOpenApp={() => window.location.assign(canonicalAppUrl('/app'))} />} />
+      <Route path="/" element={<Landing onDemo={enterDemo} signedIn={authenticated} onOpenApp={() => window.location.assign(canonicalAppUrl(workspaceBasePath))} />} />
       <Route path="/auth/callback" element={<AuthCallback />} />
+      <Route path="/app/*" element={<LegacyWorkspaceRedirect />} />
       <Route path="/*" element={authenticated ? <AccountAccessProvider session={session || null} demo={demo}><AccountRoutes session={session || null} demo={demo} onExitDemo={exitDemo} /></AccountAccessProvider> : <Navigate to="/" replace />} />
-      <Route path="*" element={<Navigate to={authenticated ? '/app' : '/'} replace />} />
+      <Route path="*" element={<Navigate to={authenticated ? workspaceBasePath : '/'} replace />} />
     </Routes>
   )
 }

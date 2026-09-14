@@ -2,6 +2,18 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "vite",
   "cleanUrls": true,
+  "redirects": [
+    {
+      "source": "/app",
+      "destination": "/workspace",
+      "permanent": true
+    },
+    {
+      "source": "/app/:path*",
+      "destination": "/workspace/:path*",
+      "permanent": true
+    }
+  ],
   "rewrites": [{ "source": "/(.*)", "destination": "/" }],
   "headers": [
     {

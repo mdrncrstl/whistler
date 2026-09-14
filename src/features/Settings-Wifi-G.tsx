@@ -187,7 +187,7 @@ function AccountSettings({ profile, name, accountName, planLabel, planDetail, on
     </div>
     <div className="settings-group settings-group-compact">
       <div className="settings-group-heading"><h3>Account access</h3><p>Your current Masterdeck workspace status.</p></div>
-      <div className="settings-status-row"><span><strong>{planLabel}</strong><small>{planDetail}</small></span><Link to="/app/billing">Manage plan <ArrowUpRight size={14}/></Link></div>
+      <div className="settings-status-row"><span><strong>{planLabel}</strong><small>{planDetail}</small></span><Link to="/workspace/billing">Manage plan <ArrowUpRight size={14}/></Link></div>
     </div>
   </>
 }
@@ -232,9 +232,9 @@ function DataSettings({ demo }: { demo: boolean }) {
   return <>
     <div className="settings-group settings-group-first">
       <div className="settings-group-heading"><h3>Portfolio data</h3><p>Control where your records come from.</p></div>
-      <SettingsLinkRow icon={Link2} title="Broker connections" detail="Connect, sync and monitor read-only broker feeds." to="/app/connections" action="Manage connections"/>
-      <SettingsLinkRow icon={Database} title="Imported records" detail={demo ? 'This demo uses local sample data only.' : 'Holdings and transactions remain isolated to your account.'} to="/app/transactions" action="View transactions"/>
-      <SettingsLinkRow icon={Calculator} title="Tax records" detail="Review the source transactions behind CGT calculations." to="/app/tax" action="Open Tax reporting"/>
+      <SettingsLinkRow icon={Link2} title="Broker connections" detail="Connect, sync and monitor read-only broker feeds." to="/workspace/connections" action="Manage connections"/>
+      <SettingsLinkRow icon={Database} title="Imported records" detail={demo ? 'This demo uses local sample data only.' : 'Holdings and transactions remain isolated to your account.'} to="/workspace/transactions" action="View transactions"/>
+      <SettingsLinkRow icon={Calculator} title="Tax records" detail="Review the source transactions behind CGT calculations." to="/workspace/tax" action="Open Tax reporting"/>
     </div>
     <div className="settings-note settings-note-strong"><LockKeyhole size={15}/><span><strong>Read-only by default.</strong> Masterdeck can read supported portfolio records, but cannot place, change or cancel trades.</span></div>
   </>
@@ -265,8 +265,8 @@ function BillingSettings({ planLabel, planDetail, paid }: { planLabel: string; p
       <Badge tone={paid ? 'success' : 'neutral'}>{paid ? 'Active' : 'No charge'}</Badge>
     </div>
     <div className="settings-group settings-group-compact">
-      <SettingsLinkRow icon={CreditCard} title="Plans & billing" detail="Compare plans or manage your subscription securely." to="/app/billing" action="Open billing"/>
-      <SettingsLinkRow icon={Gift} title="Referral programme" detail="Share Masterdeck and track earned account credit." to="/app/referrals" action="View referrals"/>
+      <SettingsLinkRow icon={CreditCard} title="Plans & billing" detail="Compare plans or manage your subscription securely." to="/workspace/billing" action="Open billing"/>
+      <SettingsLinkRow icon={Gift} title="Referral programme" detail="Share Masterdeck and track earned account credit." to="/workspace/referrals" action="View referrals"/>
     </div>
   </>
 }
