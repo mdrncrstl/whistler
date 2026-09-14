@@ -1,12 +1,13 @@
 import { cleanup, fireEvent, render, screen, within } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
+import { MemoryRouter } from 'react-router-dom'
 import { MarketingNavigation } from '../src/components/MarketingNavigation'
 import { MarketingContent } from '../src/components/MarketingContent'
 import { marketingPages } from '../src/lib/marketingPages'
 afterEach(cleanup)
 describe('public website navigation', () => {
   it('opens one group, closes outside, and restores focus on Escape', () => {
-    render(<MarketingNavigation/>)
+    render(<MemoryRouter><MarketingNavigation/></MemoryRouter>)
     const features=screen.getByRole('button',{name:'Features'})
     fireEvent.click(features)
     expect(screen.getByRole('link',{name:/Portfolio tracking/})).toHaveAttribute('href','/features/portfolio-tracking')
@@ -17,6 +18,23 @@ describe('public website navigation', () => {
     fireEvent.click(features)
     fireEvent.pointerDown(document.body)
     expect(features).toHaveAttribute('aria-expanded','false')
+  })
+  it('marks the current pricing page and its category consistently', () => {
+    render(<MemoryRouter initialEntries={['/pricing']}><MarketingNavigation/></MemoryRouter>)
+    expect(screen.getByRole('link', { name: 'Pricing' })).toHaveAttribute('aria-current', 'page')
+    expect(screen.getByRole('link', { name: 'Pricing' })).toHaveClass('is-active')
+    expect(screen.getByRole('button', { name: 'Company' })).not.toHaveAttribute('data-active', 'true')
+  })
+  it.each([
+    ['/features/performance', 'Features'],
+    ['/for/share-investors', 'Who it’s for'],
+    ['/company/about', 'Company'],
+  ])('marks %s through its navigation group', (path, group) => {
+    render(<MemoryRouter initialEntries={[path]}><MarketingNavigation/></MemoryRouter>)
+    expect(screen.getByRole('button', { name: group })).toHaveAttribute('data-active', 'true')
+    for (const button of screen.getAllByRole('button')) {
+      if (button.textContent?.trim() !== group) expect(button).not.toHaveAttribute('data-active', 'true')
+    }
   })
   it.each(marketingPages)('renders unique content for $path',page=>{
     render(<MarketingContent page={page} onStart={vi.fn()} onDemo={vi.fn()}/>)

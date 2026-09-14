@@ -1,9 +1,21 @@
 import { Fragment, useEffect, useRef, useState } from 'react'
 import { ArrowUpRight, ChevronDown } from 'lucide-react'
+import { useInRouterContext, useLocation } from 'react-router-dom'
 import { marketingGroups, marketingPages } from '../lib/marketingPages'
 import { MotionPopover } from './ui'
 
-export function MarketingNavigation({ mobile = false, onNavigate }: { mobile?: boolean; onNavigate?: () => void }) {
+type MarketingNavigationProps = { mobile?: boolean; onNavigate?: () => void }
+
+export function MarketingNavigation(props: MarketingNavigationProps) {
+  return useInRouterContext() ? <RoutedMarketingNavigation {...props} /> : <MarketingNavigationView {...props} />
+}
+
+function RoutedMarketingNavigation(props: MarketingNavigationProps) {
+  const location = useLocation()
+  return <MarketingNavigationView {...props} pathOverride={location.pathname} />
+}
+
+function MarketingNavigationView({ mobile = false, onNavigate, pathOverride }: MarketingNavigationProps & { pathOverride?: string }) {
   const [open, setOpen] = useState<string | null>(null)
   const root = useRef<HTMLDivElement>(null)
   const closeTimer = useRef(0)
@@ -33,14 +45,16 @@ export function MarketingNavigation({ mobile = false, onNavigate }: { mobile?: b
   // Touch and keyboard keep the click/Enter path, so nothing depends on hover alone.
   const hoverCapable = () => !mobile && typeof window !== 'undefined' && window.matchMedia('(hover: hover) and (pointer: fine)').matches
   const hoverClose = () => { if (!hoverCapable()) return; window.clearTimeout(closeTimer.current); closeTimer.current = window.setTimeout(() => setOpen(null), 350) }
+  const currentPath = (pathOverride ?? (typeof window !== 'undefined' ? window.location.pathname : '/')).replace(/\/+$/, '') || '/'
+  const groupIsActive = (group: string) => marketingPages.some(page => page.group === group && page.path === currentPath)
   return <div className={`md-site-menu ${mobile ? 'is-mobile' : ''}`} ref={root} onKeyDown={event => {
     if (event.key === 'Escape' && open) { event.stopPropagation(); cancelClose(); setOpen(null); root.current?.querySelector<HTMLButtonElement>(`button[data-group="${open}"]`)?.focus() }
-  }} onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget)) setOpen(null) }}
+    }} onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget)) setOpen(null) }}
     >
       {marketingGroups.map(group => <Fragment key={group}>
-        {group === 'Company' && <a className="md-pricing-link" href="/pricing" onClick={onNavigate}>Pricing</a>}
-        <div className={`md-menu-group menu-anchor ${open === group ? 'is-open' : ''}`} onPointerLeave={hoverClose}>
-        <button data-group={group} aria-haspopup="menu" aria-expanded={open === group} aria-controls={`${mobile ? 'mobile' : 'desktop'}-${group.replaceAll(' ','-')}`}
+        {group === 'Company' && <a className={`md-pricing-link ${currentPath === '/pricing' ? 'is-active' : ''}`} href="/pricing" aria-current={currentPath === '/pricing' ? 'page' : undefined} onClick={onNavigate}>Pricing</a>}
+        <div className={`md-menu-group menu-anchor ${open === group ? 'is-open' : ''} ${groupIsActive(group) ? 'is-active' : ''}`} onPointerLeave={hoverClose}>
+        <button data-group={group} data-active={groupIsActive(group) ? 'true' : undefined} aria-haspopup="menu" aria-expanded={open === group} aria-controls={`${mobile ? 'mobile' : 'desktop'}-${group.replaceAll(' ','-')}`}
           onPointerEnter={event => { if (event.pointerType === 'mouse' && hoverCapable() && !inTriangle(event.clientX, event.clientY)) { cancelClose(); setOpen(group) } }}
           onPointerLeave={event => {
             if (!hoverCapable() || open !== group) return
@@ -51,7 +65,7 @@ export function MarketingNavigation({ mobile = false, onNavigate }: { mobile?: b
           onKeyDown={event => { if (event.key === 'ArrowDown') { event.preventDefault(); cancelClose(); setOpen(group); requestAnimationFrame(() => requestAnimationFrame(() => root.current?.querySelector<HTMLAnchorElement>('.md-menu-panel.is-open a')?.focus())) } }}
           onClick={event => { cancelClose(); setOpen(hoverCapable() && event.detail > 0 ? group : open === group ? null : group) }}>{group}<ChevronDown size={14} aria-hidden="true"/></button>
       <MotionPopover open={open === group} className="md-menu-panel" role="menu" ariaLabel={`${group} navigation`} id={`${mobile ? 'mobile' : 'desktop'}-${group.replaceAll(' ','-')}`} origin="top left" onPointerEnter={cancelClose} onFocus={cancelClose}>
-        <div className="md-menu-links">{marketingPages.filter(page => page.group === group).map(page => <a key={page.path} href={page.path} onClick={() => { cancelClose(); setOpen(null); onNavigate?.() }}><span><strong>{page.label}</strong><small>{page.description}</small></span><ArrowUpRight size={16} aria-hidden="true"/></a>)}</div>
+        <div className="md-menu-links">{marketingPages.filter(page => page.group === group).map(page => <a key={page.path} href={page.path} aria-current={currentPath === page.path ? 'page' : undefined} onClick={() => { cancelClose(); setOpen(null); onNavigate?.() }}><span><strong>{page.label}</strong><small>{page.description}</small></span><ArrowUpRight size={16} aria-hidden="true"/></a>)}</div>
       </MotionPopover>
     </div></Fragment>)}
   </div>
