@@ -14,17 +14,17 @@ export function Brand({ compact = false }: { compact?: boolean }) {
   )
 }
 
-export function Button({ children, variant = 'secondary', busy = false, icon: Icon, ...props }: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: 'primary' | 'secondary' | 'ghost' | 'danger'; busy?: boolean; icon?: LucideIcon }) {
+export function Button({ children, variant = 'secondary', busy = false, icon: Icon, className = '', ...props }: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: 'primary' | 'secondary' | 'ghost' | 'danger'; busy?: boolean; icon?: LucideIcon }) {
   return (
-    <button className={`button button-${variant}`} {...props} disabled={busy || props.disabled}>
+    <button type={props.type || 'button'} className={['button', `button-${variant}`, 't-press', className].filter(Boolean).join(' ')} {...props} disabled={busy || props.disabled}>
       {busy ? <LoaderCircle className="spin" size={16} /> : Icon ? <Icon size={16} /> : null}
       <span>{children}</span>
     </button>
   )
 }
 
-export function IconButton({ label, children, ...props }: ButtonHTMLAttributes<HTMLButtonElement> & { label: string; children: ReactNode }) {
-  return <button className="icon-button" aria-label={label} title={label} {...props}>{children}</button>
+export function IconButton({ label, children, className = '', ...props }: ButtonHTMLAttributes<HTMLButtonElement> & { label: string; children: ReactNode }) {
+  return <button type={props.type || 'button'} className={['icon-button', 't-press', className].filter(Boolean).join(' ')} aria-label={label} title={label} {...props}>{children}</button>
 }
 
 export function Card({ children, className = '', as: Tag = 'section' }: { children: ReactNode; className?: string; as?: 'section' | 'div' | 'article' }) {

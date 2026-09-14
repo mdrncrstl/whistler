@@ -1616,6 +1616,10 @@ body { font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-s
 .advanced-range-presets button:active,.advanced-chart-actions > button:active,.advanced-segmented button:active,.advanced-zoom-controls button:active { transform: scale(.96); }
 .advanced-range-presets button.active,.advanced-chart-actions > button.active,.advanced-segmented button.active { border-color: color-mix(in srgb, var(--green) 24%, var(--line)); background: var(--green-soft); color: var(--green); }
 .advanced-chart-actions { justify-content: flex-end; gap: 3px; }
+.advanced-custom-range-anchor { position: relative; flex: 0 0 auto; }
+.advanced-custom-trigger { min-width: 29px; height: 28px; padding: 0 8px; border: 1px solid transparent; border-radius: 5px; display: inline-flex; align-items: center; justify-content: center; gap: 5px; background: transparent; color: var(--muted); font: inherit; font-size: 9.5px; font-weight: 600; cursor: pointer; }
+.advanced-custom-trigger:hover { color: var(--green); background: var(--green-soft); }
+.advanced-custom-trigger.active { border-color: color-mix(in srgb, var(--green) 24%, var(--line)); background: var(--green-soft); color: var(--green); }
 .advanced-segmented,.advanced-zoom-controls { padding: 2px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface-2); }
 .advanced-segmented { margin-right: 4px; }
 .advanced-segmented button,.advanced-zoom-controls button { height: 24px; }
@@ -1623,7 +1627,7 @@ body { font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-s
 .advanced-zoom-controls { margin-left: 4px; }
 .advanced-zoom-controls button { width: 26px; min-width: 26px; padding: 0; }
 .advanced-range-presets button:focus-visible,.advanced-chart-actions button:focus-visible,.advanced-custom-range input:focus-visible,.advanced-custom-range button:focus-visible,.advanced-navigator input:focus-visible + input { outline: 3px solid color-mix(in srgb, var(--green) 20%, transparent); outline-offset: 2px; }
-.advanced-custom-range { padding: 10px 12px; border-bottom: 1px solid var(--line); display: flex; align-items: end; justify-content: flex-end; gap: 9px; background: var(--surface-2); }
+.advanced-custom-range-anchor > .advanced-custom-range { min-width: 330px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; position: absolute; z-index: 30; top: calc(100% + 5px); left: 0; display: flex; align-items: end; justify-content: flex-end; gap: 9px; background: var(--surface-2); box-shadow: 0 14px 32px rgb(15 23 42 / 14%); }
 .advanced-custom-range label { display: grid; gap: 4px; color: var(--muted); font-size: 9px; font-weight: 650; text-transform: uppercase; letter-spacing: .05em; }
 .advanced-custom-range input { height: 31px; padding: 0 8px; border: 1px solid var(--line); border-radius: 5px; background: var(--surface); color: var(--text); font: inherit; font-size: 10px; }
 .advanced-custom-range button { height: 31px; padding: 0 13px; border: 1px solid var(--green); border-radius: 5px; background: var(--green); color: #fff; font: inherit; font-size: 10px; font-weight: 700; cursor: pointer; }
@@ -2694,7 +2698,8 @@ body { font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-s
   .advanced-range-presets { margin-inline: -16px; width: calc(100% + 32px); padding-inline: 16px; }
   .advanced-range-presets button,.advanced-chart-actions > button { height: 31px; }
   .advanced-chart-actions { padding-bottom: 2px; }
-  .advanced-custom-range { margin-inline: -16px; padding: 12px 16px; display: grid; grid-template-columns: 1fr 1fr; }
+  .advanced-custom-range-anchor { align-self: flex-start; }
+  .advanced-custom-range-anchor > .advanced-custom-range { width: min(360px, calc(100vw - 32px)); min-width: 0; max-width: calc(100vw - 32px); padding: 12px 16px; display: grid; grid-template-columns: 1fr 1fr; }
   .advanced-custom-range label,.advanced-custom-range input { min-width: 0; width: 100%; }
   .advanced-custom-range button { grid-column: 1 / -1; }
   .advanced-chart-stage { height: 330px; margin-inline: -8px; }
@@ -6941,42 +6946,6 @@ html { scrollbar-gutter: stable; }
   .mytax-review-item { grid-template-columns: 24px minmax(0, 1fr); }
   .mytax-review-item .badge { grid-column: 2; justify-self: start; }
 }
-
-/* transitions.dev integration: one small press response for the workspace controls. */
-.app-shell button:not(:disabled),
-.md-site-menu button:not(:disabled),
-.funnel-page button:not(:disabled),
-.cloud-page button:not(:disabled),
-.onboarding-page button:not(:disabled) {
-  transition-property: color, background-color, border-color, box-shadow, opacity, transform;
-  transition-duration: var(--duration-quick);
-  transition-timing-function: var(--ease-smooth-out);
-}
-.app-shell button:not(:disabled):not(.global-search):active,
-.md-site-menu button:not(:disabled):active,
-.funnel-page button:not(:disabled):active,
-.cloud-page button:not(:disabled):active,
-.onboarding-page button:not(:disabled):active {
-  transform: scale(.98);
-}
-
-/* Keep a forgiving triangle of pointer space between a menu trigger and its panel. */
-.menu-anchor { position: relative; }
-.menu-anchor::after {
-  content: '';
-  position: absolute;
-  top: 100%;
-  right: -6px;
-  width: calc(100% + 12px);
-  height: 16px;
-  z-index: 1;
-  pointer-events: none;
-  background: transparent;
-  clip-path: polygon(0 0, 100% 0, 82% 100%, 18% 100%);
-}
-.menu-anchor.is-open::after { pointer-events: auto; }
-.drawer-panel .menu-anchor::after,
-.md-site-menu.is-mobile .menu-anchor::after { display: none; }
 
 /* Keep the familiar centered auth row while the real Google Identity Services
    control remains the clickable layer underneath it. */

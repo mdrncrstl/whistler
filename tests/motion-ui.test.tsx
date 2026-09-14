@@ -1,8 +1,17 @@
 import { act, fireEvent, render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
-import { LoadingScreen, MotionDialogSurface, MotionPopover } from '../src/components/ui'
+import { Button, IconButton, LoadingScreen, MotionDialogSurface, MotionPopover } from '../src/components/ui'
 
 describe('motion UI primitives', () => {
+  it('marks shared buttons with the transitions.dev press contract', () => {
+    render(<><Button className="custom-action">Save</Button><IconButton label="Open menu" className="custom-icon"><span>+</span></IconButton></>)
+
+    expect(screen.getByRole('button', { name: 'Save' })).toHaveClass('button', 't-press', 'custom-action')
+    expect(screen.getByRole('button', { name: 'Save' })).toHaveAttribute('type', 'button')
+    expect(screen.getByRole('button', { name: 'Open menu' })).toHaveClass('icon-button', 't-press', 'custom-icon')
+    expect(screen.getByRole('button', { name: 'Open menu' })).toHaveAttribute('type', 'button')
+  })
+
   it('keeps popovers accessible and anchored to their trigger edge', () => {
     const { container, rerender } = render(
       <MotionPopover open className="test-menu" origin="top left" role="menu" ariaLabel="Test actions">

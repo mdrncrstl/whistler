@@ -496,7 +496,10 @@ export function AdvancedPerformanceChart({
     <div className="advanced-chart-toolbar">
       <div className="advanced-range-presets" role="group" aria-label="Performance time range">
         {presets.map((preset) => <button key={preset} type="button" className={period.preset === preset ? 'active' : ''} aria-pressed={period.preset === preset} onClick={() => { onPeriodChange({ preset }); setMeasurement(null); setCustomOpen(false) }}>{preset}</button>)}
-        <button type="button" className={period.preset === 'CUSTOM' ? 'active' : ''} aria-expanded={customOpen} onClick={toggleCustomRange}><CalendarDays size={13}/>Custom</button>
+      </div>
+      <div className={`advanced-custom-range-anchor menu-anchor ${customOpen ? 'is-open' : ''}`}>
+        <button type="button" className={`advanced-custom-trigger ${period.preset === 'CUSTOM' ? 'active' : ''}`} aria-expanded={customOpen} onClick={toggleCustomRange}><CalendarDays size={13}/>Custom</button>
+        <MotionPopover open={customOpen} className="advanced-custom-range" role="group" ariaLabel="Custom chart date range" origin="top left"><label>From<input type="date" value={customStart} min={isoDay(sortedPoints[0].date)} max={customEnd || isoDay(sortedPoints.at(-1)!.date)} onChange={(event) => setCustomStart(event.target.value)}/></label><label>To<input type="date" value={customEnd} min={customStart || isoDay(sortedPoints[0].date)} max={isoDay(sortedPoints.at(-1)!.date)} onChange={(event) => setCustomEnd(event.target.value)}/></label><button type="button" onClick={applyCustomRange}>Apply range</button></MotionPopover>
       </div>
       <div className="advanced-chart-actions">
         <div className="advanced-segmented advanced-metric-toggle" role="group" aria-label="Chart metric"><button type="button" className={chartMetric === 'Return' ? 'active' : ''} aria-pressed={chartMetric === 'Return'} onClick={() => { setChartMetric('Return'); setMeasurement(null) }}>Return</button><button type="button" className={chartMetric === 'Price' ? 'active' : ''} aria-pressed={chartMetric === 'Price'} onClick={() => { setChartMetric('Price'); setMeasurement(null) }}>Price</button></div>
@@ -507,8 +510,6 @@ export function AdvancedPerformanceChart({
         <span className="advanced-zoom-controls"><button type="button" aria-label="Zoom in" title="Zoom in" onClick={() => zoomChart(chartRef.current, .72)}><Plus size={14}/></button><button type="button" aria-label="Zoom out" title="Zoom out" onClick={() => zoomChart(chartRef.current, 1.38)}><Minus size={14}/></button><button type="button" aria-label="Reset chart zoom" title="Reset zoom" onClick={() => chartRef.current?.timeScale().fitContent()}><RotateCcw size={14}/></button></span>
       </div>
     </div>
-
-    <MotionPopover open={customOpen} className="advanced-custom-range" role="group" ariaLabel="Custom chart date range" origin="top left"><label>From<input type="date" value={customStart} min={isoDay(sortedPoints[0].date)} max={customEnd || isoDay(sortedPoints.at(-1)!.date)} onChange={(event) => setCustomStart(event.target.value)}/></label><label>To<input type="date" value={customEnd} min={customStart || isoDay(sortedPoints[0].date)} max={isoDay(sortedPoints.at(-1)!.date)} onChange={(event) => setCustomEnd(event.target.value)}/></label><button type="button" onClick={applyCustomRange}>Apply range</button></MotionPopover>
 
     <div className={`advanced-chart-stage ${measureActive ? 'is-measuring' : ''}`}>
       <div ref={chartContainerRef} className="advanced-chart-canvas"/>

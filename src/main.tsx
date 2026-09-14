@@ -9,7 +9,6 @@ import '@fontsource/inter/700.css'
 import App from './App'
 import { config } from './lib/config'
 import { redirectToCanonicalHost } from './lib/app-origin'
-import './transitions.css'
 import './styles-Wifi-G.css'
 import './laptop-density.css'
 import './product-story.css'
@@ -17,6 +16,9 @@ import './marketing-pages.css'
 import './assistant-motion.css'
 import './site-editorial.css'
 import './alpine-site.css'
+// Load the transitions.dev integration last so the shared interaction contract
+// wins over page-specific button transition declarations.
+import './transitions.css'
 
 if (!redirectToCanonicalHost()) {
   createRoot(document.getElementById('root')!).render(

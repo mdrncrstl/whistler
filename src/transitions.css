@@ -316,6 +316,49 @@
     opacity   var(--dropdown-close-dur) var(--dropdown-ease);
 }
 
+/* transitions.dev — shared press response.
+   The selector intentionally covers native buttons as well as the shared
+   Button/IconButton primitives, so one interaction contract reaches every
+   app, marketing, onboarding and funnel control. */
+button:not(:disabled),
+a.button:not([aria-disabled="true"]) {
+  transition-property: color, background-color, border-color, box-shadow, opacity, transform;
+  transition-duration: var(--duration-quick);
+  transition-timing-function: var(--ease-smooth-out);
+}
+button:not(:disabled):active,
+a.button:not([aria-disabled="true"]):active {
+  transform: scale(var(--scale-small));
+}
+
+/* transitions.dev — forgiving pointer triangle between an open trigger and
+   its anchored surface. The transparent bridge keeps hover menus reachable
+   while the real panel remains the visible interactive surface. */
+.menu-anchor { position: relative; }
+.menu-anchor::after {
+  content: '';
+  position: absolute;
+  top: calc(100% - 2px);
+  right: -8px;
+  width: calc(100% + 16px);
+  height: 20px;
+  z-index: 1;
+  pointer-events: none;
+  background: transparent;
+  clip-path: polygon(0 0, 100% 0, 86% 100%, 14% 100%);
+}
+.menu-anchor.is-open::after { pointer-events: auto; }
+.drawer-panel .menu-anchor::after,
+.md-site-menu.is-mobile .menu-anchor::after { display: none; }
+
 @media (prefers-reduced-motion: reduce) {
   .t-dropdown { transition: none !important; }
+  button:not(:disabled),
+  a.button:not([aria-disabled="true"]) {
+    transition: none !important;
+  }
+  button:not(:disabled):active,
+  a.button:not([aria-disabled="true"]):active {
+    transform: none !important;
+  }
 }
