@@ -91,6 +91,9 @@ export function AppShell({ children, onExitDemo }: { children: ReactNode; onExit
   useEffect(() => {
     document.documentElement.dataset.theme = theme
     window.localStorage.setItem('masterdeck-theme', theme)
+    return () => {
+      delete document.documentElement.dataset.theme
+    }
   }, [theme])
 
   useEffect(() => {
