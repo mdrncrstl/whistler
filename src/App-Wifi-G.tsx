@@ -83,11 +83,11 @@ function AccountRoutes({ session, demo, onExitDemo }: { session: Session | null;
   const location = useLocation()
   const { access, onboardingRequired, trialExpired } = useAccountAccess()
   const { subscription } = useBillingStatus(session, demo)
-  const previewingOnboarding = new URLSearchParams(location.search).get('preview') === '1'
+  const previewingOnboarding = import.meta.env.DEV && new URLSearchParams(location.search).get('preview') === '1'
   const paid = Boolean(subscription && subscriptionAllowsAccess.has(subscription.status))
 
   const routes = <Routes>
-    <Route path="/welcome" element={previewingOnboarding || demo || onboardingRequired ? <Onboarding /> : <Navigate to={workspaceBasePath} replace />} />
+    <Route path="/welcome" element={previewingOnboarding || onboardingRequired ? <Onboarding /> : <Navigate to={workspaceBasePath} replace />} />
     <Route path={`${workspaceBasePath}/*`} element={onboardingRequired
       ? <Navigate to="/welcome" replace />
       : trialExpired && !paid && access?.access_mode !== 'grandfathered' && location.pathname !== `${workspaceBasePath}/billing`

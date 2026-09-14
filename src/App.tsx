@@ -64,7 +64,10 @@ function AccountRoutes({ session, demo, onExitDemo }: { session: Session | null;
   const location = useLocation()
   const { access, loading: accessLoading, onboardingRequired, trialExpired } = useAccountAccess()
   const { subscription } = useBillingStatus(session, demo)
-  const previewingOnboarding = new URLSearchParams(location.search).get('preview') === '1'
+  // Keep the manual preview useful during local work without exposing a public
+  // onboarding surface in production. Real onboarding is still driven by the
+  // signed-in account's onboardingRequired state.
+  const previewingOnboarding = import.meta.env.DEV && new URLSearchParams(location.search).get('preview') === '1'
   const paid = Boolean(subscription && subscriptionAllowsAccess.has(subscription.status))
 
   // The branded loading screen belongs to the workspace boot. Onboarding is a standalone
@@ -79,7 +82,7 @@ function AccountRoutes({ session, demo, onExitDemo }: { session: Session | null;
       : trialExpired && !paid && access?.access_mode !== 'grandfathered' && location.pathname !== `${workspaceBasePath}/billing`
         ? <Navigate to={`${workspaceBasePath}/billing?trial=ended`} replace />
         : <PortfolioRoutes onExitDemo={onExitDemo} />} />
-    <Route path="/welcome" element={previewingOnboarding || demo || onboardingRequired ? <Onboarding /> : <Navigate to={workspaceBasePath} replace />} />
+    <Route path="/welcome" element={previewingOnboarding || onboardingRequired ? <Onboarding /> : <Navigate to={workspaceBasePath} replace />} />
     <Route path="*" element={<Navigate to={workspaceBasePath} replace />} />
   </Routes>
 
