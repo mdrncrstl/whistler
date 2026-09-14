@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
-import { ArrowLeft, ArrowRight, BarChart3, Bitcoin, BriefcaseBusiness, Building2, Check, Landmark, Layers3, ShieldCheck, Sparkles, Users } from 'lucide-react'
+import { ArrowLeft, ArrowRight, BarChart3, Bitcoin, BriefcaseBusiness, Building2, Check, Landmark, Layers3, Sparkles, Users } from 'lucide-react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useAccountAccess, type AssetType, type OnboardingUpdate, type PortfolioStructure, type PrimaryGoal } from '../context/AccountAccessContext'
 import { Brand } from './ui'
@@ -25,9 +25,9 @@ const assets: { value: AssetType; title: string; icon: typeof BarChart3 }[] = [
 ]
 
 const stepMeta = [
-  { label: 'Your focus', detail: 'Choose what matters first.' },
-  { label: 'Your structure', detail: 'Set up the right view.' },
-  { label: 'Your assets', detail: 'Pick what you hold.' },
+  { label: 'Focus', title: 'What do you want to see first?', copy: 'Pick a starting point. You can use everything later.' },
+  { label: 'Structure', title: 'How many portfolios?', copy: 'Choose the view that matches your setup.' },
+  { label: 'Assets', title: 'What do you hold?', copy: 'Pick all that apply.' },
 ]
 
 export function Onboarding() {
@@ -82,68 +82,48 @@ export function Onboarding() {
   return <main className="onboarding-page">
     <header className="onboarding-header">
       <Brand />
-      <span className="onboarding-header-meta">Setup <i aria-hidden="true">·</i> 3 quick choices</span>
     </header>
 
-    <div className="onboarding-layout">
-      <aside className="onboarding-rail" aria-label="Setup overview">
-        <div>
-          <p className="onboarding-eyebrow">Workspace setup</p>
-          <h1>Start with a clear view of your portfolio.</h1>
-          <p className="onboarding-rail-copy">A few choices now help us put performance, global holdings and Australian tax records in the right order.</p>
-        </div>
-        <div className="onboarding-rail-steps">
-          <RailStep icon={BarChart3} title="See performance" copy="Returns, income and allocation." active={step >= 1} />
-          <RailStep icon={BriefcaseBusiness} title="Organise portfolios" copy="Keep personal and entity views clear." active={step >= 2} />
-          <RailStep icon={Landmark} title="Stay tax-ready" copy="Keep CGT detail close to the source." active={step >= 3} />
-        </div>
-        <div className="onboarding-rail-note"><ShieldCheck size={16} /><span><strong>Read-only by design.</strong> Your broker stays in control.</span></div>
-      </aside>
+    <section className="onboarding-card" aria-labelledby="onboarding-title">
+      <div className="onboarding-card-header">
+        <span className="onboarding-panel-kicker">{meta.label}</span>
+        <span className="onboarding-step-count"><strong>0{step}</strong><span aria-hidden="true"> / </span>03</span>
+      </div>
 
-      <section className="onboarding-card" aria-labelledby="onboarding-title">
-        <div className="onboarding-panel-header">
-          <div>
-            <span className="onboarding-panel-kicker">Setup</span>
-            <strong>{meta.label}</strong>
+      <div className="onboarding-progress" role="progressbar" aria-label={`Step ${step} of 3`} aria-valuemin={1} aria-valuemax={3} aria-valuenow={step}>
+        {[1, 2, 3].map((item) => <span key={item} className={item <= step ? 'complete' : ''} />)}
+      </div>
+
+      <AnimatePresence mode="wait" initial={false}>
+        <motion.div
+          key={step}
+          className="onboarding-step"
+          initial={reduceMotion ? false : { opacity: 0, x: 14 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={reduceMotion ? undefined : { opacity: 0, x: -10 }}
+          transition={{ duration: reduceMotion ? 0.01 : 0.24, ease: [0.23, 1, 0.32, 1] }}
+        >
+          <div className="onboarding-question">
+            <h1 id="onboarding-title">{meta.title}</h1>
+            <p>{meta.copy}</p>
           </div>
-          <span className="onboarding-step-count">0{step} / 03</span>
-        </div>
+          {step === 1 && <div className="onboarding-options onboarding-options-goals">{goals.map((item) => <Choice key={item.value} selected={goal === item.value} title={item.title} copy={item.copy} icon={item.icon} onClick={() => setGoal(item.value)} />)}</div>}
+          {step === 2 && <div className="onboarding-options onboarding-options-structures">{structures.map((item) => <Choice key={item.value} selected={structure === item.value} title={item.title} copy={item.copy} icon={item.icon} onClick={() => setStructure(item.value)} />)}</div>}
+          {step === 3 && <><div className="onboarding-options onboarding-options-assets">{assets.map((item) => <Choice key={item.value} selected={selectedAssets.includes(item.value)} title={item.title} icon={item.icon} multi onClick={() => toggleAsset(item.value)} />)}</div><p className="onboarding-selection-note" aria-live="polite">{selectedAssets.length ? `${selectedAssets.length} selected` : 'Select at least one asset type'}</p></>}
+        </motion.div>
+      </AnimatePresence>
 
-        <div className="onboarding-progress" role="progressbar" aria-label={`Step ${step} of 3`} aria-valuemin={1} aria-valuemax={3} aria-valuenow={step}>
-          {[1, 2, 3].map((item) => <span key={item} className={item <= step ? 'complete' : ''} />)}
-        </div>
+      {error && <p className="onboarding-error" role="alert">{error}</p>}
 
-        <div className="onboarding-progress-row">
-          <button type="button" className="onboarding-back" disabled={step === 1 || busy} onClick={() => setStep((current) => Math.max(1, current - 1))}><ArrowLeft size={14} />Back</button>
-          <span>{meta.detail}</span>
-        </div>
-
-        <AnimatePresence mode="wait" initial={false}>
-          <motion.div
-            key={step}
-            className="onboarding-step"
-            initial={reduceMotion ? false : { opacity: 0, x: 14 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={reduceMotion ? undefined : { opacity: 0, x: -10 }}
-            transition={{ duration: reduceMotion ? 0.01 : 0.24, ease: [0.23, 1, 0.32, 1] }}
-          >
-            {step === 1 && <><h2 id="onboarding-title">What do you want to see first?</h2><p>Pick a starting point. You can use everything later.</p><div className="onboarding-options onboarding-options-goals">{goals.map((item) => <Choice key={item.value} selected={goal === item.value} title={item.title} copy={item.copy} icon={item.icon} onClick={() => setGoal(item.value)} />)}</div></>}
-            {step === 2 && <><h2 id="onboarding-title">How many portfolios?</h2><p>Choose the view that matches your setup.</p><div className="onboarding-options onboarding-options-structures">{structures.map((item) => <Choice key={item.value} selected={structure === item.value} title={item.title} copy={item.copy} icon={item.icon} onClick={() => setStructure(item.value)} />)}</div></>}
-            {step === 3 && <><h2 id="onboarding-title">What do you hold?</h2><p>Pick all that apply.</p><div className="onboarding-options onboarding-options-assets">{assets.map((item) => <Choice key={item.value} selected={selectedAssets.includes(item.value)} title={item.title} icon={item.icon} multi onClick={() => toggleAsset(item.value)} />)}</div><p className="onboarding-selection-note" aria-live="polite">{selectedAssets.length ? `${selectedAssets.length} selected` : 'Select at least one asset type'}</p></>}
-          </motion.div>
-        </AnimatePresence>
-
-        {error && <p className="onboarding-error" role="alert">{error}</p>}
+      <div className="onboarding-actions">
+        <button type="button" className="onboarding-back" disabled={step === 1 || busy} onClick={() => setStep((current) => Math.max(1, current - 1))}><ArrowLeft size={14} /><span>Back</span></button>
+        <button type="button" className="onboarding-skip" disabled={busy} onClick={skip}>Skip and add holdings</button>
         <button type="button" className="onboarding-continue" disabled={!canContinue || busy} onClick={next}><span>{busy ? 'Saving...' : step === 3 ? 'Add my holdings' : 'Continue'}</span>{!busy && <ArrowRight size={16} />}</button>
-        {step === 3 && <div className="trial-assurance"><ShieldCheck size={15} /><span>14 days free <i aria-hidden="true">·</i> No card <i aria-hidden="true">·</i> No auto-renew</span></div>}
-        <button type="button" className="onboarding-skip" disabled={busy} onClick={skip}>Skip setup and add holdings</button>
-      </section>
-    </div>
-  </main>
-}
+      </div>
 
-function RailStep({ icon: Icon, title, copy, active }: { icon: typeof BarChart3; title: string; copy: string; active: boolean }) {
-  return <div className={`onboarding-rail-step ${active ? 'active' : ''}`}><span className="onboarding-rail-icon"><Icon size={16} /></span><span><strong>{title}</strong><small>{copy}</small></span></div>
+      {step === 3 && <p className="trial-assurance">14 days free <span aria-hidden="true">·</span> No card <span aria-hidden="true">·</span> No auto-renew</p>}
+    </section>
+  </main>
 }
 
 function Choice({ selected, title, copy, icon: Icon, multi, onClick }: { selected: boolean; title: string; copy?: string; icon: typeof BarChart3; multi?: boolean; onClick: () => void }) {

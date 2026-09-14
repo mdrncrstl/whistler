@@ -20,7 +20,9 @@ describe('new account onboarding', () => {
 
   it('lets users skip setup and go directly to importing holdings', async () => {
     render(<MemoryRouter initialEntries={['/welcome?preview=1']}><Routes><Route path="/welcome" element={<Onboarding/>}/><Route path="/workspace/connections" element={<p>Add your holdings</p>}/></Routes></MemoryRouter>)
-    fireEvent.click(screen.getByRole('button', { name: 'Skip setup and add holdings' }))
+    expect(screen.queryByText('Workspace setup')).not.toBeInTheDocument()
+    expect(document.querySelector('.onboarding-rail')).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: 'Skip and add holdings' }))
     expect(await screen.findByText('Add your holdings')).toBeInTheDocument()
   })
 
