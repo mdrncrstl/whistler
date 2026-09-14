@@ -54,6 +54,8 @@ describe('Masterdeck authentication', () => {
 
     fireEvent.click(screen.getAllByRole('button', { name: /try masterdeck free/i })[0])
     expect(await screen.findByRole('dialog', { name: 'Continue to Masterdeck' })).toBeInTheDocument()
+    expect(screen.getByTestId('google-signin-control').querySelector('.masterdeck-google-logo')).toHaveAttribute('src', '/holding-logos/googl.ico')
+    expect(screen.getByTestId('google-signin-control').querySelector('.masterdeck-google-letter')).toBeNull()
 
     fireEvent.click(screen.getByRole('button', { name: 'Continue with Google' }))
     await waitFor(() => expect(authMocks.signInWithIdToken).toHaveBeenCalledWith({ provider: 'google', token: 'test-google-id-token' }))

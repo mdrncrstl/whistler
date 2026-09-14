@@ -564,9 +564,9 @@ export function Landing({ onDemo, signedIn = false, onOpenApp, page }: LandingPr
           <button type="button" role="tab" aria-selected={authMode === 'signup'} onClick={() => switchAuthMode('signup')}>Create account</button>
         </div>
         <div className="masterdeck-auth-methods" aria-label="Choose a sign-in method">
-          <GoogleAuthButton
+          <NativeGoogleSignIn
             busy={redirecting}
-            onClick={() => { setRedirecting(true); setError(''); setNotice('') }}
+            onStart={() => { setRedirecting(true); setError(''); setNotice('') }}
             onSuccess={completeGoogleSignIn}
             onError={handleGoogleSignInError}
           />
@@ -604,26 +604,43 @@ export function Landing({ onDemo, signedIn = false, onOpenApp, page }: LandingPr
   )
 }
 
-function GoogleAuthButton({ busy, onClick, onSuccess, onError }: {
+function NativeGoogleSignIn({ busy, onStart, onSuccess, onError }: {
   busy: boolean
-  onClick: () => void
+  onStart: () => void
   onSuccess: (response: CredentialResponse) => void
   onError: () => void
 }) {
-  return <div className="masterdeck-google-signin" aria-busy={busy} data-testid="google-signin-control">
-    <GoogleLogin
-      onSuccess={onSuccess}
-      onError={onError}
-      click_listener={onClick}
-      ux_mode="popup"
-      theme="outline"
-      size="large"
-      text="continue_with"
-      shape="rectangular"
-      logo_alignment="left"
-      width={400}
-    />
-    {busy && <span className="masterdeck-google-busy" role="status">Completing Google sign-in…</span>}
+  const host = useRef<HTMLDivElement>(null)
+  const [width, setWidth] = useState(400)
+  useEffect(() => {
+    if (!host.current) return
+    const measure = () => setWidth(Math.min(400, Math.floor(host.current?.clientWidth || 400)))
+    measure()
+    if (typeof ResizeObserver === 'undefined') return
+    const observer = new ResizeObserver(measure)
+    observer.observe(host.current)
+    return () => observer.disconnect()
+  }, [])
+  return <div ref={host} className="masterdeck-google-native" aria-busy={busy} inert={busy} data-testid="google-signin-control">
+    <div className="masterdeck-auth-method masterdeck-google-visual" aria-hidden="true">
+      <span className="masterdeck-auth-method-icon masterdeck-google-icon"><img className="masterdeck-google-logo" src="/holding-logos/googl.ico" alt="" /></span>
+      <span className="masterdeck-auth-method-text">{busy ? 'Opening Google sign-in…' : 'Continue with Google'}</span>
+      <span className="masterdeck-auth-method-spacer" aria-hidden="true" />
+    </div>
+    <div className="masterdeck-google-hit-area">
+      <GoogleLogin
+        onSuccess={onSuccess}
+        onError={onError}
+        click_listener={onStart}
+        ux_mode="popup"
+        theme="outline"
+        size="large"
+        text="continue_with"
+        shape="rectangular"
+        logo_alignment="left"
+        width={width}
+      />
+    </div>
   </div>
 }
 

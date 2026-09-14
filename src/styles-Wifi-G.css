@@ -357,13 +357,6 @@ h1, h2, h3, p { margin-top: 0; }
 .masterdeck-auth-method-icon { width:30px;height:30px;display:grid;place-items:center;border-radius:8px;background:#e8f5ee;color:#188d6b; }
 .masterdeck-auth-method-icon svg { width:16px;height:16px; }
 .masterdeck-auth-method.is-active { border-color:#43a77e;box-shadow:0 0 0 3px rgb(31 154 113 / 11%); }
-.masterdeck-google-signin { position:relative;display:flex;align-items:center;justify-content:center;padding:0;overflow:hidden;border-color:transparent;background:transparent;transition:background .18s ease,border-color .18s ease,box-shadow .18s ease; }
-.masterdeck-google-signin:hover { border-color:transparent;background:transparent; }
-.masterdeck-google-signin>div { width:100%;min-width:0;min-height:40px;display:flex;align-items:center;justify-content:center;transition:opacity .16s ease; }
-.masterdeck-google-signin>div>div { width:100% !important;max-width:100%; }
-.masterdeck-google-signin iframe { width:100% !important;min-width:0 !important;height:40px !important; }
-.masterdeck-google-signin>div.is-busy { opacity:.15;pointer-events:none; }
-.masterdeck-google-busy { position:absolute;inset:0;display:grid;place-items:center;background:rgb(255 255 255 / 91%);color:#466057;font-size:12px;font-weight:700; }
 .masterdeck-auth-back { margin:11px 0 -2px;padding:0;border:0;display:inline-flex;align-items:center;gap:5px;background:transparent;color:#587067;font-size:11px;font-weight:700;cursor:pointer; }
 .masterdeck-auth-back:hover:not(:disabled) { color:#147859; }
 .masterdeck-auth-back:disabled { opacity:.6;cursor:wait; }
@@ -5078,48 +5071,6 @@ body { font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-s
   box-shadow: 0 26px 68px rgb(0 35 24 / 22%);
 }
 
-/* The OAuth button uses the provider configured in Supabase, avoiding a mismatched GSI audience. */
-.masterdeck-google-signin {
-  position: relative;
-  box-sizing: border-box;
-  min-height: 40px;
-  padding: 0 15px;
-  border: 1px solid #cddbd4;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #fff;
-  color: var(--m-ink);
-  text-align: center;
-  cursor: pointer;
-  transition: background .18s ease, border-color .18s ease, box-shadow .18s ease, transform .18s ease;
-}
-.masterdeck-google-signin:hover:not(:disabled) { border-color: #86c8a7; background: #f7fcf9; transform: translateY(-1px); }
-.masterdeck-google-signin:active:not(:disabled) { transform: translateY(0); }
-.masterdeck-google-signin:disabled { opacity: .72; cursor: wait; }
-.masterdeck-google-signin .masterdeck-google-mark {
-  position: absolute;
-  left: 14px;
-  width: 23px;
-  height: 23px;
-  display: grid;
-  place-items: center;
-  font-family: Arial, sans-serif;
-  font-size: 20px;
-  font-weight: 800;
-  line-height: 1;
-  background: conic-gradient(from -45deg, #4285f4 0 25%, #34a853 25% 50%, #fbbc05 50% 75%, #ea4335 75% 100%);
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-.masterdeck-google-signin .masterdeck-google-label {
-  white-space: nowrap;
-  font-size: 12px;
-  font-weight: 750;
-}
-
 @media (max-width: 1040px) {
   .cloud-hero { grid-template-columns: 1fr; gap: 34px; }
   .cloud-hero-preview { margin-top: 2px; }
@@ -5941,17 +5892,6 @@ body { font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-s
 }
 .masterdeck-auth-method-spacer { grid-column: 3; width: 32px; height: 32px; }
 .masterdeck-google-native { position: relative; padding: 0; }
-.masterdeck-google-letter {
-  display: block;
-  font-family: Arial, sans-serif;
-  font-size: 20px;
-  font-weight: 800;
-  line-height: 1;
-  background: conic-gradient(from -45deg, #4285f4 0 25%, #34a853 25% 50%, #fbbc05 50% 75%, #ea4335 75% 100%);
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
 @media (max-width: 520px) {
   .masterdeck-auth-method,
   .masterdeck-google-native { min-height: 48px; }
@@ -6171,49 +6111,6 @@ html { scrollbar-gutter: stable; }
 
 /* Keep page hierarchy in the headings and remove redundant eyebrow tags. */
 .section-label { display:none !important; }
-
-/* Render Google's official Identity Services control so the provider mark,
-   typography and popup behavior come from Google rather than a recreated icon. */
-.masterdeck-google-signin {
-  position: relative;
-  width: 100%;
-  min-height: 50px;
-  padding: 0;
-  border: 0;
-  border-radius: 0;
-  display: flex;
-  align-items: center;
-  background: transparent;
-  box-shadow: none;
-  overflow: visible;
-}
-.masterdeck-google-signin > div:not(.masterdeck-google-busy) {
-  width: 100% !important;
-  min-width: 0 !important;
-  height: 40px !important;
-  min-height: 40px !important;
-  display: block;
-}
-.masterdeck-google-signin iframe {
-  display: block;
-  width: 100% !important;
-  max-width: 100% !important;
-  height: 40px !important;
-  border: 0;
-}
-.masterdeck-google-signin .masterdeck-google-busy {
-  position: absolute;
-  inset: 5px 0;
-  min-height: 40px;
-  display: grid;
-  place-items: center;
-  border: 1px solid #cddbd4;
-  border-radius: 4px;
-  background: rgb(255 255 255 / 96%);
-  color: #466057;
-  font-size: 12px;
-  font-weight: 700;
-}
 
 /* MyTax review workspace: keep the return focused, readable and visually distinct
    from the dense source-depth tables used by the other tax reports. */
@@ -7069,3 +6966,71 @@ html { scrollbar-gutter: stable; }
 .menu-anchor.is-open::after { pointer-events: auto; }
 .drawer-panel .menu-anchor::after,
 .md-site-menu.is-mobile .menu-anchor::after { display: none; }
+
+/* Keep the familiar centered auth row while the real Google Identity Services
+   control remains the clickable layer underneath it. */
+.masterdeck-auth-methods .masterdeck-google-native {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 50px;
+  min-height: 50px;
+  padding: 0;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  overflow: visible;
+}
+.masterdeck-google-native .masterdeck-google-visual {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+.masterdeck-google-native .masterdeck-google-icon {
+  background: #f1f3f4;
+  border-radius: 50%;
+}
+.masterdeck-google-native .masterdeck-google-logo {
+  display: block;
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+}
+.masterdeck-google-native .masterdeck-google-hit-area {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  border-radius: 12px;
+  opacity: 0;
+}
+.masterdeck-google-native .masterdeck-google-hit-area > div {
+  width: 100% !important;
+  max-width: 100% !important;
+  height: 100% !important;
+  min-height: 100% !important;
+  display: block !important;
+}
+.masterdeck-google-native .masterdeck-google-hit-area iframe {
+  display: block;
+  width: 100% !important;
+  min-width: 0 !important;
+  height: 100% !important;
+  border: 0;
+}
+.masterdeck-google-native:hover .masterdeck-google-visual {
+  border-color: #86c8a7;
+  background: #f7fcf9;
+  transform: translateY(-1px);
+}
+.masterdeck-google-native:active .masterdeck-google-visual { transform: translateY(0); }
+.masterdeck-google-native[aria-busy="true"] .masterdeck-google-visual { opacity: .65; }
+@media (max-width: 520px) {
+  .masterdeck-auth-methods .masterdeck-google-native,
+  .masterdeck-google-native .masterdeck-google-visual,
+  .masterdeck-google-native .masterdeck-google-hit-area {
+    height: 48px;
+    min-height: 48px;
+  }
+}
