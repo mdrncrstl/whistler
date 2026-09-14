@@ -10,7 +10,6 @@ import {
 } from 'lucide-react'
 import { AnimatePresence, motion, useMotionValueEvent, useReducedMotion, useScroll } from 'framer-motion'
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react'
-import { GoogleLogin, type CredentialResponse } from '@react-oauth/google'
 import { annualSavingsPercent, billingPlans, formatAud } from '../lib/billing'
 import { brokers } from '../lib/brokers'
 import { authClient } from '../lib/supabase'
@@ -210,29 +209,20 @@ export function Landing({ onDemo, signedIn = false, onOpenApp, page }: LandingPr
     setRedirecting(false)
   }
 
-  const completeGoogleSignIn = async (credentialResponse: CredentialResponse) => {
-    const token = credentialResponse.credential
-    if (!token) {
-      setError('Google did not return a sign-in credential. Please try again.')
-      setRedirecting(false)
-      return
-    }
+  const beginGoogleSignIn = async () => {
     setRedirecting(true)
     setError('')
     setNotice('')
     try {
-      const { error: signInError } = await authClient.auth.signInWithIdToken({ provider: 'google', token })
+      const { error: signInError } = await authClient.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: canonicalAppUrl('/auth/callback'),
+          queryParams: { prompt: 'select_account' },
+        },
+      })
       if (signInError) throw signInError
-      setSignInOpen(false)
-      setPassword('')
-      setRedirecting(false)
-      onOpenApp?.()
-    } catch { setError('Google sign-in could not be completed. Please try again.'); setRedirecting(false) }
-  }
-
-  const handleGoogleSignInError = () => {
-    setError('Google sign-in was cancelled or could not be completed. Please try again.')
-    setRedirecting(false)
+    } catch { setError('Google sign-in could not be started. Please try again.'); setRedirecting(false) }
   }
 
   const beginAppleSignIn = async () => {
@@ -564,12 +554,7 @@ export function Landing({ onDemo, signedIn = false, onOpenApp, page }: LandingPr
           <button type="button" role="tab" aria-selected={authMode === 'signup'} onClick={() => switchAuthMode('signup')}>Create account</button>
         </div>
         <div className="masterdeck-auth-methods" aria-label="Choose a sign-in method">
-          <NativeGoogleSignIn
-            busy={redirecting}
-            onStart={() => { setRedirecting(true); setError(''); setNotice('') }}
-            onSuccess={completeGoogleSignIn}
-            onError={handleGoogleSignInError}
-          />
+          <NativeGoogleSignIn busy={redirecting} onStart={() => { void beginGoogleSignIn() }} />
           {authMethod !== 'email' && <button
               className="masterdeck-auth-method"
               type="button"
@@ -604,44 +589,15 @@ export function Landing({ onDemo, signedIn = false, onOpenApp, page }: LandingPr
   )
 }
 
-function NativeGoogleSignIn({ busy, onStart, onSuccess, onError }: {
+function NativeGoogleSignIn({ busy, onStart }: {
   busy: boolean
   onStart: () => void
-  onSuccess: (response: CredentialResponse) => void
-  onError: () => void
 }) {
-  const host = useRef<HTMLDivElement>(null)
-  const [width, setWidth] = useState(400)
-  useEffect(() => {
-    if (!host.current) return
-    const measure = () => setWidth(Math.min(400, Math.floor(host.current?.clientWidth || 400)))
-    measure()
-    if (typeof ResizeObserver === 'undefined') return
-    const observer = new ResizeObserver(measure)
-    observer.observe(host.current)
-    return () => observer.disconnect()
-  }, [])
-  return <div ref={host} className="masterdeck-google-native" aria-busy={busy} inert={busy} data-testid="google-signin-control">
-    <div className="masterdeck-auth-method masterdeck-google-visual" aria-hidden="true">
-      <span className="masterdeck-auth-method-icon masterdeck-google-icon"><img className="masterdeck-google-logo" src="/holding-logos/googl.ico" alt="" /></span>
-      <span className="masterdeck-auth-method-text">{busy ? 'Opening Google sign-in…' : 'Continue with Google'}</span>
-      <span className="masterdeck-auth-method-spacer" aria-hidden="true" />
-    </div>
-    <div className="masterdeck-google-hit-area">
-      <GoogleLogin
-        onSuccess={onSuccess}
-        onError={onError}
-        click_listener={onStart}
-        ux_mode="popup"
-        theme="outline"
-        size="large"
-        text="continue_with"
-        shape="rectangular"
-        logo_alignment="left"
-        width={width}
-      />
-    </div>
-  </div>
+  return <button className="masterdeck-auth-method masterdeck-google-native" type="button" aria-busy={busy} disabled={busy} onClick={onStart} data-testid="google-signin-control">
+    <span className="masterdeck-auth-method-icon masterdeck-google-icon" aria-hidden="true"><img className="masterdeck-google-logo" src="/holding-logos/googl.ico" alt="" /></span>
+    <span className="masterdeck-auth-method-text">{busy ? 'Opening Google sign-in…' : 'Continue with Google'}</span>
+    <span className="masterdeck-auth-method-spacer" aria-hidden="true" />
+  </button>
 }
 
 function Reveal({ children, className = '', id, 'aria-label': ariaLabel }: { children: ReactNode; className?: string; id?: string; 'aria-label'?: string }) {
