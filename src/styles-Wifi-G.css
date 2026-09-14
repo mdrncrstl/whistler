@@ -6678,3 +6678,363 @@ html { scrollbar-gutter: stable; }
     width: 106px;
   }
 }
+
+/* MyTax report parity: one continuous return with the same hierarchy as the reference report. */
+.tax-page--mytax .mytax-report-meta {
+  margin-bottom: 14px;
+  padding: 18px 22px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(420px, 1.15fr);
+  align-items: center;
+  gap: 24px;
+  background: var(--surface);
+}
+.mytax-meta-copy { min-width: 0; }
+.mytax-meta-copy p {
+  max-width: 62ch;
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.5;
+}
+.tax-page--mytax .mytax-report-meta .mytax-context-grid {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+}
+.mytax-context-grid > div {
+  min-width: 0;
+  padding: 2px 16px;
+  border-left: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.mytax-context-grid > div:first-child { padding-left: 0; border-left: 0; }
+.mytax-context-grid dt {
+  color: var(--muted-2);
+  font-size: 9px;
+  font-weight: 750;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+.mytax-context-grid dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+  color: var(--text);
+  font-size: 11px;
+  font-weight: 750;
+  line-height: 1.35;
+}
+.mytax-context-grid dd small {
+  color: var(--muted-2);
+  font-size: 9px;
+  font-weight: 600;
+}
+.tax-page--mytax .mytax-section-card {
+  margin-bottom: 14px;
+  padding: 22px 26px 0;
+  border-radius: 12px;
+  overflow: hidden;
+}
+.tax-page--mytax .mytax-section-head {
+  min-width: 0;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+}
+.mytax-section-head > div:first-child { min-width: 0; }
+.mytax-section-head h2 {
+  margin: 5px 0 0;
+  font-size: 16px;
+  line-height: 1.25;
+  letter-spacing: -.02em;
+}
+.mytax-section-head p {
+  max-width: 68ch;
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.5;
+}
+.mytax-section-link {
+  flex: 0 0 auto;
+  min-height: 30px;
+  padding: 0 1px;
+  border: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--green);
+  font-size: 10px;
+  font-weight: 750;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.mytax-section-link:hover,
+.mytax-section-link:focus-visible {
+  color: color-mix(in srgb, var(--green) 75%, var(--text));
+  outline: 0;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.tax-page--mytax .mytax-report-rows {
+  margin: 0;
+  border-top: 1px solid var(--line);
+}
+.mytax-report-rows > div {
+  min-height: 44px;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--line);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 20px;
+}
+.mytax-report-rows dt {
+  color: var(--text);
+  font-size: 11px;
+  font-weight: 650;
+}
+.mytax-report-rows dd {
+  margin: 0;
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 750;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+.mytax-disclosure {
+  width: 100%;
+  min-height: 48px;
+  padding: 0;
+  border: 0;
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 7px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 10px;
+  font-weight: 750;
+  text-align: left;
+  cursor: pointer;
+}
+.mytax-disclosure svg { color: var(--muted); transition: transform 150ms var(--ease-out); }
+.mytax-disclosure.is-open svg { transform: rotate(180deg); }
+.mytax-disclosure small {
+  color: var(--muted-2);
+  font-size: 9px;
+  font-weight: 600;
+}
+.mytax-disclosure:hover,
+.mytax-disclosure:focus-visible { color: var(--green); outline: 0; }
+.mytax-disclosure:focus-visible { box-shadow: 0 0 0 3px color-mix(in srgb, var(--green) 16%, transparent); }
+.tax-page--mytax .mytax-breakdown {
+  margin: 0 -26px;
+  padding: 0 26px 18px;
+  border-top: 1px solid var(--line);
+  display: block;
+  background: var(--surface-2);
+}
+.tax-page--mytax .mytax-capital > .mytax-breakdown { display: block; }
+.mytax-breakdown table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+.mytax-breakdown th,
+.mytax-breakdown td {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 10px;
+  text-align: left;
+}
+.mytax-breakdown th,
+.mytax-breakdown td { padding-inline: 12px; }
+.mytax-breakdown th:first-child,
+.mytax-breakdown td:first-child { width: 52%; padding-left: 0; }
+.mytax-breakdown th:nth-child(2),
+.mytax-breakdown td:nth-child(2),
+.mytax-breakdown th:nth-child(3),
+.mytax-breakdown td:nth-child(3) { width: 24%; }
+.mytax-breakdown th { color: var(--muted-2); font-size: 9px; font-weight: 750; text-transform: uppercase; }
+.mytax-breakdown tr:last-child td { border-bottom: 0; }
+.mytax-breakdown .numeric { text-align: right; font-variant-numeric: tabular-nums; }
+.mytax-breakdown td.numeric { color: var(--text); font-weight: 700; }
+.tax-page--mytax .mytax-income-summary { padding-bottom: 20px; }
+.mytax-income-stats {
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  background: var(--surface-2);
+}
+.mytax-income-stats > div {
+  min-width: 0;
+  min-height: 84px;
+  padding: 14px 16px;
+  border-right: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+}
+.mytax-income-stats > div:last-child { border-right: 0; }
+.mytax-income-stats span {
+  color: var(--muted-2);
+  font-size: 9px;
+  font-weight: 750;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+.mytax-income-stats strong {
+  color: var(--text);
+  font-size: 17px;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.mytax-income-stats small {
+  color: var(--muted);
+  font-size: 9px;
+  line-height: 1.3;
+}
+.tax-page--mytax .mytax-return-section { padding-bottom: 0; }
+.mytax-return-head { align-items: center !important; }
+.mytax-return-count {
+  flex: 0 0 auto;
+  min-width: 82px;
+  padding-left: 18px;
+  border-left: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: right;
+}
+.mytax-return-count strong { color: var(--text); font-size: 18px; line-height: 1; }
+.mytax-return-count span { color: var(--muted-2); font-size: 9px; font-weight: 700; text-transform: uppercase; }
+.mytax-return-table { width: calc(100% + 52px); max-width: none; margin: 0 -26px; overflow-x: auto; overscroll-behavior-inline: contain; }
+.mytax-return-table table { width: 100%; min-width: 760px; border-collapse: collapse; table-layout: fixed; }
+.mytax-return-table th,
+.mytax-return-table td {
+  padding: 11px 18px;
+  border-bottom: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.4;
+  text-align: left;
+  vertical-align: middle;
+}
+.mytax-return-table th { color: var(--muted-2); font-size: 9px; font-weight: 750; letter-spacing: .04em; text-transform: uppercase; }
+.mytax-return-table th:first-child,
+.mytax-return-table td:first-child { width: 74px; }
+.mytax-return-table th:nth-child(2),
+.mytax-return-table td:nth-child(2) { width: auto; }
+.mytax-return-table th:nth-child(3),
+.mytax-return-table td:nth-child(3) { width: 134px; }
+.mytax-return-table th:last-child,
+.mytax-return-table td:last-child { width: 150px; }
+.mytax-return-table .numeric { text-align: right; font-variant-numeric: tabular-nums; }
+.mytax-return-table td:nth-child(2) { color: var(--text); font-weight: 650; }
+.mytax-return-table .mytax-field-group th {
+  width: auto;
+  padding-top: 14px;
+  padding-bottom: 9px;
+  background: var(--surface-2);
+  color: var(--muted);
+  font-size: 9px;
+  letter-spacing: .06em;
+}
+.mytax-return-table .mytax-field-group:first-child th { padding-top: 11px; }
+.mytax-return-table tr:last-child td { border-bottom: 0; }
+.mytax-code { color: var(--green); font-size: 10px; font-weight: 800; }
+.mytax-missing { color: var(--muted-2); font-size: 10px; font-style: italic; }
+.mytax-source { color: var(--muted-2); font-size: 9px; white-space: nowrap; }
+.mytax-source::before { content: '•'; margin-right: 5px; color: var(--muted-2); }
+.mytax-source.is-recorded { color: var(--green); }
+.mytax-source.is-recorded::before { color: var(--green); }
+.tax-page--mytax .mytax-review-section { padding-bottom: 22px; }
+.mytax-review-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.mytax-review-item {
+  min-width: 0;
+  padding: 13px 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 9px;
+  background: var(--surface-2);
+}
+.mytax-review-item.is-ready { border-color: color-mix(in srgb, var(--green) 20%, var(--line)); }
+.mytax-review-item.is-warning { border-color: color-mix(in srgb, var(--gold) 25%, var(--line)); }
+.mytax-review-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  display: grid;
+  place-items: center;
+  background: var(--surface-3);
+  color: var(--muted);
+}
+.mytax-review-item.is-ready .mytax-review-icon { color: var(--green); }
+.mytax-review-item.is-warning .mytax-review-icon { color: var(--gold); }
+.mytax-review-item > div { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.mytax-review-item strong { color: var(--text); font-size: 10px; }
+.mytax-review-item small { color: var(--muted); font-size: 9px; line-height: 1.45; }
+.mytax-review-item .badge { align-self: start; white-space: nowrap; }
+.tax-page--mytax .mytax-disclaimer { margin: 0; padding: 16px 18px; border-radius: 10px; box-shadow: none; }
+.tax-page--mytax .mytax-disclaimer p { max-width: none; font-size: 10px; line-height: 1.55; }
+
+@media (max-width: 1100px) {
+  .tax-page--mytax .mytax-report-meta { grid-template-columns: 1fr; gap: 16px; }
+  .tax-page--mytax .mytax-report-meta .mytax-context-grid { max-width: 620px; }
+}
+@media (max-width: 900px) {
+  .tax-page--mytax .mytax-section-head { flex-direction: column; gap: 10px; }
+  .tax-page--mytax .mytax-section-head .mytax-section-link { position: static; align-self: flex-start; }
+  .tax-page--mytax .mytax-section-head > div:first-child { width: 100%; }
+  .tax-page--mytax .mytax-section-link { min-height: 24px; }
+  .mytax-return-head { flex-direction: row !important; align-items: flex-start !important; }
+  .mytax-review-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 560px) {
+  .tax-page--mytax .mytax-report-meta { padding: 15px 16px; }
+  .tax-page--mytax .mytax-report-meta .mytax-context-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .mytax-context-grid > div { padding-inline: 9px; }
+  .mytax-context-grid dt { font-size: 8px; }
+  .mytax-context-grid dd { font-size: 10px; }
+  .tax-page--mytax .mytax-section-card { padding: 17px 16px 0; }
+  .mytax-section-head h2 { font-size: 15px; }
+  .mytax-section-head p { font-size: 9px; }
+  .mytax-report-rows > div { gap: 12px; }
+  .mytax-report-rows dt { font-size: 10px; }
+  .mytax-report-rows dd { font-size: 11px; }
+  .tax-page--mytax .mytax-breakdown { margin-inline: -16px; padding-inline: 16px; }
+  .mytax-income-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .mytax-income-stats > div:nth-child(2) { border-right: 0; }
+  .mytax-income-stats > div:nth-child(-n + 2) { border-bottom: 1px solid var(--line); }
+  .mytax-income-stats > div { min-height: 76px; padding: 11px 12px; }
+  .mytax-income-stats strong { font-size: 15px; }
+  .mytax-return-head { gap: 12px !important; }
+  .mytax-return-count { min-width: 68px; padding-left: 12px; }
+  .mytax-return-count strong { font-size: 16px; }
+  .mytax-return-table { width: calc(100% + 32px); max-width: none; margin-inline: -16px; }
+  .mytax-return-table table { min-width: 0; table-layout: fixed; }
+  .mytax-return-table th, .mytax-return-table td { padding-inline: 12px; white-space: normal; overflow-wrap: anywhere; }
+  .mytax-return-table th:first-child, .mytax-return-table td:first-child { width: 46px; }
+  .mytax-return-table th:nth-child(3), .mytax-return-table td:nth-child(3) { width: 82px; }
+  .mytax-return-table th:last-child, .mytax-return-table td:last-child { width: 130px; }
+  .mytax-return-table .mytax-source { white-space: normal; }
+  .mytax-review-item { grid-template-columns: 24px minmax(0, 1fr); }
+  .mytax-review-item .badge { grid-column: 2; justify-self: start; }
+}

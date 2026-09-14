@@ -30,13 +30,26 @@ describe('Navexa-depth workspace routes', () => {
 
   it('does not invent franking amounts or annualised portfolio returns', () => {
     const tax = renderRoute('/app/tax/mytax', '/app/tax/:report', <TaxCentre/>)
-    expect(screen.getByRole('row', {name:'11U Franking credits Not supplied'})).toBeInTheDocument()
+    expect(screen.getByRole('row', {name:'11U Franking credits Not supplied Annual statement'})).toBeInTheDocument()
     tax.unmount()
     renderRoute('/app', '/app', <Overview/>)
     expect(screen.queryByText('p.a.')).not.toBeInTheDocument()
     expect(within(screen.getByRole('row', {name:'Open AAPL holding'})).getByText('$7,797.40')).toBeInTheDocument()
     fireEvent.click(screen.getByRole('tab', {name:/Capital Gain/}))
     expect(screen.getByText(/Loading daily return history|Historical return components are not available/)).toBeInTheDocument()
+  })
+
+  it('matches the tax return flow with an expandable capital breakdown', () => {
+    renderRoute('/app/tax/mytax?from=2025-07-01&to=2026-06-30', '/app/tax/:report', <TaxCentre/>)
+    expect(screen.getByLabelText('Financial year')).toHaveValue('2025/26')
+    const breakdown = screen.getByRole('button', { name: /Capital Gains Tax Breakdown/ })
+    expect(breakdown).toHaveAttribute('aria-expanded', 'false')
+    fireEvent.click(breakdown)
+    expect(breakdown).toHaveAttribute('aria-expanded', 'true')
+    expect(screen.getByText('Shares in Australian listed companies')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /Go to CGT report/ })).toHaveAttribute('href', '/app/tax/capital-gains')
+    expect(screen.getByRole('link', { name: /Go to Taxable Income report/ })).toHaveAttribute('href', '/app/tax/taxable-income')
+    expect(screen.getByRole('button', { name: 'Export' })).toBeInTheDocument()
   })
 
   it('renders the full nested report and tax sidebar hierarchy', () => {
