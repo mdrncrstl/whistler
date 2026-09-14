@@ -94,10 +94,10 @@ h1, h2, h3, p { margin-top: 0; }
 .hero-copy { max-width: 590px; margin-bottom: 27px; color: var(--muted); font-size: 17px; line-height: 1.62; }
 .auth-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
 .auth-actions > .button { min-height: 44px; padding-inline: 18px; }
-.google-auth-button { width: 230px; min-height: 44px; padding: 0 15px; border: 1px solid #3c4043; border-radius: 8px; display: inline-flex; align-items: center; justify-content: flex-start; gap: 18px; background: #202124; color: #fff; font-size: 14px; font-weight: 500; cursor: pointer; transition: background .18s ease, border-color .18s ease, transform .18s ease; }
-.google-auth-button:hover:not(:disabled) { transform: translateY(-1px); background: #2b2c2f; border-color: #5f6368; }
+.google-auth-button { width: 230px; min-height: 44px; padding: 0 15px; border: 1px solid #d7e2dc; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; background: #fff; color: #17332b; font-size: 14px; font-weight: 500; cursor: pointer; overflow: hidden; transition: background .18s ease, border-color .18s ease, transform .18s ease; }
+.google-auth-button:hover:not(:disabled) { transform: translateY(-1px); background: #f7fcf9; border-color: #86c8a7; }
 .google-auth-button:disabled { opacity: .65; cursor: wait; }
-.google-g { width: 22px; height: 22px; display: grid; place-items: center; border-radius: 3px; background: white; color: #4285f4; font-size: 15px; font-weight: 800; font-family: Arial, sans-serif; }
+.google-auth-button > div { width: 100%; }
 .auth-error { max-width: 520px; margin: 14px 0 0; padding: 10px 12px; border: 1px solid rgb(255 118 118 / 30%); border-radius: 8px; background: rgb(255 118 118 / 7%); color: #ff9b9b; font-size: 12px; }
 .auth-foot { margin: 18px 0 0; display: flex; align-items: center; gap: 7px; color: var(--muted-2); font-size: 11px; }
 .portfolio-preview { min-width: 0; padding: 16px; border: 1px solid #2b4938; border-radius: 22px; background: linear-gradient(145deg, rgb(15 30 21 / 95%), rgb(6 14 10 / 95%)); box-shadow: 0 34px 100px rgb(0 0 0 / 42%), inset 0 1px 0 rgb(255 255 255 / 3%); }

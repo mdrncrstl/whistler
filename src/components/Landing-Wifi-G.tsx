@@ -10,6 +10,7 @@ import {
 } from 'lucide-react'
 import { AnimatePresence, motion, useMotionValueEvent, useReducedMotion, useScroll } from 'framer-motion'
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react'
+import { GoogleLogin, type CredentialResponse } from '@react-oauth/google'
 import { annualSavingsPercent, billingPlans, formatAud } from '../lib/billing'
 import { brokers } from '../lib/brokers'
 import { authClient } from '../lib/supabase'
@@ -209,20 +210,22 @@ export function Landing({ onDemo, signedIn = false, onOpenApp, page }: LandingPr
     setRedirecting(false)
   }
 
-  const beginGoogleSignIn = async () => {
+  const completeGoogleSignIn = async ({ credential }: CredentialResponse) => {
     setRedirecting(true)
     setError('')
     setNotice('')
     try {
-      const { error: signInError } = await authClient.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: canonicalAppUrl('/auth/callback'),
-          queryParams: { prompt: 'select_account' },
-        },
-      })
+      if (!credential) throw new Error('Google did not return a sign-in credential.')
+      const { error: signInError } = await authClient.auth.signInWithIdToken({ provider: 'google', token: credential })
       if (signInError) throw signInError
-    } catch { setError('Google sign-in could not be started. Please try again.'); setRedirecting(false) }
+      setSignInOpen(false)
+      onOpenApp?.()
+    } catch { setError('Google sign-in could not be completed. Please try again.'); setRedirecting(false) }
+  }
+
+  const handleGoogleSignInError = () => {
+    setError('Google sign-in could not be completed. Please try again.')
+    setRedirecting(false)
   }
 
   const beginAppleSignIn = async () => {
@@ -551,7 +554,7 @@ export function Landing({ onDemo, signedIn = false, onOpenApp, page }: LandingPr
           <button type="button" role="tab" aria-selected={authMode === 'signup'} onClick={() => switchAuthMode('signup')}>Create account</button>
         </div>
         <div className="masterdeck-auth-methods" aria-label="Choose a sign-in method">
-          <NativeGoogleSignIn busy={redirecting} onStart={() => { void beginGoogleSignIn() }} />
+          <NativeGoogleSignIn busy={redirecting} onSuccess={(response) => { void completeGoogleSignIn(response) }} onError={handleGoogleSignInError} />
           {authMethod !== 'email' && <button
               className="masterdeck-auth-method"
               type="button"
@@ -586,15 +589,25 @@ export function Landing({ onDemo, signedIn = false, onOpenApp, page }: LandingPr
   )
 }
 
-function NativeGoogleSignIn({ busy, onStart }: {
+function NativeGoogleSignIn({ busy, onSuccess, onError }: {
   busy: boolean
-  onStart: () => void
+  onSuccess: (response: CredentialResponse) => void
+  onError: () => void
 }) {
-  return <button className="masterdeck-auth-method masterdeck-google-native" type="button" aria-busy={busy} disabled={busy} onClick={onStart} data-testid="google-signin-control">
-    <span className="masterdeck-auth-method-icon masterdeck-google-icon" aria-hidden="true"><img className="masterdeck-google-logo" src="/holding-logos/googl.ico" alt="" /></span>
-    <span className="masterdeck-auth-method-text">{busy ? 'Opening Google sign-in…' : 'Continue with Google'}</span>
-    <span className="masterdeck-auth-method-spacer" aria-hidden="true" />
-  </button>
+  return <div className="masterdeck-google-native" aria-busy={busy} data-testid="google-signin-control">
+    <GoogleLogin
+      onSuccess={onSuccess}
+      onError={onError}
+      text="continue_with"
+      theme="outline"
+      size="large"
+      shape="rectangular"
+      logo_alignment="left"
+      width="400"
+      containerProps={{ className: 'masterdeck-google-gsi' }}
+    />
+    {busy && <span className="masterdeck-google-status" role="status">Finishing sign-in…</span>}
+  </div>
 }
 
 function Reveal({ children, className = '', id, 'aria-label': ariaLabel }: { children: ReactNode; className?: string; id?: string; 'aria-label'?: string }) {

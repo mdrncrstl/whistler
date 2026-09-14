@@ -1,5 +1,6 @@
 import { ArrowRight, Check, DatabaseZap, Landmark, LockKeyhole, Mail, RefreshCcw, ShieldCheck } from 'lucide-react'
 import { useState } from 'react'
+import { GoogleLogin, type CredentialResponse } from '@react-oauth/google'
 import { authClient } from '../lib/supabase'
 import { canonicalAppUrl } from '../lib/app-origin'
 import { Brand, Button } from './ui'
@@ -8,15 +9,16 @@ export function LegacyLanding({ onDemo }: { onDemo: () => void }) {
   const [error, setError] = useState('')
   const [redirecting, setRedirecting] = useState(false)
 
-  const beginGoogleSignIn = async () => {
+  const completeGoogleSignIn = async ({ credential }: CredentialResponse) => {
     setRedirecting(true)
     setError('')
-    const { error: signInError } = await authClient.auth.signInWithOAuth({
-      provider: 'google',
-      options: { redirectTo: canonicalAppUrl('/auth/callback'), queryParams: { prompt: 'select_account' } },
-    })
-    if (signInError) {
-      setError(signInError.message)
+    try {
+      if (!credential) throw new Error('Google did not return a sign-in credential.')
+      const { error: signInError } = await authClient.auth.signInWithIdToken({ provider: 'google', token: credential })
+      if (signInError) throw signInError
+      window.location.assign(canonicalAppUrl('/deck'))
+    } catch {
+      setError('Google sign-in could not be completed. Please try again.')
       setRedirecting(false)
     }
   }
@@ -34,10 +36,18 @@ export function LegacyLanding({ onDemo }: { onDemo: () => void }) {
             <h1>Your portfolio.<br /><em>Mastered.</em></h1>
             <p className="hero-copy">Track Interactive Brokers and Superhero in one private portfolio workspace with holdings, activity, performance and Australian tax reporting.</p>
             <div className="auth-actions">
-              <button className="google-auth-button" onClick={beginGoogleSignIn} disabled={redirecting}>
-                <span className="google-g" aria-hidden="true">G</span>
-                <span>{redirecting ? 'Opening secure sign-in…' : 'Continue with Google'}</span>
-              </button>
+              <div className="google-auth-button" aria-busy={redirecting} data-testid="google-signin-control">
+                <GoogleLogin
+                  onSuccess={(response) => { void completeGoogleSignIn(response) }}
+                  onError={() => { setError('Google sign-in could not be completed. Please try again.'); setRedirecting(false) }}
+                  text="continue_with"
+                  theme="outline"
+                  size="large"
+                  shape="rectangular"
+                  logo_alignment="left"
+                  width="230"
+                />
+              </div>
               <Button onClick={onDemo}>Explore demo <ArrowRight size={16} /></Button>
             </div>
             {error && <p className="auth-error" role="alert">{error}</p>}
