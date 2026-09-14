@@ -351,8 +351,162 @@ a.button:not([aria-disabled="true"]):active {
 .drawer-panel .menu-anchor::after,
 .md-site-menu.is-mobile .menu-anchor::after { display: none; }
 
+/* transitions.dev — measured layout changes. Use this for a container whose
+   dimensions change because a deliberate state exposes more content. */
+.t-resize {
+  transition:
+    width var(--resize-dur) var(--resize-ease),
+    height var(--resize-dur) var(--resize-ease),
+    max-width var(--resize-dur) var(--resize-ease),
+    max-height var(--resize-dur) var(--resize-ease);
+  will-change: width, height;
+}
+
+/* transitions.dev — occasional panel reveal. The opacity keeps the content
+   readable while the surrounding layout settles into its new height. */
+.t-panel-slide {
+  opacity: 0;
+  transform: translateY(var(--panel-translate-y));
+  filter: blur(var(--panel-blur));
+  pointer-events: none;
+  transition:
+    opacity var(--panel-open-dur) var(--panel-ease),
+    transform var(--panel-open-dur) var(--panel-ease),
+    filter var(--panel-open-dur) var(--panel-ease);
+  will-change: opacity, transform, filter;
+}
+.t-panel-slide.is-open {
+  opacity: 1;
+  transform: translateY(0);
+  filter: blur(0);
+  pointer-events: auto;
+}
+
+/* transitions.dev — a shared sliding selection pill for low-frequency tabs. */
+.t-tabs {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.t-tab {
+  position: relative;
+  z-index: 1;
+  background: transparent;
+  color: var(--tabs-text-muted);
+  transition: color var(--tabs-dur) var(--tabs-ease), font-weight var(--tabs-dur) var(--tabs-ease);
+}
+.t-tabs .t-tab:hover { background: transparent; }
+.t-tabs-pill {
+  position: absolute;
+  z-index: 0;
+  top: 0;
+  left: 0;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--tabs-pill-bg);
+  pointer-events: none;
+  transition: transform var(--tabs-dur) var(--tabs-ease), width var(--tabs-dur) var(--tabs-ease);
+  will-change: transform, width;
+}
+.t-tab[aria-pressed="true"] { color: var(--tabs-text-active); }
+
+/* transitions.dev — grid-row accordion keeps surrounding content in flow. */
+.t-acc-panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  overflow: hidden;
+  transition: grid-template-rows var(--acc-collapse) var(--acc-ease);
+}
+.t-acc-panel-inner {
+  min-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: opacity var(--acc-collapse) var(--acc-ease), transform var(--acc-collapse) var(--acc-ease);
+}
+.t-acc[data-open="true"] .t-acc-panel {
+  grid-template-rows: 1fr;
+  transition-duration: var(--acc-expand);
+}
+.t-acc[data-open="true"] .t-acc-panel-inner {
+  opacity: 1;
+  transform: translateY(0);
+  transition-duration: var(--acc-expand);
+}
+.t-acc-chevron {
+  display: grid;
+  place-items: center;
+  transition: transform var(--acc-chevron) var(--acc-ease);
+}
+.t-acc[data-open="true"] .t-acc-chevron { transform: rotate(180deg); }
+
+/* App adapters for the shared primitives. The pro toolbar owns popovers, so
+   its reveal fades while keeping those anchored menus out of a clipping box. */
+.motion-expand { overflow: hidden; will-change: height, opacity, transform; }
+.finance-pro-reveal { position: relative; z-index: 8; overflow: visible; }
+.finance-compact-reveal { overflow: hidden; }
+.finance-indicator-chip-reveal { overflow: visible; }
+
+.finance-periods.t-tabs {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 4px 8px;
+  border-radius: 0 0 22px 22px;
+  background: #f6f7f9;
+}
+.finance-periods.t-tabs .t-tabs-pill {
+  top: 4px;
+  height: 40px;
+  border-radius: 14px;
+  background: #e8eaef;
+}
+.finance-periods.t-tabs .t-tab {
+  flex: 1 1 0;
+  min-width: 36px;
+  height: 40px;
+  min-height: 40px;
+  padding: 6px 8px;
+  border-radius: 14px;
+  background: transparent !important;
+  color: #5f6368;
+  font: inherit;
+  font-size: 12px;
+}
+.finance-periods.t-tabs .t-tab[aria-pressed="true"] { color: #102a43; font-weight: 600; }
+.finance-periods.t-tabs .t-tab:hover { background: transparent !important; }
+
+.md-price-faq-list .t-acc-chevron svg { transform: none; transition: none; }
+.md-price-faq-list .t-acc-panel p { overflow: hidden; }
+
+[data-theme="dark"] .finance-periods.t-tabs { background: #18212b; }
+[data-theme="dark"] .finance-periods.t-tabs .t-tabs-pill { background: #2d3948; }
+[data-theme="dark"] .finance-periods.t-tabs .t-tab,
+[data-theme="dark"] .finance-periods.t-tabs .t-tab[aria-pressed="true"] { color: #e2e8f0; }
+
+@media (max-width: 500px) {
+  .finance-periods.t-tabs .t-tab { flex: 1 0 36px; min-width: 36px; padding: 4px 3px; font-size: 11px; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .t-dropdown { transition: none !important; }
+  .t-resize,
+  .t-panel-slide,
+  .t-tabs .t-tab,
+  .t-tabs-pill,
+  .t-acc-panel,
+  .t-acc-panel-inner,
+  .t-acc-chevron {
+    transition: none !important;
+  }
+  .t-panel-slide,
+  .t-panel-slide.is-open,
+  .t-acc-panel-inner,
+  .t-acc[data-open="true"] .t-acc-panel-inner {
+    transform: none;
+    filter: none;
+  }
   button:not(:disabled),
   a.button:not([aria-disabled="true"]) {
     transition: none !important;

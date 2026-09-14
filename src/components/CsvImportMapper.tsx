@@ -3,7 +3,7 @@ import { Check, ChevronDown, FileSpreadsheet, Sparkles } from 'lucide-react'
 import { csvFields, mapCsvReport, type CsvKind, type CsvSheet } from '../lib/csvImport'
 import { recogniseCsv } from '../lib/csvRecognise'
 import type { SuperheroReport } from '../types'
-import { Button, Modal } from './ui'
+import { Button, Modal, MotionExpand } from './ui'
 
 const label = (field: string) => field.replaceAll('_', ' ')
 
@@ -75,7 +75,7 @@ export function CsvImportMapper({ sheet, filename, source, defaultCurrency, defa
         <ChevronDown size={16} aria-hidden="true" />
       </button>
 
-      {showColumns && (
+      <MotionExpand open={showColumns} className="csv-columns-reveal">
         <div className="csv-mapping-grid">
           {required.map(field => (
             <label key={field} className={mapping[field] ? '' : 'is-unmatched'}>
@@ -87,7 +87,7 @@ export function CsvImportMapper({ sheet, filename, source, defaultCurrency, defa
             </label>
           ))}
         </div>
-      )}
+      </MotionExpand>
 
       <p>Use one currency and exchange per file. For foreign currency, match the AUD conversion rate for each row. Opening holdings do not reconstruct past trades. Trade imports require ISO dates (YYYY-MM-DD) and unique transaction IDs.</p>
       {error && <p role="alert" className="connection-error">{error}</p>}

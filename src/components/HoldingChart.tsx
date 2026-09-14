@@ -6,6 +6,7 @@ import { FinanceProToggle, FinanceProToolbar } from './FinanceProToolbar'
 import type { FinanceChartStyle, FinanceIndicatorId } from './financeChartUtils'
 import { FinancePeriodSelector } from './FinancePeriodSelector'
 import { FINANCE_PERIODS, type FinancePeriod } from '../lib/financePeriods'
+import { MotionExpand } from './ui'
 
 export function HoldingChart({ points, symbol, currency = 'AUD', price = false, loading = false, mode = 'Amount', onModeChange, period, onPeriodChange, proGraphMode: defaultProGraphMode = false }: {
   points: AdvancedPerformancePoint[]; symbol: string; currency?: string; price?: boolean; loading?: boolean;
@@ -46,9 +47,14 @@ export function HoldingChart({ points, symbol, currency = 'AUD', price = false, 
   }, [data, mode, price])
   return <section className={`holding-simple-chart ${price ? 'is-price' : ''}`} aria-label={`${symbol} ${price ? 'price' : 'performance'} chart`}>
     <div className="finance-chart-heading">{price ? <h2>Price</h2> : <p>Performance history</p>}<FinanceProToggle enabled={proGraphMode} onChange={setProGraphMode}/></div>
-    {proGraphMode ? <FinanceProToolbar chartStyle={proStyle} onChartStyleChange={setProStyle} comparison={comparison} onComparisonChange={setComparison} comparisonOptions={price ? [] : [{ id: 'benchmark', label: 'Portfolio benchmark', detail: 'Recorded portfolio history' }]} indicators={indicators} onIndicatorsChange={setIndicators} candleAvailable={hasCandleData} barAvailable/> : <div className="chart-mode-row">
-      {price ? <div role="group" aria-label="Price chart style"><button type="button" aria-label="Price line chart" aria-pressed={activeStyle === 'Line'} className={activeStyle === 'Line' ? 'active' : ''} onClick={() => setStyle('Line')}>Line</button>{hasCandleData && <button type="button" aria-label="Price candlestick chart" aria-pressed={activeStyle === 'Candles'} className={activeStyle === 'Candles' ? 'active' : ''} onClick={() => setStyle('Candles')}>Candles</button>}</div> : <><div>{(['Amount', 'Percent'] as const).map(value => <button type="button" key={value} aria-pressed={mode === value} className={mode === value ? 'active' : ''} onClick={() => onModeChange?.(value)}>{value}</button>)}</div><div>{(['Line', 'Bar'] as const).map(value => <button type="button" key={value} aria-pressed={activeStyle === value} className={activeStyle === value ? 'active' : ''} onClick={() => setStyle(value)}>{value}</button>)}</div></>}
-    </div>}
+    <MotionExpand open={proGraphMode} className="finance-pro-reveal">
+      <FinanceProToolbar chartStyle={proStyle} onChartStyleChange={setProStyle} comparison={comparison} onComparisonChange={setComparison} comparisonOptions={price ? [] : [{ id: 'benchmark', label: 'Portfolio benchmark', detail: 'Recorded portfolio history' }]} indicators={indicators} onIndicatorsChange={setIndicators} candleAvailable={hasCandleData} barAvailable/>
+    </MotionExpand>
+    <MotionExpand open={!proGraphMode} className="finance-compact-reveal">
+      <div className="chart-mode-row">
+        {price ? <div role="group" aria-label="Price chart style"><button type="button" aria-label="Price line chart" aria-pressed={activeStyle === 'Line'} className={activeStyle === 'Line' ? 'active' : ''} onClick={() => setStyle('Line')}>Line</button>{hasCandleData && <button type="button" aria-label="Price candlestick chart" aria-pressed={activeStyle === 'Candles'} className={activeStyle === 'Candles' ? 'active' : ''} onClick={() => setStyle('Candles')}>Candles</button>}</div> : <><div>{(['Amount', 'Percent'] as const).map(value => <button type="button" key={value} aria-pressed={mode === value} className={mode === value ? 'active' : ''} onClick={() => onModeChange?.(value)}>{value}</button>)}</div><div>{(['Line', 'Bar'] as const).map(value => <button type="button" key={value} aria-pressed={activeStyle === value} className={activeStyle === value ? 'active' : ''} onClick={() => setStyle(value)}>{value}</button>)}</div></>}
+      </div>
+    </MotionExpand>
     {loading && data.length < 2 ? <p role="status">Loading price history…</p> : <FinanceChart points={data.map(p => ({ ...p, value: Number(p.value) }))} label={price ? 'Price' : 'Portfolio'} comparisonLabel="Portfolio benchmark" resolution={price ? 'daily' : 'recorded'} formatValue={format} formatAxis={axisTick} chartStyle={proGraphMode ? proStyle : activeStyle === 'Candles' ? 'candle' : activeStyle === 'Bar' ? 'bar' : 'line'} indicators={proGraphMode ? indicators : []}/>}
       <FinancePeriodSelector value={selectedPeriod} onChange={(value) => onPeriodChange({ preset: value })} ariaLabel={`${symbol} chart period`}/>
   </section>

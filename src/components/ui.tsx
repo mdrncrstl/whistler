@@ -2,7 +2,7 @@ import { AlertCircle, Check, ChevronDown, LoaderCircle, Search, X, type LucideIc
 import { useEffect, type ButtonHTMLAttributes, type InputHTMLAttributes, type ReactNode } from 'react'
 import { money } from '../lib/format'
 
-export { MotionDialogSurface, MotionPopover } from './ui-Wifi-G'
+export { MotionDialogSurface, MotionExpand, MotionPopover, SlidingTabs } from './ui-Wifi-G'
 
 export function Brand({ compact = false }: { compact?: boolean }) {
   return (

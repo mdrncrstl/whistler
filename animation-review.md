@@ -1,13 +1,19 @@
-# Animation review
+# Animation audit
 
-Reviewed the motion change set against the animation standards after implementation and browser QA.
+Reviewed the app's meaningful state changes against the transitions.dev and find-animation-opportunities guidance. The implementation keeps motion for occasional state changes that help users understand what changed, while keeping data-reading surfaces stable.
 
-| Location | Severity | Finding | Resolution |
+| State change | Treatment | Purpose | Decision |
 | --- | --- | --- | --- |
-| `src/components/ui.tsx` motion surfaces | Resolved high | Framer Motion 13 interpreted `transform: none` as a zero-scale target in the production browser, leaving dialogs present but invisible after settling. | Replaced every animated identity with a full explicit transform such as `translateY(0px) scale(1)` and added a browser assertion for the settled matrix. |
-| Popovers and overlays | Pass | Entrances are trigger- or edge-aware, use opacity plus transform only, and stay below 220ms. | Shared `MotionPopover` and `MotionDialogSurface` primitives keep the vocabulary consistent. |
-| Reduced motion | Pass | Spatial movement is removed while a short opacity bridge remains. | `useReducedMotion` supplies identity transforms; CSS removes press movement. |
-| Interaction continuity | Pass | Menus, dialog controls, outside dismissal, mobile drawer, and account actions remain interactive. | Covered by component tests and the dedicated browser motion suite. |
-| Scope restraint | Pass | No route transitions, command-palette motion, chart drawing, number tickers, or table cascades were introduced. | Data-reading surfaces remain visually stable. |
+| Compact chart controls ↔ Pro graph controls | Shared `MotionExpand` reveal in the overview, reports, holding detail and stock research charts | Makes the toolbar and surrounding layout settle together instead of teleporting | Implemented |
+| Chart period selection | Measured sliding selection pill in `SlidingTabs` | Preserves the relationship between the selected period and its control | Implemented |
+| Technical indicator added or removed | Shared reveal around active indicator chips | Connects the menu choice to the new chart annotation | Implemented |
+| CSV column mapping opened or closed | Height and opacity reveal | Keeps the import flow readable when recognition needs manual input | Implemented |
+| Custom group details opened or closed | Height and opacity reveal | Shows which group card expanded | Implemented |
+| Company suggestions and relationship evidence | Anchored popover and detail reveal | Preserves spatial continuity around search and selection | Implemented |
+| Pricing FAQ opened or closed | Grid-row accordion with chevron rotation | Keeps the answer in document flow and makes the open state clear | Implemented |
 
-Verdict: **SHIP**. The runtime scale regression was found and fixed; no blocking animation-standard violations remain.
+The shared primitives use the existing motion tokens and include reduced-motion handling. The Pro graph wrapper keeps its stacking context above the chart so anchored menus remain visible while the toolbar is open. Period pills are measured after layout and reset without animation on resize to avoid a flash or misalignment.
+
+The following states remain deliberately quiet: chart lines, areas, bars, candles and indicator paths; pointer tooltips and drag selections; command palette opening; table rows and sort results; and high-frequency search result filtering. Animating those surfaces would compete with values the user is reading, add noise to frequent interactions, or make the data appear to change independently of the source.
+
+Validation covers the reduced-motion app flow, legacy route redirects, popover triangles, Escape dismissal, Pro graph menus, the no-preference Pro graph reveal, menu stacking, measured period pill and mobile overflow. The existing unit suite and lint/type checks also pass.

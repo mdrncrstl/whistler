@@ -1,7 +1,7 @@
 import { Activity, AreaChart, BarChart3, CandlestickChart, Check, ChevronDown, ChartLine, GitCompareArrows, Search, X } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import type { FinanceChartStyle, FinanceIndicatorId } from './financeChartUtils'
-import { MotionPopover } from './ui'
+import { MotionExpand, MotionPopover } from './ui'
 
 export interface FinanceComparisonOption {
   id: string
@@ -127,8 +127,10 @@ export function FinanceProToolbar({
         </MotionPopover>
       </div>
     </div>
-    {!!selectedIndicators.length && <div className="finance-indicator-chips" aria-label="Active indicators">
-      {selectedIndicators.map(id => <button type="button" key={id} aria-label={`Remove ${indicatorLabel(id)}`} onClick={() => toggleIndicator(id)}><i className={`indicator-swatch indicator-${id}`}/><span>{id === 'sma' ? 'Moving average (SMA-5 Price)' : indicatorLabel(id)}</span><X size={15}/></button>)}
-    </div>}
+    <MotionExpand open={selectedIndicators.length > 0} className="finance-indicator-chip-reveal">
+      <div className="finance-indicator-chips" aria-label="Active indicators">
+        {selectedIndicators.map(id => <button type="button" key={id} aria-label={`Remove ${indicatorLabel(id)}`} onClick={() => toggleIndicator(id)}><i className={`indicator-swatch indicator-${id}`}/><span>{id === 'sma' ? 'Moving average (SMA-5 Price)' : indicatorLabel(id)}</span><X size={15}/></button>)}
+      </div>
+    </MotionExpand>
   </div>
 }

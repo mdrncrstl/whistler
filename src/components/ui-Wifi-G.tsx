@@ -1,6 +1,6 @@
 import { AlertCircle, Check, ChevronDown, LoaderCircle, Search, X, type LucideIcon } from 'lucide-react'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
-import { useEffect, useRef, useState, type AriaRole, type ButtonHTMLAttributes, type FocusEventHandler, type InputHTMLAttributes, type PointerEventHandler, type ReactNode } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState, type AriaRole, type ButtonHTMLAttributes, type FocusEventHandler, type InputHTMLAttributes, type PointerEventHandler, type ReactNode } from 'react'
 import { money } from '../lib/format'
 
 const easeOut = [0.23, 1, 0.32, 1] as const
@@ -20,6 +20,89 @@ function scheduleFrame(callback: () => void) {
   }
   const timeout = window.setTimeout(callback, 0)
   return () => window.clearTimeout(timeout)
+}
+
+export function MotionExpand({ open, children, className = '' }: { open: boolean; children: ReactNode; className?: string }) {
+  const reduceMotion = useReducedMotion()
+  const openDuration = readMotionDuration('--panel-open-dur', 400) / 1000
+  const closeDuration = readMotionDuration('--panel-close-dur', 350) / 1000
+  const expandVariants = {
+    closed: {
+      height: 0,
+      opacity: 0,
+      transform: 'translateY(0px)',
+      transition: { duration: reduceMotion ? 0 : closeDuration, ease: easeOut },
+    },
+    open: {
+      height: 'auto',
+      opacity: 1,
+      transform: 'translateY(0px)',
+      transition: { duration: reduceMotion ? 0 : openDuration, ease: easeOut },
+    },
+  }
+  return (
+    <AnimatePresence initial={false}>
+      {open && <motion.div
+        className={['motion-expand', className].filter(Boolean).join(' ')}
+        initial={reduceMotion ? false : 'closed'}
+        animate="open"
+        exit="closed"
+        variants={expandVariants}
+      >{children}</motion.div>}
+    </AnimatePresence>
+  )
+}
+
+export function SlidingTabs<T extends string>({ options, value, onChange, ariaLabel, className = '' }: {
+  options: Array<{ value: T; label: ReactNode }>
+  value: T
+  onChange: (value: T) => void
+  ariaLabel: string
+  className?: string
+}) {
+  const barRef = useRef<HTMLDivElement>(null)
+  const pillRef = useRef<HTMLSpanElement>(null)
+  const activeRef = useRef<HTMLButtonElement>(null)
+  const firstPaint = useRef(true)
+
+  useLayoutEffect(() => {
+    const bar = barRef.current
+    const pill = pillRef.current
+    const active = activeRef.current
+    if (!bar || !pill || !active) return
+    const moveToActive = (animate: boolean) => {
+      const previousTransition = pill.style.transition
+      if (!animate) pill.style.transition = 'none'
+      pill.style.transform = `translateX(${active.offsetLeft}px)`
+      pill.style.width = `${active.offsetWidth}px`
+      if (!animate) {
+        void pill.offsetWidth
+        pill.style.transition = previousTransition
+      }
+    }
+    moveToActive(!firstPaint.current)
+    firstPaint.current = false
+    const onResize = () => moveToActive(false)
+    window.addEventListener('resize', onResize)
+    const observer = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(onResize)
+    observer?.observe(bar)
+    return () => {
+      window.removeEventListener('resize', onResize)
+      observer?.disconnect()
+    }
+  }, [options.length, value])
+
+  return <div ref={barRef} className={['t-tabs', className].filter(Boolean).join(' ')} role="group" aria-label={ariaLabel}>
+    <span ref={pillRef} className="t-tabs-pill" aria-hidden="true" />
+    {options.map((option) => <button
+      key={option.value}
+      ref={option.value === value ? activeRef : undefined}
+      type="button"
+      className="t-tab"
+      aria-pressed={option.value === value}
+      onClick={() => onChange(option.value)}
+    >{option.label}</button>)}
+  </div>
 }
 
 export function MotionPopover({ open, children, className, origin = 'top right', role, ariaLabel, id, onPointerEnter, onFocus }: { open: boolean; children: ReactNode; className: string; origin?: string; role?: AriaRole; ariaLabel?: string; id?: string; onPointerEnter?: PointerEventHandler<HTMLDivElement>; onFocus?: FocusEventHandler<HTMLDivElement> }) {

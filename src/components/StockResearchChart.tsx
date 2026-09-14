@@ -6,6 +6,7 @@ import type { FinanceChartStyle, FinanceIndicatorId } from './financeChartUtils'
 import { FinancePeriodSelector } from './FinancePeriodSelector'
 import { filterFinancePoints, type FinancePeriod } from '../lib/financePeriods'
 import { fetchMarketHistory, type MarketHistoryPoint } from '../lib/marketDataApi'
+import { MotionExpand } from './ui'
 
 type StockPoint = MarketHistoryPoint
 
@@ -38,7 +39,12 @@ export function StockResearchChart({ points, symbol, currency, market = '', comp
   const styles: Array<'Area' | 'Line' | 'Candles'> = hasCandleData ? ['Area', 'Line', 'Candles'] : ['Area', 'Line']
   return <div className="ai-stock-chart" aria-label={`${symbol} price history`}>
     <div className="ai-stock-chart-heading"><span>Price history · {currency}</span><FinanceProToggle enabled={proGraphMode} onChange={setProGraphMode}/></div>
-    {proGraphMode ? <FinanceProToolbar chartStyle={proStyle} onChartStyleChange={setProStyle} comparison={comparison} onComparisonChange={value => { setComparison(value); setComparisonPoints([]) }} comparisonOptions={availableComparisons} indicators={indicators} onIndicatorsChange={setIndicators} candleAvailable={hasCandleData} barAvailable allowSymbolSearch/> : <div className="finance-chart-controls" role="group" aria-label="Stock chart type">{styles.map(value => <button key={value} type="button" aria-pressed={value === activeStyle} onClick={() => setStyle(value)}>{value}</button>)}</div>}
+    <MotionExpand open={proGraphMode} className="finance-pro-reveal">
+      <FinanceProToolbar chartStyle={proStyle} onChartStyleChange={setProStyle} comparison={comparison} onComparisonChange={value => { setComparison(value); setComparisonPoints([]) }} comparisonOptions={availableComparisons} indicators={indicators} onIndicatorsChange={setIndicators} candleAvailable={hasCandleData} barAvailable allowSymbolSearch/>
+    </MotionExpand>
+    <MotionExpand open={!proGraphMode} className="finance-compact-reveal">
+      <div className="finance-chart-controls" role="group" aria-label="Stock chart type">{styles.map(value => <button key={value} type="button" aria-pressed={value === activeStyle} onClick={() => setStyle(value)}>{value}</button>)}</div>
+    </MotionExpand>
     <FinanceChart points={plottedData} comparisonLabel={selectedComparison?.label || comparison} resolution="daily" chartStyle={proGraphMode ? proStyle : activeStyle === 'Candles' ? 'candle' : activeStyle === 'Area' ? 'area' : 'line'} formatValue={v => Intl.NumberFormat('en', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(v)} formatAxis={v => Intl.NumberFormat('en', { maximumFractionDigits: 2 }).format(v)} indicators={proGraphMode ? indicators : []}/>
     <FinancePeriodSelector value={period} onChange={setPeriod} ariaLabel="Price history period"/>
   </div>

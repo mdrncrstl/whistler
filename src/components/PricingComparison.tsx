@@ -49,11 +49,11 @@ export function PricingComparison() {
         </div>
         <div className="md-price-faq-list">
           {pricingFaqs.map(([question, answer], index) => (
-            <div key={question} className={openFaq === index ? 'is-open' : ''}>
+            <div key={question} className={`t-acc ${openFaq === index ? 'is-open' : ''}`} data-open={openFaq === index}>
               <button type="button" aria-expanded={openFaq === index} aria-controls={`pricing-faq-${index}`} onClick={() => setOpenFaq(openFaq === index ? -1 : index)}>
-                <span>{question}</span><ChevronDown size={17} aria-hidden="true" />
+                <span>{question}</span><span className="t-acc-chevron"><ChevronDown size={17} aria-hidden="true" /></span>
               </button>
-              <div id={`pricing-faq-${index}`} hidden={openFaq !== index}><p>{answer}</p></div>
+              <div id={`pricing-faq-${index}`} className="t-acc-panel" aria-hidden={openFaq !== index} inert={openFaq !== index}><div className="t-acc-panel-inner"><p>{answer}</p></div></div>
             </div>
           ))}
         </div>
