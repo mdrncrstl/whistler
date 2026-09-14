@@ -1363,8 +1363,9 @@ body { font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-s
 .side-nav a.active { color: #111827; background: #dfe2e5; box-shadow: none; }
 .side-nav a.active svg { color: #5f6875; }
 .nav-parent > span { flex: 1; }
-.nav-parent > svg:last-child { color: #b7bec8; }
-.nav-branch { max-height: 0; opacity: 0; overflow: hidden; }
+.nav-parent > svg:last-child { color: #b7bec8; transition: transform var(--acc-chevron) var(--acc-ease), color var(--duration-quick) var(--ease-smooth-out); }
+.nav-parent[aria-expanded="true"] > svg:last-child { transform: rotate(180deg); }
+.nav-branch { max-height: 0; opacity: 0; overflow: hidden; transition: max-height var(--acc-collapse) var(--acc-ease), opacity var(--acc-collapse) var(--acc-ease); will-change: max-height, opacity; }
 .nav-branch > * { visibility: hidden; }
 .nav-branch.open { max-height: 520px; opacity: 1; overflow: visible; }
 .nav-branch.open > * { visibility: visible; }

@@ -15,7 +15,7 @@ import { CalendarDays, Crosshair, Minus, Plus, RotateCcw, Scale, SlidersHorizont
 import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
 import { date, money } from '../lib/format'
 import { FINANCE_PERIODS } from '../lib/financePeriods'
-import { MotionPopover } from './ui'
+import { MotionPopover, SlidingTabs } from './ui'
 
 export type PerformanceRangePreset = '1D' | '5D' | '1M' | '3M' | '6M' | 'YTD' | '1Y' | '3Y' | '5Y' | 'MAX' | 'CUSTOM'
 export type PerformanceMode = 'Amount' | 'Percent'
@@ -502,8 +502,8 @@ export function AdvancedPerformanceChart({
         <MotionPopover open={customOpen} className="advanced-custom-range" role="group" ariaLabel="Custom chart date range" origin="top left"><label>From<input type="date" value={customStart} min={isoDay(sortedPoints[0].date)} max={customEnd || isoDay(sortedPoints.at(-1)!.date)} onChange={(event) => setCustomStart(event.target.value)}/></label><label>To<input type="date" value={customEnd} min={customStart || isoDay(sortedPoints[0].date)} max={isoDay(sortedPoints.at(-1)!.date)} onChange={(event) => setCustomEnd(event.target.value)}/></label><button type="button" onClick={applyCustomRange}>Apply range</button></MotionPopover>
       </div>
       <div className="advanced-chart-actions">
-        <div className="advanced-segmented advanced-metric-toggle" role="group" aria-label="Chart metric"><button type="button" className={chartMetric === 'Return' ? 'active' : ''} aria-pressed={chartMetric === 'Return'} onClick={() => { setChartMetric('Return'); setMeasurement(null) }}>Return</button><button type="button" className={chartMetric === 'Price' ? 'active' : ''} aria-pressed={chartMetric === 'Price'} onClick={() => { setChartMetric('Price'); setMeasurement(null) }}>Price</button></div>
-        {chartMetric === 'Return' && <div className="advanced-segmented" role="group" aria-label="Chart value mode"><button type="button" className={mode === 'Amount' ? 'active' : ''} onClick={() => onModeChange('Amount')}>Amount</button><button type="button" className={mode === 'Percent' ? 'active' : ''} onClick={() => onModeChange('Percent')}>Percent</button></div>}
+        <SlidingTabs className="advanced-segmented advanced-metric-toggle" options={[{ value: 'Return', label: 'Return' }, { value: 'Price', label: 'Price' }]} value={chartMetric} onChange={(value) => { setChartMetric(value as PerformanceMetric); setMeasurement(null) }} ariaLabel="Chart metric" />
+        {chartMetric === 'Return' && <SlidingTabs className="advanced-segmented" options={[{ value: 'Amount', label: 'Amount' }, { value: 'Percent', label: 'Percent' }]} value={mode} onChange={(value) => onModeChange(value as PerformanceMode)} ariaLabel="Chart value mode" />}
         {chartMetric === 'Return' && <button type="button" className={compare ? 'active' : ''} aria-pressed={compare} onClick={() => setCompare((value) => !value)}><Scale size={14}/>Compare</button>}
         <button type="button" className={measureActive ? 'active' : ''} aria-pressed={measureActive} onClick={() => { setMeasureActive((value) => !value); setMeasurement(null) }}><Crosshair size={14}/>Measure</button>
         <button type="button" aria-label="Change chart style" title="Change chart style" onClick={() => setChartStyle((value) => value === 'Area' ? 'Line' : 'Area')}><SlidersHorizontal size={14}/>{chartStyle}</button>

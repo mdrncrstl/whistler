@@ -447,6 +447,137 @@ a.button:not([aria-disabled="true"]):active {
 .finance-compact-reveal { overflow: hidden; }
 .finance-indicator-chip-reveal { overflow: visible; }
 
+/* Shared adapters — segmented switches use the same moving selection surface
+   as finance periods, so low-frequency view changes feel continuous. */
+.segmented.t-tabs {
+  position: relative;
+  align-items: center;
+}
+.segmented.t-tabs .t-tabs-pill {
+  top: 3px;
+  height: 27px;
+  border-radius: 5px;
+  background: var(--surface);
+  box-shadow: 0 1px 2px rgb(15 23 42 / 8%);
+}
+.segmented.t-tabs .t-tab {
+  min-height: 27px;
+  padding: 0 10px;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 9px;
+}
+.segmented.t-tabs .t-tab:hover { background: transparent; }
+.segmented.t-tabs .t-tab[aria-pressed="true"] { color: var(--text); }
+
+.billing-toggle.t-tabs { position: relative; }
+.billing-toggle.t-tabs .t-tabs-pill {
+  top: 3px;
+  height: 32px;
+  border-radius: 6px;
+  background: var(--surface-3);
+}
+.billing-toggle.t-tabs .t-tab {
+  min-width: 110px;
+  height: 32px;
+  border-radius: 6px;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 700;
+}
+.billing-toggle.t-tabs .t-tab:hover { background: transparent; color: var(--text); }
+.billing-toggle.t-tabs .t-tab[aria-pressed="true"] { color: var(--green-strong); }
+.billing-toggle.t-tabs .billing-save { margin-left: 3px; color: var(--green); font-size: 8px; font-style: normal; }
+
+.advanced-segmented.t-tabs { position: relative; }
+.advanced-segmented.t-tabs .t-tabs-pill {
+  top: 2px;
+  height: 24px;
+  border-radius: 5px;
+  background: var(--surface);
+  box-shadow: 0 1px 3px rgb(17 24 39 / 8%);
+}
+.advanced-segmented.t-tabs .t-tab {
+  min-width: 29px;
+  height: 24px;
+  min-height: 24px;
+  padding: 0 8px;
+  border-radius: 5px;
+  color: var(--muted);
+  font-size: 9.5px;
+  font-weight: 600;
+}
+.advanced-segmented.t-tabs .t-tab:hover { background: transparent; }
+.advanced-segmented.t-tabs .t-tab[aria-pressed="true"] { color: var(--green); }
+
+.md-price-toggle.t-tabs { position: relative; }
+.md-price-toggle.t-tabs .t-tabs-pill {
+  top: 4px;
+  height: 38px;
+  border-radius: 6px;
+  background: #dcede2;
+}
+.md-price-toggle.t-tabs .t-tab {
+  padding: 10px 20px;
+  border-radius: 6px;
+  color: inherit;
+}
+.md-price-toggle.t-tabs .t-tab:hover { background: transparent; }
+
+.cloud-billing-toggle.t-tabs { position: relative; }
+.cloud-billing-toggle.t-tabs .t-tabs-pill {
+  top: 4px;
+  height: 35px;
+  border-radius: 7px;
+  background: #fff;
+  box-shadow: 0 3px 12px rgb(13 70 50 / 10%);
+}
+.cloud-billing-toggle.t-tabs .t-tab {
+  min-height: 35px;
+  padding: 0 12px;
+  border-radius: 7px;
+  color: #6c867b;
+  font-size: 10px;
+  font-weight: 800;
+}
+.cloud-billing-toggle.t-tabs .t-tab:hover { background: transparent; }
+.cloud-billing-toggle.t-tabs .t-tab[aria-pressed="true"] { color: var(--cloud-ink); }
+
+.chart-mode-tabs.t-tabs {
+  min-height: 26px;
+  padding: 2px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--surface-2);
+}
+.chart-mode-tabs.t-tabs .t-tabs-pill {
+  top: 2px;
+  height: 24px;
+  border-radius: 5px;
+  background: var(--accent-tint);
+  box-shadow: none;
+}
+.chart-mode-tabs.t-tabs .t-tab {
+  min-height: 24px;
+  height: 24px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 5px;
+  color: var(--muted);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 500;
+}
+.chart-mode-tabs.t-tabs .t-tab:hover { background: transparent; color: var(--accent-strong); }
+.chart-mode-tabs.t-tabs .t-tab[aria-pressed="true"] { color: var(--accent-strong); font-weight: 600; }
+
+.catalog-disclosure svg,
+.mytax-disclosure svg { transition: transform var(--acc-chevron) var(--acc-ease), color var(--duration-quick) var(--ease-smooth-out); }
+.catalog-disclosure.is-open svg,
+.mytax-disclosure.is-open svg { transform: rotate(180deg); }
+
 .finance-periods.t-tabs {
   width: 100%;
   display: flex;
@@ -491,6 +622,10 @@ a.button:not([aria-disabled="true"]):active {
 
 @media (prefers-reduced-motion: reduce) {
   .t-dropdown { transition: none !important; }
+  .nav-branch,
+  .nav-parent > svg:last-child,
+  .catalog-disclosure svg,
+  .mytax-disclosure svg { transition: none !important; }
   .t-resize,
   .t-panel-slide,
   .t-tabs .t-tab,

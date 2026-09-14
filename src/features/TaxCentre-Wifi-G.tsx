@@ -3,7 +3,7 @@ import { HoldingLogo } from '../components/HoldingLogo'
 import { HoldingNavigationRow } from '../components/HoldingNavigation'
 import { useMemo, useState, type ReactNode } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
-import { Badge, Button, Card, EmptyState, PageHeader, Select } from '../components/ui'
+import { Badge, Button, Card, EmptyState, MotionExpand, PageHeader, Select } from '../components/ui'
 import { usePortfolio } from '../context/PortfolioContext'
 import { financialYearFor, incomeTransactions } from '../lib/portfolio'
 import { matchTaxLots, taxSummary } from '../lib/tax'
@@ -143,12 +143,12 @@ function MyTax({ bundle, matches, fy, method, unmatchedSales }: { bundle: Portfo
         <span>Capital Gains Tax Breakdown</span>
         <small>{breakdownOpen ? 'Hide detail' : 'Show detail'}</small>
       </button>
-      {breakdownOpen && <div id="mytax-capital-breakdown" className="mytax-breakdown">
+      <MotionExpand open={breakdownOpen} className="mytax-breakdown-reveal"><div id="mytax-capital-breakdown" className="mytax-breakdown">
         <table>
           <thead><tr><th>Asset class</th><th className="numeric">Capital gain</th><th className="numeric">Capital loss</th></tr></thead>
           <tbody>{capitalBreakdown.map(row => <tr key={row.label}><td>{row.label}</td><td className="numeric">{taxMoney(row.gain)}</td><td className="numeric">{taxMoney(row.loss)}</td></tr>)}</tbody>
         </table>
-      </div>}
+      </div></MotionExpand>
     </section>
 
     <section className="mytax-section-card mytax-income-summary" aria-labelledby="mytax-income-title">

@@ -54,7 +54,7 @@ export function MotionExpand({ open, children, className = '' }: { open: boolean
 }
 
 export function SlidingTabs<T extends string>({ options, value, onChange, ariaLabel, className = '' }: {
-  options: Array<{ value: T; label: ReactNode }>
+  options: Array<{ value: T; label: ReactNode; ariaLabel?: string }>
   value: T
   onChange: (value: T) => void
   ariaLabel: string
@@ -99,6 +99,7 @@ export function SlidingTabs<T extends string>({ options, value, onChange, ariaLa
       ref={option.value === value ? activeRef : undefined}
       type="button"
       className="t-tab"
+      aria-label={option.ariaLabel}
       aria-pressed={option.value === value}
       onClick={() => onChange(option.value)}
     >{option.label}</button>)}

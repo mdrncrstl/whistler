@@ -15,7 +15,7 @@ import { brokers } from '../lib/brokers'
 import { authClient } from '../lib/supabase'
 import { applySeo } from '../lib/seo'
 import { canonicalAppUrl } from '../lib/app-origin'
-import { Brand, MotionDialogSurface } from './ui-Wifi-G'
+import { Brand, MotionDialogSurface, SlidingTabs } from './ui-Wifi-G'
 
 const howItWorks = [
   { title: 'Bring in your records', copy: 'Connect a supported source or upload your broker statement.', icon: Link2 },
@@ -445,10 +445,7 @@ export function Landing({ onDemo, signedIn = false, onOpenApp, page }: LandingPr
             </div>
             <div className="cloud-pricing-copy">
               <p><strong>Try every plan free for 14 days.</strong><br />No card required. Cancel anytime.</p>
-              <div className="cloud-billing-toggle" aria-label="Billing period">
-                <button aria-pressed={!annual} className={!annual ? 'active' : ''} onClick={() => setAnnual(false)}>Monthly</button>
-                <button aria-pressed={annual} className={annual ? 'active' : ''} onClick={() => setAnnual(true)}>Annual <span>save 26%</span></button>
-              </div>
+              <SlidingTabs className="cloud-billing-toggle" options={[{ value: 'monthly', label: 'Monthly' }, { value: 'annual', label: <>Annual <span>save 26%</span></> }]} value={annual ? 'annual' : 'monthly'} onChange={(value) => setAnnual(value === 'annual')} ariaLabel="Billing period" />
             </div>
           </div>
           <div className="cloud-pricing-grid">

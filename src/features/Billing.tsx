@@ -1,6 +1,6 @@
 import { Check, CreditCard, ExternalLink, ShieldCheck } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { Badge, Button, Card, PageHeader } from '../components/ui'
+import { Badge, Button, Card, PageHeader, SlidingTabs } from '../components/ui'
 import { usePortfolio } from '../context/PortfolioContext'
 import { useAccountAccess } from '../context/AccountAccessContext'
 import { useBillingStatus } from '../hooks/useBillingStatus'
@@ -96,7 +96,7 @@ export function Billing() {
       <div className="billing-current-copy"><span>Current plan</span><strong>{accountPlanName}</strong><small>{accountPlanDetail}</small></div>
       <Badge tone={hasPaidPlan || trialActive ? 'success' : trialExpired ? 'warning' : undefined}>{accountPlanStatus}</Badge>
     </Card>
-    <div className="billing-plans-heading"><h2>Choose a plan</h2><div className="billing-toggle" role="group" aria-label="Billing interval"><button type="button" aria-pressed={!annual} className={!annual ? 'active' : ''} onClick={() => setAnnual(false)}>Monthly</button><button type="button" aria-pressed={annual} className={annual ? 'active' : ''} onClick={() => setAnnual(true)}>Annual <span>save 26%</span></button></div></div>
+    <div className="billing-plans-heading"><h2>Choose a plan</h2><SlidingTabs className="billing-toggle" options={[{ value: 'monthly', label: 'Monthly' }, { value: 'annual', label: <><span>Annual</span> <em className="billing-save">save 26%</em></> }]} value={annual ? 'annual' : 'monthly'} onChange={(value) => setAnnual(value === 'annual')} ariaLabel="Billing interval" /></div>
     <div className="pricing-grid">{plans.map((plan) => <Card key={plan.id} className={`pricing-card ${plan.featured ? 'featured' : ''}`}>{plan.featured && <Badge tone="success">Recommended</Badge>}<h2>{plan.name}</h2><p>Up to <strong>{plan.portfolios}</strong> {plan.portfolios === 1 ? 'portfolio' : 'portfolios'}</p><div className="plan-price"><strong>${formatAud(annual ? plan.annual : plan.monthly)}</strong><span>AUD / month</span></div><small>{annual ? `$${formatAud(plan.annualTotal)} billed annually · save ${annualSavingsPercent(plan)}%` : 'Billed monthly. Cancel anytime.'}</small><Button variant={plan.featured ? 'primary' : 'secondary'} icon={hasPaidPlan ? ExternalLink : CreditCard} busy={busy === plan.id || busy === 'stripe-portal'} onClick={() => hasPaidPlan ? openBilling() : checkout(plan.id)}>{hasPaidPlan ? 'Manage current plan' : `Choose ${plan.name}`}</Button><ul>{plan.features.map((feature) => <li key={feature}><Check />{feature}</li>)}</ul></Card>)}</div>
     <p className="billing-trust"><ShieldCheck aria-hidden="true" /><span>14-day trial with no card · Payments handled by Stripe</span></p>
   </>
