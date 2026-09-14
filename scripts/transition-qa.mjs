@@ -49,7 +49,7 @@ try {
   assert.equal(await page.locator('.t-dropdown.is-open').count(), 0, 'Escape closes the pro chart menu')
 
   await page.goto(`${baseUrl}/app/holdings/AAPL`, { waitUntil: 'networkidle' })
-  await page.getByRole('heading', { name: 'Apple Inc.', exact: true }).waitFor()
+  await page.getByRole('heading', { name: 'Apple Inc.', exact: true, level: 1 }).waitFor()
   const holdingPro = page.getByRole('button', { name: 'Pro graph', exact: true }).first()
   await holdingPro.click()
   await openAndClose(page.locator('.finance-pro-menu-trigger').first())
