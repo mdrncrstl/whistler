@@ -4,7 +4,7 @@ import type { MarketingPage } from '../lib/marketingPages'
 import { marketingGroups, marketingPages } from '../lib/marketingPages'
 import { config } from '../lib/config'
 import {
-  ArrowLeft, ArrowRight, BarChart3, Check, ChevronDown, Database, Eye, EyeOff,
+  ArrowLeft, ArrowRight, ArrowUpRight, BarChart3, Check, ChevronDown, Database, Eye, EyeOff,
   FileCheck2, FileSpreadsheet, Gauge, Globe2, Link2, LockKeyhole, Mail, Menu,
   ShieldCheck, TrendingUp, X,
 } from 'lucide-react'
@@ -26,9 +26,33 @@ const howItWorks = [
 ] as const
 
 const clarityViews = [
-  { title: 'What do I own?', copy: 'See holdings across your accounts in one place.', icon: Globe2 },
-  { title: 'What changed?', copy: 'Separate capital growth, income and currency effects.', icon: TrendingUp },
-  { title: 'What does it mean for tax?', copy: 'Review Australian tax records with the transactions behind them.', icon: FileCheck2 },
+  {
+    title: 'What do I own?',
+    shortTitle: 'Holdings',
+    copy: 'See holdings across your accounts in one place.',
+    icon: Globe2,
+    image: '/marketing/portfolio-focus.png',
+    imageAlt: 'Masterdeck portfolio view showing holdings across connected accounts',
+    screenLabel: 'PORTFOLIO / HOLDINGS',
+  },
+  {
+    title: 'What changed?',
+    shortTitle: 'Performance',
+    copy: 'Separate capital growth, income and currency effects.',
+    icon: TrendingUp,
+    image: '/marketing/performance-focus.png',
+    imageAlt: 'Masterdeck performance view showing return components and a benchmark',
+    screenLabel: 'PERFORMANCE / RETURN',
+  },
+  {
+    title: 'What does it mean for tax?',
+    shortTitle: 'Australian tax',
+    copy: 'Review Australian tax records with the transactions behind them.',
+    icon: FileCheck2,
+    image: '/marketing/tax-focus.png',
+    imageAlt: 'Masterdeck Australian tax view with connected investment records',
+    screenLabel: 'TAX / RECORDS',
+  },
 ] as const
 
 const supportedBrokers = brokers.filter((broker) => broker.id !== 'other')
@@ -196,6 +220,7 @@ export function Landing({ onDemo, signedIn = false, onOpenApp, page }: LandingPr
   }, [mobileOpen])
   const [annual, setAnnual] = useState(true)
   const [openFaq, setOpenFaq] = useState(0)
+  const [activeClarityIndex, setActiveClarityIndex] = useState(0)
   const [headerScrolled, setHeaderScrolled] = useState(false)
   const { scrollY } = useScroll()
 
@@ -377,6 +402,8 @@ export function Landing({ onDemo, signedIn = false, onOpenApp, page }: LandingPr
 
   const signupLabel = signedIn ? 'Open Masterdeck' : redirecting ? 'Finishing sign-in...' : 'Try Masterdeck free'
   const pricingCtaLabel = signedIn ? 'Open Masterdeck' : 'Start free trial'
+  const activeClarity = clarityViews[activeClarityIndex]
+  const ActiveClarityIcon = activeClarity.icon
 
   return (
     <div className="cloud-page alpine-site">
@@ -475,20 +502,69 @@ export function Landing({ onDemo, signedIn = false, onOpenApp, page }: LandingPr
           </div>
           <figure><img src="/marketing/masterdeck-portfolio-hero.png" width="1585" height="900" alt="Actual Masterdeck portfolio with demo holdings, performance chart and returns" loading="lazy"/><figcaption>Actual Masterdeck app · Demo portfolio</figcaption></figure>
         </Reveal>
-        <Reveal className="alpine-clarity-section cloud-container" aria-labelledby="clarity-heading">
-          <div className="alpine-clarity-copy">
-            <h2 id="clarity-heading">See the result. Follow the reason.</h2>
-            <p>A portfolio number is only useful when you can explain it. Masterdeck keeps holdings, transactions, income and Australian tax records connected across the views you use to understand what changed.</p>
+        <Reveal className="alpine-story-section cloud-container" aria-labelledby="clarity-heading">
+          <div className="alpine-story-copy">
+            <span className="section-label">FOLLOW THE RECORD</span>
+            <h2 id="clarity-heading" aria-label="See the result. Follow the reason.">See the result.<br /><em>Follow the reason.</em></h2>
+            <p>A portfolio number is only useful when you can explain it. Move through the connected views behind the result.</p>
+            <div className="alpine-story-nav" role="tablist" aria-label="Views behind the portfolio result">
+              {clarityViews.map(({ title, shortTitle, copy, icon: Icon }, index) => (
+                <button
+                  className={`alpine-story-tab${activeClarityIndex === index ? ' is-active' : ''}`}
+                  key={title}
+                  id={`clarity-tab-${index}`}
+                  type="button"
+                  role="tab"
+                  aria-selected={activeClarityIndex === index}
+                  aria-controls={`clarity-panel-${index}`}
+                  onClick={() => setActiveClarityIndex(index)}
+                  onFocus={() => setActiveClarityIndex(index)}
+                  onMouseEnter={() => setActiveClarityIndex(index)}
+                >
+                  <span className="alpine-story-tab-index">{`0${index + 1}`}</span>
+                  <span className="alpine-story-tab-icon"><Icon size={17} /></span>
+                  <span className="alpine-story-tab-copy"><strong>{shortTitle}</strong><small>{copy}</small></span>
+                  <ArrowRight className="alpine-story-tab-arrow" size={16} />
+                </button>
+              ))}
+            </div>
           </div>
-          <div className="alpine-clarity-list" aria-label="Questions Masterdeck helps answer">
-            <div className="alpine-clarity-list-header">THE VIEWS BEHIND THE NUMBER</div>
-            {clarityViews.map(({ title, copy, icon: Icon }, index) => (
-              <div className="alpine-clarity-row" key={title}>
-                <span className="alpine-clarity-number">{`0${index + 1}`}</span>
-                <span className="alpine-clarity-icon"><Icon size={19} /></span>
-                <div><strong>{title}</strong><p>{copy}</p></div>
-              </div>
-            ))}
+          <div
+            className="alpine-story-stage"
+            id={`clarity-panel-${activeClarityIndex}`}
+            role="tabpanel"
+            aria-labelledby={`clarity-tab-${activeClarityIndex}`}
+          >
+            <div className="alpine-story-chrome">
+              <span>MASTERDECK <i /> {activeClarity.screenLabel}</span>
+              <span>{`0${activeClarityIndex + 1}`} <b /> 03</span>
+            </div>
+            <div className="alpine-story-frame-wrap">
+              <AnimatePresence mode="wait" initial={false}>
+                <motion.div
+                  className="alpine-story-frame"
+                  key={activeClarity.title}
+                  initial={reduceMotion ? false : { opacity: 0, x: 18, filter: 'blur(4px)' }}
+                  animate={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
+                  exit={reduceMotion ? undefined : { opacity: 0, x: -18, filter: 'blur(4px)' }}
+                  transition={{ duration: reduceMotion ? 0 : 0.34, ease: [0.22, 1, 0.36, 1] }}
+                >
+                  <div className="alpine-story-frame-head">
+                    <span><ActiveClarityIcon size={15} />{activeClarity.title}</span>
+                    <small>CONNECTED DETAIL</small>
+                  </div>
+                  <figure>
+                    <img src={activeClarity.image} alt={activeClarity.imageAlt} loading="lazy" />
+                  </figure>
+                  <div className="alpine-story-frame-foot">
+                    <span className="alpine-story-frame-marker"><ActiveClarityIcon size={14} /></span>
+                    <strong>{activeClarity.copy}</strong>
+                    <ArrowUpRight size={16} />
+                  </div>
+                </motion.div>
+              </AnimatePresence>
+            </div>
+            <div className="alpine-story-stage-footer"><span>ONE RECORD</span><span className="alpine-story-stage-line"/><span>THREE WAYS IN</span></div>
           </div>
         </Reveal>
 
