@@ -13,6 +13,7 @@ import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'rea
 import { GoogleLogin, type CredentialResponse } from '@react-oauth/google'
 import { annualSavingsPercent, billingPlans, formatAud } from '../lib/billing'
 import { brokers } from '../lib/brokers'
+import { captureDemoLead, clearPendingDemoIntent, savePendingDemoIntent } from '../lib/demo-leads'
 import { authClient } from '../lib/supabase'
 import { applySeo } from '../lib/seo'
 import { canonicalAppUrl } from '../lib/app-origin'
@@ -36,7 +37,7 @@ const faqs = [
   ['Is Masterdeck a broker?', 'No. Masterdeck tracks and analyses portfolios. It cannot hold assets, move money or place trades.'],
   ['Which accounts can I connect?', 'Bring records from named broker formats, any broker that exports CSV, and supported PDF statements. Where a direct read-only sync is available, it is optional; every import is reviewed before it is saved.'],
   ['Does it work for global portfolios?', 'Track performance, income, currency and allocation for supported global holdings, with dedicated Australian CGT records.'],
-  ['Can I try it before paying?', 'Yes. Start a 14-day free trial without a credit card, or explore the demo without creating an account. The trial does not automatically charge you.'],
+  ['Can I try it before paying?', 'Yes. Create a free account to open the demo, or start a 14-day trial when you are ready to add your own records. Neither requires a credit card or creates an automatic charge.'],
 ] as const
 
 const principleRows = [
@@ -80,6 +81,8 @@ export function Landing({ onDemo, signedIn = false, onOpenApp, page }: LandingPr
   const [notice, setNotice] = useState('')
   const [redirecting, setRedirecting] = useState(false)
   const [signInOpen, setSignInOpen] = useState(false)
+  const [pendingDemo, setPendingDemo] = useState(false)
+  const [marketingOptIn, setMarketingOptIn] = useState(false)
   const [appleAvailable, setAppleAvailable] = useState(false)
   useEffect(() => {
     if (!signInOpen) return
@@ -115,12 +118,17 @@ export function Landing({ onDemo, signedIn = false, onOpenApp, page }: LandingPr
     setHeaderScrolled(currentScrollY > 16)
   })
 
-  const openAuthentication = (mode: 'signin' | 'signup') => {
+  const openAuthentication = (mode: 'signin' | 'signup', intent: 'account' | 'demo' = 'account') => {
     setMobileOpen(false)
     if (signedIn) {
-      onOpenApp?.()
+      if (intent === 'demo') void launchDemo()
+      else onOpenApp?.()
       return
     }
+    const isDemoIntent = intent === 'demo'
+    setPendingDemo(isDemoIntent)
+    if (isDemoIntent) savePendingDemoIntent(false)
+    else clearPendingDemoIntent()
     setAuthMode(mode)
     setError('')
     setNotice('')
@@ -140,6 +148,8 @@ export function Landing({ onDemo, signedIn = false, onOpenApp, page }: LandingPr
   const closeAuthentication = () => {
     if (redirecting) return
     setSignInOpen(false)
+    setPendingDemo(false)
+    clearPendingDemoIntent()
     setError('')
     setNotice('')
     setPassword('')
@@ -153,6 +163,51 @@ export function Landing({ onDemo, signedIn = false, onOpenApp, page }: LandingPr
     if (normalized.includes('rate limit') || normalized.includes('too many')) return 'Too many attempts. Wait a moment, then try again.'
     if (normalized.includes('password')) return message
     return 'We could not complete that request. Please try again.'
+  }
+
+  const launchDemo = async () => {
+    setRedirecting(true)
+    setError('')
+    setNotice('')
+    try {
+      try {
+        await captureDemoLead(marketingOptIn)
+      } catch {
+        // Supabase Auth has already recorded the account email. Keep demo access
+        // available if the optional lead-capture function is temporarily down.
+      }
+      onDemo()
+      setPendingDemo(false)
+      clearPendingDemoIntent()
+      setSignInOpen(false)
+      setPassword('')
+      onOpenApp?.()
+    } catch {
+      setError('We could not save your demo access. Please try again.')
+    } finally {
+      setRedirecting(false)
+    }
+  }
+
+  const finishAuthentication = async () => {
+    if (pendingDemo) {
+      await launchDemo()
+      return
+    }
+    setSignInOpen(false)
+    setPassword('')
+    setRedirecting(false)
+    onOpenApp?.()
+  }
+
+  const openDemo = () => {
+    setMobileOpen(false)
+    if (signedIn) {
+      void launchDemo()
+      return
+    }
+    setMarketingOptIn(false)
+    openAuthentication('signup', 'demo')
   }
 
   const completeEmailAuthentication = async (event: FormEvent<HTMLFormElement>) => {
@@ -183,9 +238,7 @@ export function Landing({ onDemo, signedIn = false, onOpenApp, page }: LandingPr
         setRedirecting(false)
         return
       }
-      setSignInOpen(false)
-      setPassword('')
-      onOpenApp?.()
+      await finishAuthentication()
       return
     }
 
@@ -200,9 +253,7 @@ export function Landing({ onDemo, signedIn = false, onOpenApp, page }: LandingPr
       return
     }
     if (data.session) {
-      setSignInOpen(false)
-      setPassword('')
-      onOpenApp?.()
+      await finishAuthentication()
       return
     }
     setPassword('')
@@ -218,8 +269,7 @@ export function Landing({ onDemo, signedIn = false, onOpenApp, page }: LandingPr
       if (!credential) throw new Error('Google did not return a sign-in credential.')
       const { error: signInError } = await authClient.auth.signInWithIdToken({ provider: 'google', token: credential })
       if (signInError) throw signInError
-      setSignInOpen(false)
-      onOpenApp?.()
+      await finishAuthentication()
     } catch { setError('Google sign-in could not be completed. Please try again.'); setRedirecting(false) }
   }
 
@@ -282,7 +332,7 @@ export function Landing({ onDemo, signedIn = false, onOpenApp, page }: LandingPr
         </AnimatePresence>
       </header>
 
-      {page ? <MarketingContent page={page} onStart={() => openAuthentication('signup')} onDemo={() => { onDemo(); onOpenApp?.() }} /> : <main id="top">
+      {page ? <MarketingContent page={page} onStart={() => openAuthentication('signup')} onDemo={openDemo} /> : <main id="top">
         <section className="cloud-hero cloud-container">
           <div className="cloud-hero-field" aria-hidden="true">
             <span className="cloud-hero-grid" />
@@ -302,7 +352,7 @@ export function Landing({ onDemo, signedIn = false, onOpenApp, page }: LandingPr
               <button className="cloud-button cloud-button-light" onClick={() => openAuthentication('signup')} disabled={redirecting}>
                 {signupLabel}<ArrowRight />
               </button>
-              {!signedIn && <button className="cloud-button cloud-button-outline-light" onClick={() => { onDemo(); onOpenApp?.() }}>Explore the demo</button>}
+              {!signedIn && <button className="cloud-button cloud-button-outline-light" onClick={openDemo}>Explore the demo</button>}
             </div>
             {!signedIn && <p className="cloud-trial-note">14-day free trial · No credit card · No automatic charge</p>}
           </motion.div>
@@ -548,7 +598,7 @@ export function Landing({ onDemo, signedIn = false, onOpenApp, page }: LandingPr
           <button className="masterdeck-signin-close" type="button" aria-label="Close sign-in" disabled={redirecting} onClick={closeAuthentication}><X /></button>
         </div>
         <h2 id="masterdeck-signin-title">Continue to Masterdeck</h2>
-        <p>{authMode === 'signin' ? 'Welcome back. Choose how to sign in.' : 'Try Masterdeck free for 14 days. No card or automatic charge.'}</p>
+        <p>{pendingDemo ? 'Create or use your free account to open the demo.' : authMode === 'signin' ? 'Welcome back. Choose how to sign in.' : 'Try Masterdeck free for 14 days. No card or automatic charge.'}</p>
         <div className="masterdeck-auth-tabs" role="tablist" aria-label="Email authentication">
           <button type="button" role="tab" aria-selected={authMode === 'signin'} onClick={() => switchAuthMode('signin')}>Sign in</button>
           <button type="button" role="tab" aria-selected={authMode === 'signup'} onClick={() => switchAuthMode('signup')}>Create account</button>
@@ -571,6 +621,10 @@ export function Landing({ onDemo, signedIn = false, onOpenApp, page }: LandingPr
             <span className="masterdeck-auth-method-spacer" aria-hidden="true" />
           </button>}
         </div>
+        {pendingDemo && <label className="masterdeck-marketing-consent">
+          <input type="checkbox" checked={marketingOptIn} onChange={(event) => { setMarketingOptIn(event.target.checked); savePendingDemoIntent(event.target.checked) }} />
+          <span>Send me occasional Masterdeck tips and product updates.</span>
+        </label>}
         {authMethod === 'email' && <button className="masterdeck-auth-back" type="button" disabled={redirecting} onClick={() => { setAuthMethod('choice'); setError(''); setNotice('') }}><ArrowLeft /> Choose another method</button>}
         <form className={'masterdeck-email-auth ' + (authMethod !== 'email' ? 'is-collapsed' : '')} onSubmit={completeEmailAuthentication} noValidate>
           <label htmlFor="masterdeck-auth-email">Email</label>

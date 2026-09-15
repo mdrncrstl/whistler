@@ -93,17 +93,27 @@ function AccountRoutes({ session, demo, onExitDemo }: { session: Session | null;
 function AppContent() {
   const location = useLocation()
   const [session, setSession] = useState<Session | null | undefined>(undefined)
-  const [demo, setDemo] = useState(() => window.sessionStorage.getItem('masterdeck-demo') === 'true')
+  const [demo, setDemo] = useState(false)
   const publicMarketingPath = location.pathname === '/'
     || location.pathname === '/pricing'
     || marketingPages.some(page => page.path === location.pathname)
 
   useEffect(() => {
     let mounted = true
-    authClient.auth.getSession().then(({ data }) => { if (mounted) setSession(data.session) }).catch(() => { if (mounted) setSession(null) })
+    authClient.auth.getSession().then(({ data }) => {
+      if (!mounted) return
+      if (!data.session) window.sessionStorage.removeItem('masterdeck-demo')
+      setSession(data.session)
+      setDemo(Boolean(data.session && window.sessionStorage.getItem('masterdeck-demo') === 'true'))
+    }).catch(() => {
+      if (!mounted) return
+      window.sessionStorage.removeItem('masterdeck-demo')
+      setSession(null)
+      setDemo(false)
+    })
     const { data: subscription } = authClient.auth.onAuthStateChange((_event, nextSession) => {
       setSession(nextSession)
-      if (nextSession) {
+      if (!nextSession) {
         window.sessionStorage.removeItem('masterdeck-demo')
         setDemo(false)
       }

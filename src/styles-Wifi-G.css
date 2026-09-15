@@ -5928,6 +5928,24 @@ body { font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-s
   pointer-events: none;
 }
 .masterdeck-google-native[aria-busy="true"] { opacity: .8; }
+.masterdeck-marketing-consent {
+  margin-top: 14px;
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  color: #60706a;
+  font-size: 11px;
+  line-height: 1.45;
+  text-align: left;
+  cursor: pointer;
+}
+.masterdeck-marketing-consent input {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  margin: 0;
+  accent-color: #188d6b;
+}
 .google-auth-button {
   background: #fff;
   color: var(--m-ink);

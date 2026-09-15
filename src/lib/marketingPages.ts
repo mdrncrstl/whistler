@@ -40,7 +40,7 @@ export const marketingPages = [
   page('/company/about','About Masterdeck','Company','A portfolio should be easier to understand.','Investment records, reports and tax in one workspace.',[
     ['Built around your records','The aim is straightforward: make it easier to move from a headline number to the holdings and transactions behind it.'],
     ['Your investments stay with you','Masterdeck is portfolio tracking software. It does not act as a broker, hold assets, move money or place trades.'],
-    ['See it before you connect','Explore the demo to inspect the interface with sample data. Start a free trial when you are ready to add your own records.']]),
+    ['See it before you connect','Create a free account to inspect the interface with sample data. Start a trial when you are ready to add your own records.']]),
   page('/company/contact','Contact','Company','Talk to the people who build it.','Get help with records, plans and imports.',[
     ['Email us','Write to support@masterdeck.app with your account email and, where it helps, the report or holding you are asking about. Including the broker and date range gets to an answer faster.'],
     ['Before you write in about an import','Check the import preview for flagged records and compare the totals against your broker statement. Most import questions come down to a column mapping or a missing foreign-exchange rate, and the preview names both.'],

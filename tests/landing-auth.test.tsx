@@ -5,6 +5,7 @@ import { Landing } from '../src/components/Landing-Wifi-G'
 const authMocks = vi.hoisted(() => ({
   signInWithOAuth: vi.fn().mockResolvedValue({ data: { provider: 'google', url: 'https://accounts.google.com/' }, error: null }),
   signInWithIdToken: vi.fn().mockResolvedValue({ data: { session: {} }, error: null }),
+  functionsInvoke: vi.fn().mockResolvedValue({ data: { ok: true, emailStatus: 'skipped' }, error: null }),
   signInWithPassword: vi.fn().mockResolvedValue({ error: null }),
   signUp: vi.fn().mockResolvedValue({ data: { session: null }, error: null }),
 }))
@@ -21,18 +22,25 @@ vi.mock('../src/lib/supabase', () => ({
     signInWithIdToken: authMocks.signInWithIdToken,
     signInWithPassword: authMocks.signInWithPassword,
     signUp: authMocks.signUp,
-  } },
+  }, functions: { invoke: authMocks.functionsInvoke } },
 }))
 
 describe('Masterdeck authentication', () => {
   afterEach(() => vi.unstubAllGlobals())
-  it('opens the demo without requiring account creation', () => {
+  it('requires an account before opening the demo and records the lead', async () => {
     const onDemo = vi.fn(), onOpenApp = vi.fn()
     render(<Landing onDemo={onDemo} onOpenApp={onOpenApp} />)
     fireEvent.click(screen.getByRole('button', { name: 'Explore the demo' }))
+    expect(await screen.findByRole('dialog', { name: 'Continue to Masterdeck' })).toBeInTheDocument()
+    expect(onDemo).not.toHaveBeenCalled()
+    expect(authMocks.signUp).not.toHaveBeenCalled()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Continue with Google' }))
+    await waitFor(() => expect(authMocks.functionsInvoke).toHaveBeenCalledWith('capture-demo-lead', {
+      body: { source: 'public_demo', marketingOptIn: false },
+    }))
     expect(onDemo).toHaveBeenCalledOnce()
     expect(onOpenApp).toHaveBeenCalledOnce()
-    expect(authMocks.signUp).not.toHaveBeenCalled()
   })
   beforeEach(() => {
     cleanup()

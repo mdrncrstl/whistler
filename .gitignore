@@ -5,6 +5,7 @@ coverage/
 .env.local
 .env.*.local
 .vercel/
+supabase/.temp/
 *.log
 playwright-report/
 test-results/

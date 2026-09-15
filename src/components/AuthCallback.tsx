@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { captureDemoLead, clearPendingDemoIntent, readPendingDemoIntent } from '../lib/demo-leads'
 import { authClient } from '../lib/supabase'
 import { canonicalAppOrigin, canonicalAppUrl } from '../lib/app-origin'
 import { Brand } from './ui'
@@ -16,10 +17,22 @@ export function AuthCallback() {
     const timeout = window.setTimeout(() => { if (alive) setError('Sign-in took too long. Return to Masterdeck and try again.') }, 15000)
     // Supabase owns URL detection and the one-time PKCE exchange. Exchanging
     // again here races client initialization and React StrictMode.
-    void authClient.auth.getSession().then(({ data, error: sessionError }) => {
+    void authClient.auth.getSession().then(async ({ data, error: sessionError }) => {
       if (!alive) return
       window.clearTimeout(timeout)
       if (data.session) {
+        const pendingDemo = readPendingDemoIntent()
+        if (pendingDemo) {
+          try {
+            await captureDemoLead(pendingDemo.marketingOptIn)
+          } catch {
+            // The account email is already held by Supabase Auth. A lead capture
+            // outage should not strand a user after a successful sign-in.
+          }
+          window.sessionStorage.setItem('masterdeck-demo', 'true')
+          clearPendingDemoIntent()
+        }
+        if (!alive) return
         if (window.location.origin === canonicalAppOrigin()) navigate('/deck', { replace: true })
         else window.location.replace(canonicalAppUrl('/deck'))
       }
