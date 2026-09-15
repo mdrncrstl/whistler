@@ -12,7 +12,7 @@ import { AnimatePresence, motion, useMotionValueEvent, useReducedMotion, useScro
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react'
 import { GoogleLogin, type CredentialResponse } from '@react-oauth/google'
 import { annualSavingsPercent, billingPlans, formatAud } from '../lib/billing'
-import { brokers } from '../lib/brokers'
+import { brokers, type Broker } from '../lib/brokers'
 import { captureDemoLead, clearPendingDemoIntent, savePendingDemoIntent } from '../lib/demo-leads'
 import { authClient } from '../lib/supabase'
 import { applySeo } from '../lib/seo'
@@ -31,7 +31,60 @@ const clarityViews = [
   { title: 'What does it mean for tax?', copy: 'Review Australian tax records with the transactions behind them.', icon: FileCheck2 },
 ] as const
 
-const integrationBrokers = brokers.filter((broker) => broker.id !== 'ibkr' && broker.id !== 'other').slice(0, 10)
+const supportedBrokers = brokers.filter((broker) => broker.id !== 'other')
+const integrationBrokers = supportedBrokers.slice(0, 10)
+
+const brokerLogoDomains: Partial<Record<Broker['id'], string>> = {
+  ibkr: 'interactivebrokers.com',
+  superhero: 'superhero.com.au',
+  commsec: 'commsec.com.au',
+  selfwealth: 'selfwealth.com.au',
+  pearler: 'pearler.com',
+  'stake-au': 'hellostake.com',
+  nabtrade: 'nabtrade.com.au',
+  cmc: 'cmcmarkets.com.au',
+  westpac: 'westpac.com.au',
+  anz: 'anz.com.au',
+  'bell-direct': 'belldirect.com.au',
+  macquarie: 'macquarie.com.au',
+  betashares: 'betashares.com.au',
+  'vanguard-au': 'vanguard.com.au',
+  raiz: 'raiz.com.au',
+  'sharesies-au': 'sharesies.com.au',
+  'stake-us': 'hellostake.com',
+  moomoo: 'moomoo.com',
+  webull: 'webull.com',
+  schwab: 'schwab.com',
+  fidelity: 'fidelity.com',
+  robinhood: 'robinhood.com',
+  etrade: 'etrade.com',
+  'vanguard-us': 'investor.vanguard.com',
+  degiro: 'degiro.com',
+  saxo: 'home.saxo',
+  wealthsimple: 'wealthsimple.com',
+  hatch: 'hatchinvest.nz',
+}
+
+function brokerLogoSources(broker: Broker) {
+  const domain = brokerLogoDomains[broker.id]
+  if (!domain) return []
+  const logoDevKey = import.meta.env.VITE_LOGO_DEV_PUBLIC_KEY?.trim()
+  return [
+    ...(logoDevKey ? [`https://img.logo.dev/${encodeURIComponent(domain)}?token=${encodeURIComponent(logoDevKey)}&size=128&format=png&retina=true&fallback=404`] : []),
+    `https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}&sz=128`,
+  ]
+}
+
+function BrokerLogo({ broker, size = 28 }: { broker: Broker; size?: number }) {
+  const sources = brokerLogoSources(broker)
+  const [sourceIndex, setSourceIndex] = useState(0)
+  const source = sources[sourceIndex]
+  return (
+    <span className="alpine-broker-logo" style={{ width: size, height: size }} aria-hidden="true">
+      {source ? <img src={source} alt="" onError={() => setSourceIndex((current) => current + 1)} /> : <span>{broker.name.slice(0, 2).toUpperCase()}</span>}
+    </span>
+  )
+}
 
 const faqs = [
   ['Is Masterdeck a broker?', 'No. Masterdeck tracks and analyses portfolios. It cannot hold assets, move money or place trades.'],
@@ -486,10 +539,33 @@ export function Landing({ onDemo, signedIn = false, onOpenApp, page }: LandingPr
           <div className="alpine-integrations-panel">
             <div className="alpine-integrations-head"><strong>Popular sources</strong><span>CSV · PDF · read-only sync</span></div>
             <div className="alpine-source-grid">
-              {integrationBrokers.map((broker) => <div key={broker.id} className="alpine-source-item"><span>{broker.name.slice(0, 1)}</span><strong>{broker.name}</strong><small>{broker.region}</small></div>)}
+              {integrationBrokers.map((broker) => <div key={broker.id} className="alpine-source-item"><BrokerLogo broker={broker}/><strong>{broker.name}</strong><small>{broker.region}</small></div>)}
             </div>
             <div className="alpine-import-note"><FileSpreadsheet size={18}/><span><strong>Another broker?</strong><small>Any compatible CSV export can get you started.</small></span></div>
           </div>
+        </Reveal>
+
+        <Reveal className="alpine-broker-rail" aria-label="Supported broker formats">
+          <div className="alpine-broker-rail-intro cloud-container">
+            <span className="section-label">SUPPORTED SOURCES</span>
+            <h2>Recognise your broker.</h2>
+            <p>Bring records from 28 named brokers, or start with a compatible CSV export.</p>
+          </div>
+          <div className="alpine-broker-marquee" aria-label="Supported brokers">
+            <div className="alpine-broker-marquee-track">
+              {[supportedBrokers, supportedBrokers].map((brokerList, listIndex) => (
+                <div className="alpine-broker-marquee-list" key={listIndex} role="list" aria-hidden={listIndex === 1}>
+                  {brokerList.map((broker) => (
+                    <div className="alpine-broker-chip" key={`${listIndex}-${broker.id}`} role="listitem">
+                      <BrokerLogo broker={broker} size={34}/>
+                      <span>{broker.name}</span>
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
+          <p className="alpine-broker-rail-note">Interactive Brokers supports optional read-only sync. Other listed sources use statement or CSV imports.</p>
         </Reveal>
 
         <Reveal className="cloud-pricing cloud-container" id="pricing">

@@ -11,6 +11,7 @@ describe('Masterdeck public conversion funnel', () => {
     expect(screen.getByRole('heading', { name: /More perspective. Less piecing things together/i })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: /Clear pricing. Try it before you pay/i })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: /Bring every portfolio into one history/i })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Recognise your broker.' })).toBeInTheDocument()
     expect(screen.getAllByRole('link', { name: 'See pricing' }).length).toBeGreaterThan(0)
     expect(screen.getAllByText('Multiple portfolios').length).toBeGreaterThan(0)
     expect(screen.queryByText('200+ global brokers')).not.toBeInTheDocument()
@@ -49,7 +50,16 @@ describe('Masterdeck public conversion funnel', () => {
     expect(screen.getByText('Actual Masterdeck app · Demo portfolio')).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: /See the result\. Follow the reason/i })).toBeInTheDocument()
     expect(screen.getByText('What do I own?', { exact: true })).toBeInTheDocument()
-    expect(screen.queryByText('IBKR')).not.toBeInTheDocument()
+    expect(screen.queryByText('IBKR', { exact: true })).not.toBeInTheDocument()
+  })
+
+  it('renders every named broker in the supported-source rail', () => {
+    render(<GoogleOAuthProvider clientId="test-client"><Landing onDemo={vi.fn()} signedIn onOpenApp={vi.fn()} /></GoogleOAuthProvider>)
+    const rail = screen.getByRole('region', { name: 'Supported broker formats' })
+    const brokerItems = within(rail).getAllByRole('listitem')
+    expect(brokerItems).toHaveLength(28)
+    expect(within(brokerItems[0]).getByText('Interactive Brokers', { exact: true })).toBeInTheDocument()
+    expect(within(brokerItems[27]).getByText('Hatch', { exact: true })).toBeInTheDocument()
   })
 
   it('has a working accessible mobile navigation menu', async () => {
