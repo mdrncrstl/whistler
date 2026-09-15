@@ -1,7 +1,7 @@
 import { beforeAll, describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen, cleanup } from '@testing-library/react'
 import { FinanceChart } from '../src/components/FinanceChart'
-import { nearestFinancePoint, normaliseFinancePoints } from '../src/components/financeChartUtils'
+import { nearestFinancePoint, normaliseFinancePoints, projectFinanceComparison } from '../src/components/financeChartUtils'
 import { FinanceProToolbar } from '../src/components/FinanceProToolbar'
 
 beforeAll(() => { globalThis.ResizeObserver = class { observe() {} unobserve() {} disconnect() {} } })
@@ -53,6 +53,27 @@ describe('Finance chart comparisons', () => {
     expect(plot).toHaveAttribute('data-range', 'false')
     expect(screen.queryByRole('status')).toBeNull()
     expect(chart.releasePointerCapture).toHaveBeenCalledWith(1)
+    cleanup()
+  })
+
+  it('projects comparison prices onto the primary price scale', () => {
+    const projected = projectFinanceComparison([
+      { date: '2026-01-01T10:00:00Z', value: 100 },
+      { date: '2026-01-02T10:00:00Z', value: 105 },
+    ], [
+      { date: '2026-01-01T10:00:00Z', value: 200 },
+      { date: '2026-01-02T10:00:00Z', value: 220 },
+    ])
+    expect(projected[0]).toBe(100)
+    expect(projected[1]).toBeCloseTo(110, 8)
+  })
+
+  it('keeps positive stock axes at zero or above', () => {
+    render(<FinanceChart nonNegative points={[{ date: '2026-01-01', value: 100 }, { date: '2026-01-02', value: 102 }]} formatValue={format} formatAxis={value => String(value)}/>)
+    const numericLabels = [...screen.getByRole('img').querySelectorAll('text')]
+      .map(node => Number(node.textContent))
+      .filter(value => Number.isFinite(value))
+    expect(numericLabels.every(value => value >= 0)).toBe(true)
     cleanup()
   })
   it('handles losses, missing history and a zero baseline without Infinity', () => {

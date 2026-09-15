@@ -35,6 +35,30 @@ export function normaliseFinancePoints(points: FinancePoint[]) {
   return [...byTime.values()].sort((a, b) => Date.parse(a.date) - Date.parse(b.date))
 }
 
+/** Project another positive price series onto the primary series' price scale. */
+export function projectFinanceComparison(points: FinancePoint[], comparisonPoints: FinancePoint[]) {
+  const primary = normaliseFinancePoints(points)
+  const comparison = normaliseFinancePoints(comparisonPoints).filter(point => point.value > 0)
+  if (!primary.length || !comparison.length) return primary.map(() => undefined as number | undefined)
+
+  const valueAt = (timestamp: number) => {
+    let latest: number | undefined
+    for (const point of comparison) {
+      if (Date.parse(point.date) > timestamp) break
+      latest = point.value
+    }
+    return latest ?? comparison[0]?.value
+  }
+  const primaryBase = primary.find(point => point.value > 0)?.value
+  const comparisonBase = valueAt(Date.parse(primary[0]?.date || ''))
+  if (!primaryBase || !comparisonBase) return primary.map(() => undefined as number | undefined)
+
+  return primary.map(point => {
+    const comparisonValue = valueAt(Date.parse(point.date))
+    return comparisonValue && comparisonValue > 0 ? comparisonValue / comparisonBase * primaryBase : undefined
+  })
+}
+
 export function nearestFinancePoint(times: number[], target: number) {
   if (!times.length) return null
   let low = 0

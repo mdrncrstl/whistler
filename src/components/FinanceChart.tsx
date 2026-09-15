@@ -15,12 +15,13 @@ type FinanceChartProps = {
   resolution?: 'daily' | 'intraday' | 'recorded'
   chartStyle?: FinanceChartStyle
   indicators?: FinanceIndicatorId[]
+  nonNegative?: boolean
 }
 
 const fullDate = { day: 'numeric' as const, month: 'short' as const, year: 'numeric' as const, timeZone: 'UTC' as const }
 
 /** Shared Google Finance-style plot: hover a daily point, or drag two points to compare them. */
-export function FinanceChart({ points, label = 'Price', formatValue, formatAxis = formatValue, bars = false, candles = false, comparisonLabel = 'Benchmark', area = true, resolution = 'recorded', chartStyle, indicators: activeIndicators = [] }: FinanceChartProps) {
+export function FinanceChart({ points, label = 'Price', formatValue, formatAxis = formatValue, bars = false, candles = false, comparisonLabel = 'Benchmark', area = true, resolution = 'recorded', chartStyle, indicators: activeIndicators = [], nonNegative = false }: FinanceChartProps) {
   const host = useRef<HTMLDivElement>(null)
   const svgRef = useRef<SVGSVGElement>(null)
   const id = useId().replaceAll(':', '')
@@ -71,12 +72,14 @@ export function FinanceChart({ points, label = 'Price', formatValue, formatAxis 
   const values = data.flatMap(p => [p.value, ...(candleMode ? [p.high!, p.low!] : []), ...(p.comparison !== undefined && Number.isFinite(p.comparison) ? [p.comparison] : [])])
   const low = Math.min(...values, ...mainIndicatorSeries.flatMap(series => series.values.filter((value): value is number => Number.isFinite(value))), ...(barMode ? [0] : []))
   const high = Math.max(...values, ...mainIndicatorSeries.flatMap(series => series.values.filter((value): value is number => Number.isFinite(value))), ...(barMode ? [0] : []))
-  const span = high - low || Math.abs(high) * .1 || 1
+  const axisLow = nonNegative ? Math.max(0, low) : low
+  const axisHigh = nonNegative ? Math.max(0, high) : high
+  const span = axisHigh - axisLow || Math.abs(axisHigh) * .1 || 1
   const rawStep = span / 4
   const magnitude = 10 ** Math.floor(Math.log10(rawStep))
   const step = magnitude * ([1, 2, 5, 10].find(n => n * magnitude >= rawStep) || 10)
-  const min = Math.floor((low - span * .08) / step) * step
-  const max = Math.ceil((high + span * .08) / step) * step
+  const min = nonNegative ? Math.max(0, Math.floor((axisLow - span * .08) / step) * step) : Math.floor((low - span * .08) / step) * step
+  const max = Math.ceil((axisHigh + span * .08) / step) * step
   const firstTime = Date.parse(data[0]?.date || '')
   const lastTime = Date.parse(data.at(-1)?.date || '')
   const timeSpan = lastTime - firstTime || 1
@@ -89,7 +92,10 @@ export function FinanceChart({ points, label = 'Price', formatValue, formatAxis 
     const interval = intervals.length ? Math.min(...intervals) : timeSpan / Math.max(1, data.length - 1)
     return Math.max(2, Math.min(32, interval / timeSpan * chartSpan * .78))
   }
-  const y = (value: number) => plotBottom - (value - min) / (max - min || 1) * (plotBottom - top)
+  const y = (value: number) => {
+    const plottedValue = nonNegative ? Math.max(0, value) : value
+    return plotBottom - (plottedValue - min) / (max - min || 1) * (plotBottom - top)
+  }
   const pathForValues = (values: Array<number | undefined>, scale: (value: number) => number) => {
     let path = ''
     let previous = false

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { FinanceChart } from './FinanceChart'
 import { FinanceProToggle, FinanceProToolbar, type FinanceComparisonOption } from './FinanceProToolbar'
-import { normaliseFinancePoints } from './financeChartUtils'
+import { normaliseFinancePoints, projectFinanceComparison } from './financeChartUtils'
 import type { FinanceChartStyle, FinanceIndicatorId } from './financeChartUtils'
 import { FinancePeriodSelector } from './FinancePeriodSelector'
 import { filterFinancePoints, type FinancePeriod } from '../lib/financePeriods'
@@ -50,17 +50,11 @@ export function StockResearchChart({ points, symbol, currency, market = '', comp
     return () => controller.abort()
   }, [comparison, market, period, proGraphMode, selectedComparison?.market])
   const comparisonSeries = useMemo(() => normaliseFinancePoints(comparisonPoints.map(point => ({ date: point.date, value: point.price }))), [comparisonPoints])
-  const plottedData = useMemo(() => {
-    const comparisonValueAt = (timestamp: number) => {
-      let value: number | undefined
-      for (const point of comparisonSeries) {
-        if (Date.parse(point.date) > timestamp) break
-        value = point.value
-      }
-      return value
-    }
-    return data.map(point => ({ ...point, comparison: proGraphMode && comparison !== 'none' ? comparisonValueAt(Date.parse(point.date)) : undefined }))
-  }, [comparison, comparisonSeries, data, proGraphMode])
+  const comparisonValues = useMemo(() => projectFinanceComparison(data, comparisonSeries), [comparisonSeries, data])
+  const plottedData = useMemo(() => data.map((point, index) => ({
+    ...point,
+    comparison: proGraphMode && comparison !== 'none' ? comparisonValues[index] : undefined,
+  })), [comparison, comparisonValues, data, proGraphMode])
   const hasCandleData = data.length > 1 && data.every(point => [point.open, point.high, point.low, point.close].every(value => Number.isFinite(value)))
   const activeStyle = style === 'Candles' && !hasCandleData ? 'Line' : style
   const styles: Array<'Area' | 'Line' | 'Candles'> = hasCandleData ? ['Area', 'Line', 'Candles'] : ['Area', 'Line']
@@ -72,7 +66,7 @@ export function StockResearchChart({ points, symbol, currency, market = '', comp
     <MotionExpand open={!proGraphMode} className="finance-compact-reveal">
       <div className="finance-chart-controls"><SlidingTabs className="chart-mode-tabs" options={styles.map(value => ({ value, label: value }))} value={activeStyle} onChange={setStyle} ariaLabel="Stock chart type" /></div>
     </MotionExpand>
-    <FinanceChart points={plottedData} comparisonLabel={selectedComparison?.label || comparison} resolution={activeAdaptiveHistory?.points.length ? 'intraday' : 'daily'} chartStyle={proGraphMode ? proStyle : activeStyle === 'Candles' ? 'candle' : activeStyle === 'Area' ? 'area' : 'line'} formatValue={v => Intl.NumberFormat('en', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(v)} formatAxis={v => Intl.NumberFormat('en', { maximumFractionDigits: 2 }).format(v)} indicators={proGraphMode ? indicators : []}/>
+    <FinanceChart points={plottedData} comparisonLabel={selectedComparison?.label || comparison} resolution={activeAdaptiveHistory?.points.length ? 'intraday' : 'daily'} chartStyle={proGraphMode ? proStyle : activeStyle === 'Candles' ? 'candle' : activeStyle === 'Area' ? 'area' : 'line'} formatValue={v => Intl.NumberFormat('en', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(v)} formatAxis={v => Intl.NumberFormat('en', { maximumFractionDigits: 2 }).format(v)} indicators={proGraphMode ? indicators : []} nonNegative/>
     <FinancePeriodSelector value={period} onChange={setPeriod} ariaLabel="Price history period"/>
   </div>
 }

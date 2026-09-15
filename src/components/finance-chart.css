@@ -136,10 +136,69 @@
 .finance-chart-controls button[aria-pressed="true"] { background: #e8eaef; font-weight: 600; }
 .finance-chart-controls button:hover { background: #e8eaef; }
 .report-chart-card .finance-plot { border-radius: 4px; }
-.holding-simple-chart:has(.finance-plot) .chart-mode-row, .portfolio-chart-section:has(.finance-plot) .chart-mode-row { height: auto; min-height: 44px; margin: 0 0 3px; padding: 6px 16px; border: 0; border-radius: 0 0 4px 4px; background: #f6f7f9; justify-content: center; gap: 12px; }
-.holding-simple-chart:has(.finance-plot) .chart-mode-row button, .portfolio-chart-section:has(.finance-plot) .chart-mode-row button { height: 32px; min-height: 32px; display: inline-flex; align-items: center; justify-content: center; border: 0; border-radius: 8px; background: transparent; color: #5f6368; padding: 0 12px; line-height: 1.2; }
-.holding-simple-chart:has(.finance-plot) .chart-mode-row button.active, .portfolio-chart-section:has(.finance-plot) .chart-mode-row button.active { background: #e8eaef; color: #102a43; }
+.holding-simple-chart:has(.finance-plot) .chart-mode-row,
+.portfolio-chart-section:has(.finance-plot) .chart-mode-row,
+.ai-stock-chart:has(.finance-plot) .finance-chart-controls {
+  height: auto;
+  min-height: 52px;
+  margin: 0 0 3px;
+  padding: 6px 12px;
+  border: 0;
+  border-radius: 0 0 4px 4px;
+  background: #f6f7f9;
+  justify-content: flex-start;
+  gap: 5px;
+}
+.holding-simple-chart:has(.finance-plot) .chart-mode-row .chart-mode-tabs.t-tabs,
+.portfolio-chart-section:has(.finance-plot) .chart-mode-row .chart-mode-tabs.t-tabs,
+.ai-stock-chart:has(.finance-plot) .finance-chart-controls .chart-mode-tabs.t-tabs {
+  min-height: 38px;
+  height: 38px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+}
+.holding-simple-chart:has(.finance-plot) .chart-mode-row .chart-mode-tabs .t-tabs-pill,
+.portfolio-chart-section:has(.finance-plot) .chart-mode-row .chart-mode-tabs .t-tabs-pill,
+.ai-stock-chart:has(.finance-plot) .finance-chart-controls .chart-mode-tabs .t-tabs-pill {
+  top: 0;
+  height: 38px;
+  border-radius: 8px;
+  background: #e8eaef;
+  box-shadow: none;
+}
+.holding-simple-chart:has(.finance-plot) .chart-mode-row .chart-mode-tabs .t-tab,
+.portfolio-chart-section:has(.finance-plot) .chart-mode-row .chart-mode-tabs .t-tab,
+.ai-stock-chart:has(.finance-plot) .finance-chart-controls .chart-mode-tabs .t-tab {
+  min-height: 38px;
+  height: 38px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #202124;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 400;
+}
+.holding-simple-chart:has(.finance-plot) .chart-mode-row .chart-mode-tabs .t-tab:hover,
+.portfolio-chart-section:has(.finance-plot) .chart-mode-row .chart-mode-tabs .t-tab:hover,
+.ai-stock-chart:has(.finance-plot) .finance-chart-controls .chart-mode-tabs .t-tab:hover { background: transparent; color: #202124; }
+.holding-simple-chart:has(.finance-plot) .chart-mode-row .chart-mode-tabs .t-tab[aria-pressed="true"],
+.portfolio-chart-section:has(.finance-plot) .chart-mode-row .chart-mode-tabs .t-tab[aria-pressed="true"],
+.ai-stock-chart:has(.finance-plot) .finance-chart-controls .chart-mode-tabs .t-tab[aria-pressed="true"] { color: #202124; font-weight: 600; }
 .ai-stock-chart:has(.finance-plot) { min-width: 0; }
+
+[data-theme="dark"] .holding-simple-chart:has(.finance-plot) .chart-mode-row .chart-mode-tabs .t-tab,
+[data-theme="dark"] .portfolio-chart-section:has(.finance-plot) .chart-mode-row .chart-mode-tabs .t-tab,
+[data-theme="dark"] .ai-stock-chart:has(.finance-plot) .finance-chart-controls .chart-mode-tabs .t-tab,
+[data-theme="dark"] .holding-simple-chart:has(.finance-plot) .chart-mode-row .chart-mode-tabs .t-tab[aria-pressed="true"],
+[data-theme="dark"] .portfolio-chart-section:has(.finance-plot) .chart-mode-row .chart-mode-tabs .t-tab[aria-pressed="true"],
+[data-theme="dark"] .ai-stock-chart:has(.finance-plot) .finance-chart-controls .chart-mode-tabs .t-tab[aria-pressed="true"] { color: #e2e8f0; }
+[data-theme="dark"] .holding-simple-chart:has(.finance-plot) .chart-mode-row .chart-mode-tabs .t-tab:hover,
+[data-theme="dark"] .portfolio-chart-section:has(.finance-plot) .chart-mode-row .chart-mode-tabs .t-tab:hover,
+[data-theme="dark"] .ai-stock-chart:has(.finance-plot) .finance-chart-controls .chart-mode-tabs .t-tab:hover { color: #e2e8f0; }
 
 [data-theme="dark"] .finance-plot, [data-theme="dark"] .finance-periods, [data-theme="dark"] .finance-chart-controls { --finance-selection: rgb(106 203 139 / 16%); border-color: #334155; background: #18212b; }
 [data-theme="dark"] .finance-plot { --finance-up: #6acb8b; --finance-down: #ef7777; }
