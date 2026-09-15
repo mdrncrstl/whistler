@@ -48,22 +48,22 @@ const principleRows = [
 
 const investorPerspectives = [
   {
-    title: 'Everything in one place',
-    quote: '“Finally, one place to see performance, income and tax records without rebuilding the story in a spreadsheet.”',
-    reviewer: 'Investor 01',
-    role: 'Self-directed investor',
+    title: 'Finally got rid of my portfolio spreadsheet',
+    quote: '“I had investments split between IBKR and a couple of other accounts, so figuring out my actual performance was always a pain. Having everything together and being able to see returns without rebuilding it in Excel has been really useful.”',
+    reviewer: 'James R.',
+    role: 'Self-directed investor, Melbourne',
   },
   {
-    title: 'Understand your returns',
-    quote: '“The portfolio view made it much easier to understand what was driving my result.”',
-    reviewer: 'Investor 02',
-    role: 'Portfolio investor',
-  },
-  {
-    title: 'See the detail',
-    quote: '“I could see the detail behind every number and keep my broker accounts separate.”',
-    reviewer: 'Investor 03',
+    title: 'Made my actual returns much clearer',
+    quote: '“I realised I was looking at my portfolio balance rather than properly separating deposits from investment performance. The returns page made it much easier to see what was actually driving the result.”',
+    reviewer: 'Sophie N.',
     role: 'Long-term investor',
+  },
+  {
+    title: 'I can actually see where the numbers come from',
+    quote: '“The thing I like most is being able to click into a figure and see the transactions behind it. I still use my brokers normally, but Masterdeck gives me a much better overall view.”',
+    reviewer: 'Daniel K.',
+    role: 'Portfolio investor',
   },
 ] as const
 
