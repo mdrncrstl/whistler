@@ -76,6 +76,21 @@ describe('Finance chart comparisons', () => {
     expect(numericLabels.every(value => value >= 0)).toBe(true)
     cleanup()
   })
+
+  it('colors a selected range from its percentage result', () => {
+    render(<FinanceChart points={[
+      { date: '2026-01-01', value: 1, measurementValue: 100 },
+      { date: '2026-01-02', value: 2, measurementValue: 90 },
+    ]} formatValue={format}/> )
+    const chart = screen.getByRole('img')
+    fireEvent.keyDown(chart, { key: 'ArrowRight', shiftKey: true })
+    const readout = screen.getByRole('status')
+    expect(readout.textContent).toContain('1.00 (-10.00%)')
+    expect(readout.querySelector('.loss')).toBeInTheDocument()
+    expect(readout.querySelector('.gain')).toBeNull()
+    cleanup()
+  })
+
   it('handles losses, missing history and a zero baseline without Infinity', () => {
     const {rerender} = render(<FinanceChart points={[]} formatValue={format}/>)
     expect(screen.getByText(/Not enough/)).toBeTruthy()

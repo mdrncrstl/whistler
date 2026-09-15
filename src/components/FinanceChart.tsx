@@ -143,7 +143,7 @@ export function FinanceChart({ points, label = 'Price', formatValue, formatAxis 
   const displayDelta = selected && selectedStart && selectedEnd ? selectedEnd.value - selectedStart.value : current?.value ?? 0
   const percent = base !== undefined && end !== undefined && Math.abs(base) > Number.EPSILON ? (end - base) / Math.abs(base) * 100 : null
   const percentText = percent === null ? '—' : `${percent.toFixed(2)}%`
-  const positive = (selected ? displayDelta : percent || 0) >= 0
+  const positive = (selected ? (percent ?? displayDelta) : (percent ?? 0)) >= 0
   const color = data.at(-1) && data[0] && data.at(-1)!.value < data[0].value ? 'var(--finance-down)' : 'var(--finance-up)'
   const line = data.map((point, index) => `${index ? 'L' : 'M'}${x(index)},${y(point.value)}`).join(' ')
   const ticks = Array.from({ length: Math.round((max - min) / step) + 1 }, (_, index) => min + step * index)
