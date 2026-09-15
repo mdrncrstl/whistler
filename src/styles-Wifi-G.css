@@ -4270,8 +4270,6 @@ body { font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-s
 .cloud-footer-brand .brand { width: max-content; padding: 9px 11px; border-radius: 8px; background: #f5fff9; }
 .cloud-footer-brand .brand-logo-image { width: 170px; display: block; }
 .cloud-footer-brand > p { max-width: 32ch; margin: 10px 0 8px; color: #8bb9a5; font-size: 12px; line-height: 1.6; }
-.cloud-footer-brand > span { display: inline-flex; align-items: center; gap: 7px; color: #88b19f; font-size: 10px; }
-.cloud-footer-brand > span svg { width: 14px; }
 .cloud-footer-grid strong { margin-bottom: 5px; color: #7ea898; font-size: 9px; letter-spacing: .13em; text-transform: uppercase; }
 .cloud-footer-grid a,
 .cloud-footer-grid button { padding: 0; border: 0; background: transparent; color: #c6e4d6; font-size: 12px; cursor: pointer; transition: color .18s ease, transform .18s ease; }

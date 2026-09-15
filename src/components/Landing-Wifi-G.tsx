@@ -415,7 +415,7 @@ export function Landing({ onDemo, signedIn = false, onOpenApp, page }: LandingPr
           </figure>
         </section>
 
-        <section className="alpine-assurance" aria-label="Trial and security"><span><ShieldCheck size={15}/>Read-only by design</span><span><Check size={15}/>14 days free</span><span><LockKeyhole size={15}/>No credit card required</span></section>
+        <section className="alpine-assurance" aria-label="Trial details"><span><Check size={15}/>14 days free</span><span><LockKeyhole size={15}/>No credit card required</span></section>
         <Reveal className="alpine-trustpilot cloud-container" aria-labelledby="trustpilot-heading">
           <div className="alpine-trustpilot-summary">
             <img className="trustpilot-wordmark" src="https://cdn.trustpilot.net/brand-assets/4.1.0/logo-black.svg" alt="Trustpilot" width="130" height="32"/>
@@ -616,7 +616,7 @@ export function Landing({ onDemo, signedIn = false, onOpenApp, page }: LandingPr
               </article>
             ))}
           </div>
-          <div className="cloud-pricing-foot"><span><ShieldCheck /> No card required</span><span><LockKeyhole /> Read-only by design</span><span><ArrowRight /> Cancel anytime</span></div>
+          <div className="cloud-pricing-foot"><span><ShieldCheck /> No card required</span><span><ArrowRight /> Cancel anytime</span></div>
         </Reveal>
 
         <Reveal className="cloud-faq cloud-container" id="faq">
@@ -662,7 +662,7 @@ export function Landing({ onDemo, signedIn = false, onOpenApp, page }: LandingPr
 
       <footer className="cloud-footer">
         <div className="cloud-container cloud-footer-grid">
-          <div className="cloud-footer-brand"><Brand /><p>Global portfolio tracking with serious Australian CGT depth.</p><span><LockKeyhole /> Read-only by design</span></div>
+          <div className="cloud-footer-brand"><Brand /><p>Global portfolio tracking with serious Australian CGT depth.</p></div>
           {marketingGroups.map(group => <div key={group}><strong>{group}</strong>{marketingPages.filter(item => item.group === group).map(item => <a key={item.path} href={item.path}>{item.label}</a>)}</div>)}
           <div><strong>Account</strong><a href="/pricing">Pricing</a><button onClick={() => openAuthentication('signin')}>{signedIn ? 'Open app' : 'Log in'}</button><button onClick={() => openAuthentication('signup')}>{signupLabel}</button></div>
         </div>
