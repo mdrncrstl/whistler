@@ -84,7 +84,7 @@ function escapeHtml(value: string) {
     .replaceAll("'", '&#39;')
 }
 
-function authAction(value: string): AuthEmailAction {
+export function normalizeAuthEmailAction(value: string): AuthEmailAction {
   if (Object.prototype.hasOwnProperty.call(authEmailCopy, value)) return value as AuthEmailAction
   if (value === 'magic_link') return 'magiclink'
   return 'signup'
@@ -133,7 +133,7 @@ export function buildAuthEmailMessage({
   confirmationUrl?: string
   token?: string
 }) {
-  const copy = authEmailCopy[authAction(action)]
+  const copy = authEmailCopy[normalizeAuthEmailAction(action)]
   const escapedUrl = confirmationUrl ? escapeHtml(confirmationUrl) : ''
   const button = copy.button && escapedUrl
     ? `<a href="${escapedUrl}" style="display:inline-block;padding:14px 20px;border-radius:10px;background:#0c9d73;color:#ffffff;font-size:15px;font-weight:700;line-height:1;text-decoration:none">${copy.button}</a>`

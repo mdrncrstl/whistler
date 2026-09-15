@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { buildAuthEmailMessage, buildDemoWelcomeEmailHtml } from '../supabase/functions/_shared/masterdeck-email'
+import { buildAuthEmailMessage, buildDemoWelcomeEmailHtml, normalizeAuthEmailAction } from '../supabase/functions/_shared/masterdeck-email'
 
 describe('Masterdeck email templates', () => {
   it('builds a branded signup confirmation with a safe confirmation link', () => {
@@ -20,5 +20,10 @@ describe('Masterdeck email templates', () => {
     expect(html).toContain('YOUR DEMO IS READY')
     expect(html).toContain('masterdeck-logo.png')
     expect(html).toContain('Open Masterdeck')
+  })
+
+  it('normalizes the auth action used by Supabase hooks', () => {
+    expect(normalizeAuthEmailAction('magic_link')).toBe('magiclink')
+    expect(normalizeAuthEmailAction('unexpected')).toBe('signup')
   })
 })

@@ -1,6 +1,6 @@
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts'
 import { Webhook } from 'npm:standardwebhooks@1.0.0'
-import { buildAuthEmailMessage } from '../_shared/masterdeck-email.ts'
+import { buildAuthEmailMessage, normalizeAuthEmailAction } from '../_shared/masterdeck-email.ts'
 
 type AuthEmailHookPayload = {
   user: {
@@ -11,7 +11,6 @@ type AuthEmailHookPayload = {
     token_hash?: string
     redirect_to?: string
     email_action_type?: string
-    site_url?: string
   }
 }
 
@@ -103,7 +102,7 @@ Deno.serve(async (request) => {
     const webhook = new Webhook(secret)
     const payload = webhook.verify(rawPayload, Object.fromEntries(request.headers)) as AuthEmailHookPayload
     const email = payload.user?.email?.trim().toLowerCase()
-    const action = payload.email_data?.email_action_type || 'signup'
+    const action = normalizeAuthEmailAction(payload.email_data?.email_action_type || 'signup')
     if (!email) return json({ error: 'The auth event has no recipient email.' }, 400)
 
     await sendEmail({
