@@ -58,8 +58,8 @@ describe('Masterdeck public conversion funnel', () => {
     const rail = screen.getByRole('region', { name: 'Supported broker formats' })
     const brokerItems = within(rail).getAllByRole('listitem')
     expect(brokerItems).toHaveLength(28)
-    expect(within(brokerItems[0]).getByText('Interactive Brokers', { exact: true })).toBeInTheDocument()
-    expect(within(brokerItems[27]).getByText('Hatch', { exact: true })).toBeInTheDocument()
+    expect(within(brokerItems[0]).getByLabelText('Interactive Brokers')).toBeInTheDocument()
+    expect(within(brokerItems[27]).getByLabelText('Hatch')).toBeInTheDocument()
   })
 
   it('has a working accessible mobile navigation menu', async () => {

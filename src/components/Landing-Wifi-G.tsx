@@ -65,6 +65,24 @@ const brokerLogoDomains: Partial<Record<Broker['id'], string>> = {
   hatch: 'hatchinvest.nz',
 }
 
+const brokerWordmarkSources: Partial<Record<Broker['id'], string>> = {
+  ibkr: 'https://www.interactivebrokers.com/images/web/logos/ib-logo-text-white.png',
+  superhero: '/broker-logos/superhero.svg',
+  commsec: 'https://www.commsec.com.au/content/dam/EN/Images/new-svgs/logo_black.png',
+  pearler: 'https://pearler.com/_next/static/media/full_pearler_logo.95faf091.png',
+  'stake-au': 'https://hellostake.com/images/stake_logo.svg',
+  nabtrade: 'https://www.nabtrade.com.au/content/dam/nabtrade/logos/logo.png',
+  cmc: 'https://cdn.cmcmarkets.com/bonsai/images/cmc-logo-invest-blue.png',
+  westpac: 'https://www.westpac.com.au/content/dam/public/wbc/images/home/westpac-logo-social.jpg',
+  anz: 'https://www.anz.com.au/content/dam/anzcomau/logos/anz/anz-logo-og-1200x1200.jpg',
+  'bell-direct': 'https://belldirect.com.au/wp-content/uploads/2020/01/bd_logo_badge.png',
+  moomoo: 'https://cdn.futustatic.com/moomoo_common/dist/img/logo-3bd67..svg',
+  schwab: 'https://www.schwab.com/themes/custom/schwabcog/images/charles_schwab_logo_720x400.png',
+  etrade: 'https://cdn2.etrade.net/1/26022716140.0/aempros/content/dam/etrade/retail/en_US/images/global/logos/etrade-from-morgan-stanley-logo-dark-theme.svg',
+  saxo: 'https://www.home.saxo/-/media/global/logos/saxo-2022/saxo-beinvested-logo-blue.svg',
+  hatch: 'https://www.hatchinvest.nz/images/logo.svg',
+}
+
 function brokerLogoSources(broker: Broker) {
   const domain = brokerLogoDomains[broker.id]
   if (!domain) return []
@@ -82,6 +100,20 @@ function BrokerLogo({ broker, size = 28 }: { broker: Broker; size?: number }) {
   return (
     <span className="alpine-broker-logo" style={{ width: size, height: size }} aria-hidden="true">
       {source ? <img src={source} alt="" onError={() => setSourceIndex((current) => current + 1)} /> : <span>{broker.name.slice(0, 2).toUpperCase()}</span>}
+    </span>
+  )
+}
+
+function BrokerWordmark({ broker }: { broker: Broker }) {
+  const sources = [
+    ...(brokerWordmarkSources[broker.id] ? [brokerWordmarkSources[broker.id] as string] : []),
+    ...brokerLogoSources(broker),
+  ]
+  const [sourceIndex, setSourceIndex] = useState(0)
+  const source = sources[sourceIndex]
+  return (
+    <span className="alpine-broker-wordmark" data-broker={broker.id} title={broker.name} aria-label={broker.name}>
+      {source ? <img src={source} alt="" onError={() => setSourceIndex((current) => current + 1)} /> : <span aria-hidden="true">{broker.name.slice(0, 2).toUpperCase()}</span>}
     </span>
   )
 }
@@ -557,15 +589,13 @@ export function Landing({ onDemo, signedIn = false, onOpenApp, page }: LandingPr
                 <div className="alpine-broker-marquee-list" key={listIndex} role="list" aria-hidden={listIndex === 1}>
                   {brokerList.map((broker) => (
                     <div className="alpine-broker-chip" key={`${listIndex}-${broker.id}`} role="listitem">
-                      <BrokerLogo broker={broker} size={34}/>
-                      <span>{broker.name}</span>
+                      <BrokerWordmark broker={broker}/>
                     </div>
                   ))}
                 </div>
               ))}
             </div>
           </div>
-          <p className="alpine-broker-rail-note">Interactive Brokers supports optional read-only sync. Other listed sources use statement or CSV imports.</p>
         </Reveal>
 
         <Reveal className="cloud-pricing cloud-container" id="pricing">

@@ -267,12 +267,14 @@ html:has(.alpine-site) { overflow-x:clip; }
 .alpine-broker-marquee::before,.alpine-broker-marquee::after { position:absolute; z-index:1; top:0; bottom:0; width:clamp(32px,8vw,120px); content:""; pointer-events:none; }
 .alpine-broker-marquee::before { left:0; background:linear-gradient(90deg,#f6faf7,transparent); }
 .alpine-broker-marquee::after { right:0; background:linear-gradient(270deg,#f6faf7,transparent); }
-.alpine-broker-marquee-track { display:flex; width:max-content; animation:alpine-broker-marquee 58s linear infinite; }
+.alpine-broker-marquee-track { display:flex; width:max-content; animation:alpine-broker-marquee 120s linear infinite; }
 .alpine-broker-marquee:hover .alpine-broker-marquee-track,.alpine-broker-marquee:focus-within .alpine-broker-marquee-track { animation-play-state:paused; }
 .alpine-broker-marquee-list { display:flex; flex:none; gap:12px; padding-right:12px; }
-.alpine-broker-chip { min-width:158px; display:flex; align-items:center; gap:10px; padding:13px 15px; border:1px solid #dce8e1; border-radius:12px; background:#fff; color:#183c2d; }
-.alpine-broker-chip > span:last-child { overflow:hidden; font-size:12px; font-weight:650; text-overflow:ellipsis; white-space:nowrap; }
-.alpine-broker-rail-note { margin:23px auto 0; color:#718b7f; font-size:11px; text-align:center; }
+.alpine-broker-chip { min-width:176px; height:72px; display:flex; align-items:center; justify-content:center; padding:14px 20px; border:1px solid #dce8e1; border-radius:12px; background:#fff; color:#183c2d; }
+.alpine-broker-wordmark { --wordmark-width:132px; --wordmark-height:38px; width:var(--wordmark-width); height:var(--wordmark-height); display:grid; place-items:center; overflow:hidden; }
+.alpine-broker-wordmark img { display:block; width:auto; height:auto; max-width:var(--wordmark-width); max-height:var(--wordmark-height); object-fit:contain; }
+.alpine-broker-wordmark[data-broker="ibkr"] img { filter:invert(1); }
+.alpine-broker-wordmark > span { color:#0a8d69; font-size:14px; font-weight:750; letter-spacing:.03em; }
 @keyframes alpine-broker-marquee { from { transform:translateX(0); } to { transform:translateX(-50%); } }
 
 @media(max-width:900px) {
@@ -302,8 +304,8 @@ html:has(.alpine-site) { overflow-x:clip; }
   .alpine-source-grid { grid-template-columns:1fr; }
   .alpine-broker-rail { padding:62px 0 66px; }
   .alpine-broker-rail-intro { padding-bottom:24px; }
-  .alpine-broker-chip { min-width:145px; padding:11px 13px; }
-  .alpine-broker-rail-note { padding-inline:20px; line-height:1.5; }
+  .alpine-broker-chip { min-width:145px; height:64px; padding:11px 13px; }
+  .alpine-broker-wordmark { --wordmark-width:112px; --wordmark-height:32px; width:var(--wordmark-width); height:var(--wordmark-height); }
 }
 
 @media(prefers-reduced-motion:reduce) {
