@@ -5,7 +5,7 @@ import { normaliseFinancePoints } from './financeChartUtils'
 import type { FinanceChartStyle, FinanceIndicatorId } from './financeChartUtils'
 import { FinancePeriodSelector } from './FinancePeriodSelector'
 import { filterFinancePoints, type FinancePeriod } from '../lib/financePeriods'
-import { fetchMarketHistory, type MarketHistoryPoint } from '../lib/marketDataApi'
+import { fetchMarketHistory, marketHistoryResolution, mergeMarketHistoryPoints, type MarketHistoryPoint } from '../lib/marketDataApi'
 import { MotionExpand, SlidingTabs } from './ui'
 
 type StockPoint = MarketHistoryPoint
@@ -18,34 +18,61 @@ export function StockResearchChart({ points, symbol, currency, market = '', comp
   const [comparison, setComparison] = useState('none')
   const [indicators, setIndicators] = useState<FinanceIndicatorId[]>([])
   const [comparisonPoints, setComparisonPoints] = useState<MarketHistoryPoint[]>([])
+  const [adaptiveHistory, setAdaptiveHistory] = useState<{ period: FinancePeriod; points: MarketHistoryPoint[] } | null>(null)
+  const resolution = marketHistoryResolution(period)
+  const needsAdaptiveHistory = resolution.interval !== '1d'
+  const activeAdaptiveHistory = adaptiveHistory?.period === period ? adaptiveHistory : null
+
+  useEffect(() => {
+    if (!needsAdaptiveHistory) return
+    const controller = new AbortController()
+    void fetchMarketHistory(symbol, market, controller.signal, { period })
+      .then(result => { if (!controller.signal.aborted) setAdaptiveHistory({ period, points: result.points }) })
+      .catch(() => { if (!controller.signal.aborted) setAdaptiveHistory({ period, points: [] }) })
+    return () => controller.abort()
+  }, [market, needsAdaptiveHistory, period, symbol])
+
   const data = useMemo(() => {
-    const ordered = normaliseFinancePoints(points.map(point => ({ date: point.date, value: point.price, volume: point.volume, open: point.open, high: point.high, low: point.low, close: point.close })))
+    const source = activeAdaptiveHistory?.points.length
+      ? mergeMarketHistoryPoints(points, activeAdaptiveHistory.points)
+      : points
+    const ordered = normaliseFinancePoints(source.map(point => ({ date: point.date, value: point.price, volume: point.volume, open: point.open, high: point.high, low: point.low, close: point.close })))
     return filterFinancePoints(ordered, period)
-  }, [points, period])
+  }, [activeAdaptiveHistory, period, points])
   const availableComparisons = useMemo(() => comparisonOptions.filter(item => item.id.toUpperCase() !== symbol.toUpperCase()), [comparisonOptions, symbol])
   const selectedComparison = availableComparisons.find(item => item.id === comparison)
   useEffect(() => {
     if (!proGraphMode || comparison === 'none') return
     const controller = new AbortController()
-    void fetchMarketHistory(comparison, selectedComparison?.market || market, controller.signal)
+    void fetchMarketHistory(comparison, selectedComparison?.market || market, controller.signal, { period })
       .then(result => setComparisonPoints(result.points))
       .catch(error => { if ((error as { name?: string })?.name !== 'AbortError') setComparisonPoints([]) })
     return () => controller.abort()
-  }, [comparison, market, proGraphMode, selectedComparison?.market])
-  const comparisonByDate = useMemo(() => new Map(normaliseFinancePoints(comparisonPoints.map(point => ({ date: point.date, value: point.price }))).map(point => [point.date.slice(0, 10), point.value])), [comparisonPoints])
-  const plottedData = useMemo(() => data.map(point => ({ ...point, comparison: proGraphMode && comparison !== 'none' ? comparisonByDate.get(point.date.slice(0, 10)) : undefined })), [comparison, comparisonByDate, data, proGraphMode])
+  }, [comparison, market, period, proGraphMode, selectedComparison?.market])
+  const comparisonSeries = useMemo(() => normaliseFinancePoints(comparisonPoints.map(point => ({ date: point.date, value: point.price }))), [comparisonPoints])
+  const plottedData = useMemo(() => {
+    const comparisonValueAt = (timestamp: number) => {
+      let value: number | undefined
+      for (const point of comparisonSeries) {
+        if (Date.parse(point.date) > timestamp) break
+        value = point.value
+      }
+      return value
+    }
+    return data.map(point => ({ ...point, comparison: proGraphMode && comparison !== 'none' ? comparisonValueAt(Date.parse(point.date)) : undefined }))
+  }, [comparison, comparisonSeries, data, proGraphMode])
   const hasCandleData = data.length > 1 && data.every(point => [point.open, point.high, point.low, point.close].every(value => Number.isFinite(value)))
   const activeStyle = style === 'Candles' && !hasCandleData ? 'Line' : style
   const styles: Array<'Area' | 'Line' | 'Candles'> = hasCandleData ? ['Area', 'Line', 'Candles'] : ['Area', 'Line']
   return <div className="ai-stock-chart" aria-label={`${symbol} price history`}>
-    <div className="ai-stock-chart-heading"><span>Price history · {currency}</span><FinanceProToggle enabled={proGraphMode} onChange={setProGraphMode}/></div>
+    <div className="ai-stock-chart-heading"><span>Price history · {currency}</span>{needsAdaptiveHistory && <small className="finance-resolution-note" role="status">{activeAdaptiveHistory?.points.length ? resolution.label : activeAdaptiveHistory ? 'Intraday data unavailable · showing daily history' : `Loading ${resolution.label.toLowerCase()}…`}</small>}<FinanceProToggle enabled={proGraphMode} onChange={setProGraphMode}/></div>
     <MotionExpand open={proGraphMode} className="finance-pro-reveal">
       <FinanceProToolbar chartStyle={proStyle} onChartStyleChange={setProStyle} comparison={comparison} onComparisonChange={value => { setComparison(value); setComparisonPoints([]) }} comparisonOptions={availableComparisons} indicators={indicators} onIndicatorsChange={setIndicators} candleAvailable={hasCandleData} barAvailable allowSymbolSearch/>
     </MotionExpand>
     <MotionExpand open={!proGraphMode} className="finance-compact-reveal">
       <div className="finance-chart-controls"><SlidingTabs className="chart-mode-tabs" options={styles.map(value => ({ value, label: value }))} value={activeStyle} onChange={setStyle} ariaLabel="Stock chart type" /></div>
     </MotionExpand>
-    <FinanceChart points={plottedData} comparisonLabel={selectedComparison?.label || comparison} resolution="daily" chartStyle={proGraphMode ? proStyle : activeStyle === 'Candles' ? 'candle' : activeStyle === 'Area' ? 'area' : 'line'} formatValue={v => Intl.NumberFormat('en', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(v)} formatAxis={v => Intl.NumberFormat('en', { maximumFractionDigits: 2 }).format(v)} indicators={proGraphMode ? indicators : []}/>
+    <FinanceChart points={plottedData} comparisonLabel={selectedComparison?.label || comparison} resolution={activeAdaptiveHistory?.points.length ? 'intraday' : 'daily'} chartStyle={proGraphMode ? proStyle : activeStyle === 'Candles' ? 'candle' : activeStyle === 'Area' ? 'area' : 'line'} formatValue={v => Intl.NumberFormat('en', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(v)} formatAxis={v => Intl.NumberFormat('en', { maximumFractionDigits: 2 }).format(v)} indicators={proGraphMode ? indicators : []}/>
     <FinancePeriodSelector value={period} onChange={setPeriod} ariaLabel="Price history period"/>
   </div>
 }

@@ -17,7 +17,7 @@ import { date, money } from '../lib/format'
 import { FINANCE_PERIODS } from '../lib/financePeriods'
 import { MotionPopover, SlidingTabs } from './ui'
 
-export type PerformanceRangePreset = '1D' | '5D' | '1M' | '3M' | '6M' | 'YTD' | '1Y' | '3Y' | '5Y' | 'MAX' | 'CUSTOM'
+export type PerformanceRangePreset = '1D' | '5D' | '1W' | '1M' | '3M' | '6M' | 'YTD' | '1Y' | '3Y' | '5Y' | 'MAX' | 'CUSTOM'
 export type PerformanceMode = 'Amount' | 'Percent'
 export type PerformanceChartStyle = 'Area' | 'Line'
 export type PerformanceMetric = 'Return' | 'Price'
@@ -88,6 +88,7 @@ function cutoffForPreset(preset: PerformanceRangePreset, latest: string) {
   const days: Partial<Record<PerformanceRangePreset, number>> = {
     '1D': 1,
     '5D': 5,
+    '1W': 7,
     '1M': 31,
     '3M': 93,
     '6M': 183,
@@ -110,6 +111,11 @@ export function filterPerformancePoints(points: AdvancedPerformancePoint[], peri
     const time = dateTime(point.date)
     return (start === null || time >= start) && (end === null || time <= end)
   })
+  if (period.preset === '1D') {
+    const latestDay = isoDay(latest)
+    const session = sorted.filter((point) => isoDay(point.date) === latestDay)
+    if (session.length >= 2) return session
+  }
   return filtered.length >= 2 ? filtered : sorted.slice(-2)
 }
 

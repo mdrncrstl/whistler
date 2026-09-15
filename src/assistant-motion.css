@@ -27,6 +27,7 @@
 .ai-stock-chart { margin: 18px 0; min-width: 0; }
 .ai-stock-chart-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 28px; }
 .ai-stock-chart-heading > span { color: var(--muted); font-size: 10px; }
+.finance-resolution-note { margin-left: auto; color: var(--muted-2); font-size: 10px; white-space: nowrap; }
 .ai-stock-plot { position: relative; min-width: 0; border-radius: 14px; overflow: hidden; touch-action: none; cursor: crosshair; --chart-pointer-x: 0px; --chart-pointer-y: 0px; }
 .ai-stock-plot:focus, .ai-stock-plot:focus-visible, .ai-stock-plot .recharts-wrapper:focus, .ai-stock-plot .recharts-surface:focus { outline: none !important; }
 .ai-stock-plot .recharts-tooltip-wrapper { transition: none !important; animation: none !important; pointer-events: none !important; z-index: 4 !important; }

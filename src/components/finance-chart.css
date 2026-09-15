@@ -181,6 +181,7 @@
 .finance-chart-heading > h2,
 .finance-chart-heading > p { margin: 0; }
 .finance-chart-heading > p { color: var(--muted); font-size: 12px; }
+.finance-resolution-note { margin-left: auto; color: var(--muted-2); font-size: 10px; white-space: nowrap; }
 .finance-pro-toggle {
   min-height: 30px;
   padding: 0 10px;

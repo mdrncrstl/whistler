@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { demoBundle } from '../src/data/demo'
+import { marketHistoryResolution, mergeMarketHistoryPoints } from '../src/lib/marketDataApi'
 import { applyMarketSnapshot } from '../src/lib/repricePortfolio'
 import type { MarketSnapshot } from '../src/lib/marketDataApi'
 describe('portfolio repricing', () => {
@@ -23,5 +24,23 @@ describe('portfolio repricing', () => {
     expect(bhp.value_aud).toBe(13796.5)
     expect(result.bundle.snapshots.at(-1)?.date).toBe('2026-08-29')
     expect(result.updated).toBe(2)
+  })
+
+  it('uses finer history for shorter windows and replaces daily observations on those sessions', () => {
+    expect(marketHistoryResolution('1D')).toEqual({ interval: '5m', label: '5-minute data' })
+    expect(marketHistoryResolution('1W')).toEqual({ interval: '15m', label: '15-minute data' })
+    expect(marketHistoryResolution('1M')).toEqual({ interval: '1h', label: 'Hourly data' })
+    const merged = mergeMarketHistoryPoints([
+      { date: '2026-02-26T00:00:00.000Z', price: 98 },
+      { date: '2026-02-27T00:00:00.000Z', price: 100 },
+    ], [
+      { date: '2026-02-27T00:00:00.000Z', price: 100 },
+      { date: '2026-02-27T01:00:00.000Z', price: 101 },
+    ])
+    expect(merged.map((point) => point.date)).toEqual([
+      '2026-02-26T00:00:00.000Z',
+      '2026-02-27T00:00:00.000Z',
+      '2026-02-27T01:00:00.000Z',
+    ])
   })
 })

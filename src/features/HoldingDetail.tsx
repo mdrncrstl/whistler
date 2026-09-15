@@ -14,7 +14,8 @@ import { usePortfolio } from '../context/PortfolioContext'
 import { date, money } from '../lib/format'
 import { holdingCurrencyGain } from '../lib/portfolio'
 import { companyUrlForSymbol } from '../lib/companyIdentity'
-import { fetchMarketHistory, fetchMarketMovement, marketFreshnessLabel, type MarketHistoryPoint, type MarketMovement } from '../lib/marketDataApi'
+import { fetchMarketHistory, fetchMarketMovement, marketFreshnessLabel, mergeMarketHistoryPoints, type MarketHistoryPeriod, type MarketHistoryPoint, type MarketMovement } from '../lib/marketDataApi'
+import { FINANCE_PERIODS, type FinancePeriod } from '../lib/financePeriods'
 import type { Transaction } from '../types'
 import { SupplyChain } from './SupplyChain'
 
@@ -24,6 +25,15 @@ type TradeSort = 'date' | 'type' | 'quantity' | 'price' | 'fees' | 'amount'
 type IncomeSort = 'date' | 'type' | 'gross' | 'franking' | 'net'
 type PerformancePoint = { date: string; holdingPercent: number; benchmarkPercent: number; holdingAmount: number; benchmarkAmount: number; price: number; open?: number; high?: number; low?: number; close?: number; volume?: number }
 type PricePoint = MarketHistoryPoint
+type HistoryResult = { symbol: string; points: PricePoint[] }
+
+function historyPeriodFor(preset: PerformancePeriod['preset']): MarketHistoryPeriod {
+  return FINANCE_PERIODS.includes(preset as FinancePeriod) ? preset as FinancePeriod : 'MAX'
+}
+
+function historyResolutionRank(period: MarketHistoryPeriod) {
+  return period === '1D' ? 4 : period === '5D' || period === '1W' ? 3 : period === '1M' ? 2 : 1
+}
 
 function transactionKey(item: Transaction) { return item.id || item.provider_external_id }
 function financialYear(value: string) { const current = new Date(value); const year = current.getUTCFullYear(); return `FY ${current.getUTCMonth() >= 6 ? year + 1 : year}` }
@@ -55,8 +65,15 @@ export function HoldingDetail() {
   const [selectedIncome, setSelectedIncome] = useState<Set<string>>(new Set())
   const [collapsedYears, setCollapsedYears] = useState<Set<string>>(new Set())
   const [pageSize, setPageSize] = useState(25)
-  const [historyResult, setHistoryResult] = useState<{ symbol: string; points: PricePoint[] } | null>(null)
-  const marketHistory = useMemo(() => historyResult?.symbol === symbol ? historyResult.points : [], [historyResult, symbol])
+  const requestedHistoryPeriods = useMemo(() => [...new Set<MarketHistoryPeriod>(['MAX', historyPeriodFor(period.preset), historyPeriodFor(pricePeriod.preset)])], [period.preset, pricePeriod.preset])
+  const requestedHistoryKey = requestedHistoryPeriods.join('|')
+  const [historyResults, setHistoryResults] = useState<Partial<Record<MarketHistoryPeriod, HistoryResult>>>({})
+  const marketHistory = useMemo(() => {
+    const matching = Object.entries(historyResults).filter(([, result]) => result?.symbol === symbol) as Array<[MarketHistoryPeriod, HistoryResult]>
+    const base = matching.find(([key]) => key === 'MAX')?.[1].points || []
+    return matching.filter(([key]) => key !== 'MAX').sort(([a], [b]) => historyResolutionRank(a) - historyResolutionRank(b)).reduce((points, [, result]) => mergeMarketHistoryPoints(points, result.points), base)
+  }, [historyResults, symbol])
+  const historyLoading = requestedHistoryPeriods.some((key) => historyResults[key]?.symbol !== symbol)
   const [marketMovement, setMarketMovement] = useState<MarketMovement | null>(null)
   const [marketMovementLoading, setMarketMovementLoading] = useState(false)
   const [marketMovementError, setMarketMovementError] = useState<string | null>(null)
@@ -70,11 +87,19 @@ export function HoldingDetail() {
   useEffect(() => {
     if (!holding) return
     const controller = new AbortController()
-    fetchMarketHistory(holding.symbol, holding.market || '', controller.signal).then((result) => {
-      if (!controller.signal.aborted) setHistoryResult({ symbol, points: result.points })
-    }).catch(() => { if (!controller.signal.aborted) setHistoryResult({ symbol, points: [] }) })
+    void Promise.all(requestedHistoryPeriods.map(async (requestedPeriod) => {
+      try {
+        const result = await fetchMarketHistory(holding.symbol, holding.market || '', controller.signal, { period: requestedPeriod })
+        return { period: requestedPeriod, result: { symbol, points: result.points } }
+      } catch {
+        return { period: requestedPeriod, result: { symbol, points: [] } }
+      }
+    })).then((results) => {
+      if (controller.signal.aborted) return
+      setHistoryResults((current) => ({ ...current, ...Object.fromEntries(results.map(({ period: requestedPeriod, result }) => [requestedPeriod, result])) }))
+    })
     return () => controller.abort()
-  }, [holding, symbol])
+  }, [holding, requestedHistoryKey, requestedHistoryPeriods, symbol])
 
   useEffect(() => {
     if (!holding) return
@@ -157,8 +182,8 @@ export function HoldingDetail() {
     {tab === 'Overview' && <>
       <div className="holding-controls holding-position-controls"><label><select aria-label="Holding positions" value={positionMode} onChange={(event) => setPositionMode(event.target.value)}><option>All Positions</option><option>Open Positions Only</option></select><ChevronDown size={13}/></label></div>
       <div className="holding-metrics"><article className="active"><span>Holding Value</span><strong><PrivateMoney value={holding.value_aud} digits={2}/></strong><small className={totalPct >= 0 ? 'positive' : 'negative'}>{totalPct.toFixed(2)}% <em>period</em></small></article><article><span>Capital Gain</span><strong><PrivateMoney value={periodCapitalGain} digits={2}/></strong><small className={capitalPct >= 0 ? 'positive' : 'negative'}>{capitalPct.toFixed(2)}% <em>period</em></small></article><article><span>Income Return</span><strong><PrivateMoney value={incomeTotal} digits={2}/></strong><small className={incomeTotal >= 0 ? 'positive' : 'negative'}>{holding.cost_aud ? (incomeTotal / holding.cost_aud * 100).toFixed(2) : '0.00'}% <em>period</em></small></article><article><span>Currency Gain</span><strong>{holdingCurrencyGain(holding) === null ? '—' : <PrivateMoney value={holdingCurrencyGain(holding)!} digits={2}/>}</strong><small>{holdingCurrencyGain(holding) === null ? 'Cost base not recorded' : 'Exchange-rate movement'}</small></article><article><span>Total Return</span><strong><PrivateMoney value={totalReturn} digits={2}/></strong><small className={totalPct >= 0 ? 'positive' : 'negative'}>{totalPct.toFixed(2)}% <em>period</em></small></article></div>
-      <HoldingChart loading={historyResult?.symbol !== symbol} points={performanceData} symbol={holding.symbol} currency="AUD" mode={mode} onModeChange={setMode} period={period} onPeriodChange={setPeriod} proGraphMode={Boolean(bundle.profile?.settings?.proGraphMode)}/>
-      <section className="holding-overview-grid"><div className="holding-stats-panel"><div className="holding-section-heading"><h2>Key Stats</h2><span>As of {holding.as_of ? date(holding.as_of, { day: 'numeric', month: 'short', year: 'numeric' }) : 'latest sync'}</span></div><dl><div><dt><CircleDollarSign size={14}/>Holding Value</dt><dd>{money(holding.value_aud, 'AUD', 2)}</dd></div><div><dt><Hash size={14}/>Current Quantity</dt><dd>{holding.quantity.toLocaleString('en-AU')}</dd></div><div><dt><ReceiptText size={14}/>Tax Cost Base</dt><dd>{money(holding.cost_aud, 'AUD', 2)} <small>({money(holding.average_cost, holding.currency, 2)} p/s)</small></dd></div><div><dt><Scale size={14}/>Avg Buy Price</dt><dd>{money(holding.average_cost, holding.currency, 3)}</dd></div><div><dt><TrendingUp size={14}/>Dividend Yield</dt><dd>{(annualIncome / Math.max(holding.value_aud, 1) * 100).toFixed(2)}%</dd></div><div><dt><PieChart size={14}/>Portfolio Weight</dt><dd>{(holding.value_aud / Math.max(1, portfolioTotal) * 100).toFixed(2)}%</dd></div></dl></div><HoldingChart loading={historyResult?.symbol !== symbol} points={performanceData} symbol={holding.symbol} currency={holding.currency} price period={pricePeriod} onPeriodChange={setPricePeriod} proGraphMode={Boolean(bundle.profile?.settings?.proGraphMode)}/></section>
+      <HoldingChart loading={historyLoading} points={performanceData} symbol={holding.symbol} currency="AUD" mode={mode} onModeChange={setMode} period={period} onPeriodChange={setPeriod} proGraphMode={Boolean(bundle.profile?.settings?.proGraphMode)}/>
+      <section className="holding-overview-grid"><div className="holding-stats-panel"><div className="holding-section-heading"><h2>Key Stats</h2><span>As of {holding.as_of ? date(holding.as_of, { day: 'numeric', month: 'short', year: 'numeric' }) : 'latest sync'}</span></div><dl><div><dt><CircleDollarSign size={14}/>Holding Value</dt><dd>{money(holding.value_aud, 'AUD', 2)}</dd></div><div><dt><Hash size={14}/>Current Quantity</dt><dd>{holding.quantity.toLocaleString('en-AU')}</dd></div><div><dt><ReceiptText size={14}/>Tax Cost Base</dt><dd>{money(holding.cost_aud, 'AUD', 2)} <small>({money(holding.average_cost, holding.currency, 2)} p/s)</small></dd></div><div><dt><Scale size={14}/>Avg Buy Price</dt><dd>{money(holding.average_cost, holding.currency, 3)}</dd></div><div><dt><TrendingUp size={14}/>Dividend Yield</dt><dd>{(annualIncome / Math.max(holding.value_aud, 1) * 100).toFixed(2)}%</dd></div><div><dt><PieChart size={14}/>Portfolio Weight</dt><dd>{(holding.value_aud / Math.max(1, portfolioTotal) * 100).toFixed(2)}%</dd></div></dl></div><HoldingChart loading={historyLoading} points={performanceData} symbol={holding.symbol} currency={holding.currency} price period={pricePeriod} onPeriodChange={setPricePeriod} proGraphMode={Boolean(bundle.profile?.settings?.proGraphMode)}/></section>
       <PriceSummary movement={marketMovement} loading={marketMovementLoading} error={marketMovementError}/>
     </>}
 

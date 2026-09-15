@@ -12,7 +12,7 @@ type FinanceChartProps = {
   candles?: boolean
   comparisonLabel?: string
   area?: boolean
-  resolution?: 'daily' | 'recorded'
+  resolution?: 'daily' | 'intraday' | 'recorded'
   chartStyle?: FinanceChartStyle
   indicators?: FinanceIndicatorId[]
 }
@@ -159,7 +159,7 @@ export function FinanceChart({ points, label = 'Price', formatValue, formatAxis 
   const tooltipIndex = hover ?? selected?.[1] ?? null
   const tooltipPoint = tooltipIndex === null ? null : data[tooltipIndex]
   const tooltipStyle = pointer ? { left: `${Math.max(left + 10, Math.min(right - 10, pointer.x))}px`, top: `${Math.max(top + 42, Math.min(plotBottom - 10, pointer.y - 12))}px` } : undefined
-  const dataDescription = candleMode ? 'Daily OHLC market points' : resolution === 'daily' ? 'Daily market points' : 'Recorded portfolio points'
+  const dataDescription = candleMode ? `${resolution === 'intraday' ? 'Intraday' : 'Daily'} OHLC market points` : resolution === 'intraday' ? 'Intraday market points' : resolution === 'daily' ? 'Daily market points' : 'Recorded portfolio points'
   const displayLabel = label.replace(/\b\w/g, (character) => character.toUpperCase())
   const displayComparisonLabel = comparisonLabel.replace(/\b\w/g, (character) => character.toUpperCase())
 

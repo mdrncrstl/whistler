@@ -1,7 +1,9 @@
 import type { Position } from '../types'
+import type { FinancePeriod } from './financePeriods'
 
+export type MarketHistoryPeriod = FinancePeriod | 'MAX'
 export interface MarketHistoryPoint { date: string; price: number; adjustedPrice?: number; open?: number; high?: number; low?: number; close?: number; volume?: number }
-export interface MarketHistory { symbol: string; currency: string; exchange: string; source: string; generatedAt: string; points: MarketHistoryPoint[]; splits?: Array<{ date: string; numerator: number; denominator: number }> }
+export interface MarketHistory { symbol: string; currency: string; exchange: string; source: string; generatedAt: string; period?: MarketHistoryPeriod; interval?: string; points: MarketHistoryPoint[]; splits?: Array<{ date: string; numerator: number; denominator: number }> }
 
 export interface MarketMovementItem {
   date: string
@@ -65,8 +67,26 @@ export interface MarketDataState {
   message: string | null
 }
 
-export async function fetchMarketHistory(symbol: string, market: string, signal?: AbortSignal) {
-  const response = await fetch(`/api/market-history?symbol=${encodeURIComponent(symbol)}&market=${encodeURIComponent(market)}`, { signal })
+export function marketHistoryResolution(period: MarketHistoryPeriod) {
+  if (period === '1D') return { interval: '5m', label: '5-minute data' }
+  if (period === '5D' || period === '1W') return { interval: '15m', label: '15-minute data' }
+  if (period === '1M') return { interval: '1h', label: 'Hourly data' }
+  return { interval: '1d', label: 'Daily data' }
+}
+
+export function mergeMarketHistoryPoints(base: MarketHistoryPoint[], supplemental: MarketHistoryPoint[]) {
+  if (!supplemental.length) return [...base].sort((a, b) => Date.parse(a.date) - Date.parse(b.date))
+  const supplementalDays = new Set(supplemental.map((point) => point.date.slice(0, 10)))
+  const byTimestamp = new Map<number, MarketHistoryPoint>()
+  base.filter((point) => !supplementalDays.has(point.date.slice(0, 10))).forEach((point) => byTimestamp.set(Date.parse(point.date), point))
+  supplemental.forEach((point) => byTimestamp.set(Date.parse(point.date), point))
+  return [...byTimestamp.values()].sort((a, b) => Date.parse(a.date) - Date.parse(b.date))
+}
+
+export async function fetchMarketHistory(symbol: string, market: string, signal?: AbortSignal, options: { period?: MarketHistoryPeriod } = {}) {
+  const params = new URLSearchParams({ symbol, market })
+  if (options.period) params.set('period', options.period)
+  const response = await fetch(`/api/market-history?${params.toString()}`, { signal })
   let payload: MarketHistory & { error?: string }
   try { payload = await response.json() as MarketHistory & { error?: string } }
   catch { throw new Error('Daily market history is unavailable in this runtime.') }
