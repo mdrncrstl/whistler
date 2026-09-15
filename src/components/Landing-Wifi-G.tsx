@@ -25,13 +25,13 @@ const howItWorks = [
   { title: 'Read the reports', copy: 'Explore your returns, income and Australian tax records.', icon: BarChart3 },
 ] as const
 
-const integrationBrokers = brokers.filter((broker) => broker.id !== 'ibkr' && broker.id !== 'other').slice(0, 10)
+const clarityViews = [
+  { title: 'What do I own?', copy: 'See holdings across your accounts in one place.', icon: Globe2 },
+  { title: 'What changed?', copy: 'Separate capital growth, income and currency effects.', icon: TrendingUp },
+  { title: 'What does it mean for tax?', copy: 'Review Australian tax records with the transactions behind them.', icon: FileCheck2 },
+] as const
 
-const proofStats = [
-  { value: '1–10', label: 'portfolios per workspace', icon: BarChart3 },
-  { value: `${brokers.filter((broker) => broker.id !== 'other').length}`, label: 'named broker guides', icon: Link2 },
-  { value: 'CSV + PDF', label: 'imports from supported exports', icon: FileSpreadsheet },
-]
+const integrationBrokers = brokers.filter((broker) => broker.id !== 'ibkr' && broker.id !== 'other').slice(0, 10)
 
 const faqs = [
   ['Is Masterdeck a broker?', 'No. Masterdeck tracks and analyses portfolios. It cannot hold assets, move money or place trades.'],
@@ -390,17 +390,18 @@ export function Landing({ onDemo, signedIn = false, onOpenApp, page }: LandingPr
           </div>
           <figure><img src="/marketing/masterdeck-portfolio-hero.png" width="1585" height="900" alt="Actual Masterdeck portfolio with demo holdings, performance chart and returns" loading="lazy"/><figcaption>Actual Masterdeck app · Demo portfolio</figcaption></figure>
         </Reveal>
-        <Reveal className="cloud-region cloud-container">
-          <div className="cloud-region-intro">
-            <h2>Every portfolio.<br />One clear record.</h2>
-            <p>Start with one of our named broker guides, or bring a compatible CSV or PDF from another broker. Every holding and trade stays connected to the return you are looking at now.</p>
+        <Reveal className="alpine-clarity-section cloud-container" aria-labelledby="clarity-heading">
+          <div className="alpine-clarity-copy">
+            <h2 id="clarity-heading">See the result. Follow the reason.</h2>
+            <p>A portfolio number is only useful when you can explain it. Masterdeck keeps holdings, transactions, income and Australian tax records connected across the views you use to understand what changed.</p>
           </div>
-          <div className="cloud-stat-table" aria-label="Masterdeck coverage">
-            {proofStats.map(({ value, label, icon: Icon }) => (
-              <div className="cloud-stat-row" key={label}>
-                <Icon />
-                <strong>{value}</strong>
-                <span>{label}</span>
+          <div className="alpine-clarity-list" aria-label="Questions Masterdeck helps answer">
+            <div className="alpine-clarity-list-header">THE VIEWS BEHIND THE NUMBER</div>
+            {clarityViews.map(({ title, copy, icon: Icon }, index) => (
+              <div className="alpine-clarity-row" key={title}>
+                <span className="alpine-clarity-number">{`0${index + 1}`}</span>
+                <span className="alpine-clarity-icon"><Icon size={19} /></span>
+                <div><strong>{title}</strong><p>{copy}</p></div>
               </div>
             ))}
           </div>

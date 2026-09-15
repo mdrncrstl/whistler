@@ -47,7 +47,8 @@ describe('Masterdeck public conversion funnel', () => {
     render(<GoogleOAuthProvider clientId="test-client"><Landing onDemo={vi.fn()} signedIn onOpenApp={vi.fn()} /></GoogleOAuthProvider>)
     expect(screen.getByRole('img', { name: /Actual Masterdeck portfolio with demo holdings/ })).toHaveAttribute('src', '/marketing/masterdeck-portfolio-hero.png')
     expect(screen.getByText('Actual Masterdeck app · Demo portfolio')).toBeInTheDocument()
-    expect(screen.getByText('named broker guides', { exact: true })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: /See the result\. Follow the reason/i })).toBeInTheDocument()
+    expect(screen.getByText('What do I own?', { exact: true })).toBeInTheDocument()
     expect(screen.queryByText('IBKR')).not.toBeInTheDocument()
   })
 
