@@ -94,7 +94,7 @@ describe('Masterdeck authentication', () => {
       password: 'long-enough-password',
       options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
     }))
-    expect(await screen.findByRole('status')).toHaveTextContent('Check new@example.com for your confirmation link.')
+    expect(await screen.findByRole('status')).toHaveTextContent('Your Masterdeck account is nearly ready. Check new@example.com for the confirmation link.')
   })
 
   it('does not expose Supabase credential errors verbatim', async () => {

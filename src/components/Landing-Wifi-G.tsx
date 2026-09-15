@@ -367,7 +367,7 @@ export function Landing({ onDemo, signedIn = false, onOpenApp, page }: LandingPr
       return
     }
     setPassword('')
-    setNotice('Check ' + cleanEmail + ' for your confirmation link.')
+    setNotice('Your Masterdeck account is nearly ready. Check ' + cleanEmail + ' for the confirmation link.')
     setRedirecting(false)
   }
 

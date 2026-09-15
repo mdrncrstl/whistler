@@ -18,6 +18,13 @@ entrypoint = "./functions/capture-demo-lead/index.ts"
 # For example, if you want to serve static HTML pages in your function:
 # static_files = [ "./functions/capture-demo-lead/*.html" ]
 
+[functions.masterdeck-auth-email]
+enabled = true
+# Supabase Auth signs this request with SEND_EMAIL_HOOK_SECRET; the function
+# performs its own webhook verification rather than using a user JWT.
+verify_jwt = false
+entrypoint = "./functions/masterdeck-auth-email/index.ts"
+
 [functions.masterdeck-snaptrade]
 enabled = true
 verify_jwt = true

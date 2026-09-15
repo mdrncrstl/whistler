@@ -1,5 +1,6 @@
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts'
 import { createClient, type User } from 'https://esm.sh/@supabase/supabase-js@2.57.4'
+import { buildDemoWelcomeEmailHtml } from '../_shared/masterdeck-email.ts'
 
 const appOrigin = 'https://masterdeck.app'
 const allowedOrigins = new Set([
@@ -48,19 +49,6 @@ async function authenticatedUser(request: Request): Promise<User> {
   return data.user
 }
 
-function welcomeEmailHtml() {
-  return `<!doctype html>
-<html lang="en"><body style="margin:0;background:#f4f8f6;color:#10251e;font-family:Arial,sans-serif">
-  <div style="max-width:560px;margin:32px auto;padding:36px 32px;background:#fff;border:1px solid #d9e6df;border-radius:16px">
-    <p style="margin:0 0 24px;color:#138a68;font-size:12px;font-weight:700;letter-spacing:.12em">MASTERDECK</p>
-    <h1 style="margin:0 0 14px;font-size:28px;line-height:1.15">Your demo is ready.</h1>
-    <p style="margin:0 0 24px;color:#5d6f68;font-size:16px;line-height:1.6">See your portfolio value, returns, income and Australian tax views in one place.</p>
-    <a href="${appOrigin}/deck" style="display:inline-block;padding:13px 18px;border-radius:9px;background:#168b69;color:#fff;text-decoration:none;font-weight:700">Open Masterdeck</a>
-    <p style="margin:28px 0 0;color:#87958f;font-size:12px;line-height:1.5">You’re receiving this because you opted in to Masterdeck updates. Reply to this email if you’d like to stop receiving them.</p>
-  </div>
-</body></html>`
-}
-
 async function sendWelcomeEmail(email: string) {
   const apiKey = Deno.env.get('RESEND_API_KEY')
   const from = Deno.env.get('MARKETING_FROM_EMAIL')
@@ -74,7 +62,7 @@ async function sendWelcomeEmail(email: string) {
       to: [email],
       reply_to: Deno.env.get('MARKETING_REPLY_TO') || undefined,
       subject: 'Your Masterdeck demo is ready',
-      html: welcomeEmailHtml(),
+      html: buildDemoWelcomeEmailHtml(),
     }),
   })
   return response.ok ? 'sent' as const : 'failed' as const
