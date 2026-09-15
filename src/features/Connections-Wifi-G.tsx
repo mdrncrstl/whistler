@@ -13,12 +13,13 @@ import { Badge, Button, Card, EmptyState, Modal, MotionExpand, PageHeader } from
 
 function providerName(provider: BrokerConnection['provider']) {
   if (provider === 'ibkr') return 'Direct read-only sync'
+  if (provider === 'snaptrade') return 'Secure broker connection'
   if (provider === 'google_gmail') return 'Superhero Gmail'
   return 'Statement imports'
 }
 
 export function Connections() {
-  const { bundle, demo, action, connectIbkr, syncIbkr, importSuperhero, connectGmail, syncGmail, disconnect, setNotice } = usePortfolio()
+  const { bundle, demo, action, connectIbkr, syncIbkr, startSnapTrade, syncSnapTrade, importSuperhero, connectGmail, syncGmail, disconnect, setNotice } = usePortfolio()
   const [searchParams, setSearchParams] = useSearchParams()
   const requestedSetup = searchParams.get('setup')
   const [ibkrOpen, setIbkrOpen] = useState(() => requestedSetup === 'ibkr' && !demo)
@@ -35,9 +36,11 @@ export function Connections() {
   const [catalogOpen, setCatalogOpen] = useState(false)
   const genericFileInput = useRef<HTMLInputElement>(null)
   const fileInput = useRef<HTMLInputElement>(null)
+  const snapTradeReturnHandled = useRef(false)
   const ibkr = bundle.connections.find((item) => item.provider === 'ibkr')
   const superhero = bundle.connections.find((item) => item.provider === 'superhero')
   const gmail = bundle.connections.find((item) => item.provider === 'google_gmail')
+  const snapTradeConnections = bundle.connections.filter((item) => item.provider === 'snaptrade')
   const ibkrReference = ibkr?.config?.mode === 'reference-portfolio'
   const superheroReference = superhero?.config?.mode === 'reference-portfolio'
   // One shared broker list backs this catalogue and the marketing integrations page, so
@@ -48,6 +51,8 @@ export function Connections() {
     return brokers.filter((broker) => `${broker.name} ${broker.region} ${methodLabel[broker.method]} ${broker.market}`.toLowerCase().includes(query))
   }, [catalogQuery])
 
+  const snapTradeConnectionFor = (broker: Broker) => snapTradeConnections.find((item) => item.config?.broker_id === broker.id)
+
   useEffect(() => {
     if (requestedSetup === 'import') {
       window.requestAnimationFrame(() => {
@@ -57,6 +62,20 @@ export function Connections() {
       })
     }
   }, [requestedSetup])
+
+  useEffect(() => {
+    const connectionId = searchParams.get('connectionId')
+    if (demo || requestedSetup !== 'snaptrade' || !connectionId || snapTradeReturnHandled.current) return
+    snapTradeReturnHandled.current = true
+    setNotice({ tone: 'info', message: 'Finishing secure broker connection…' })
+    void syncSnapTrade(connectionId).finally(() => {
+      const next = new URLSearchParams(searchParams)
+      next.delete('setup')
+      next.delete('connectionId')
+      next.delete('broker')
+      setSearchParams(next, { replace: true })
+    })
+  }, [demo, requestedSetup, searchParams, setNotice, setSearchParams, syncSnapTrade])
 
   const closeIbkrSetup = () => {
     setIbkrOpen(false)
@@ -101,6 +120,13 @@ export function Connections() {
     try { await importSuperhero(report); setReport(null); setFileName(''); if (fileInput.current) fileInput.current.value = '' } catch { /* surfaced by context */ }
   }
 
+  const openSnapTrade = async (broker: Broker) => {
+    try {
+      const result = await startSnapTrade(broker.id, `${window.location.origin}/deck/connections`)
+      window.location.assign(result.redirectUrl)
+    } catch { /* surfaced by context */ }
+  }
+
   const connectionCard = (connection: BrokerConnection | undefined, provider: BrokerConnection['provider'], description: string, actions: React.ReactNode) => (
     <div className={`connection-slot ${requestedSetup === (provider === 'ibkr' ? 'ibkr' : provider === 'superhero' ? 'import' : '') ? 'requested' : ''}`} data-setup-provider={provider}>
     <Card className="connection-card">
@@ -116,7 +142,7 @@ export function Connections() {
 
   return (
     <>
-      <PageHeader title="Connections" description="Bring every portfolio in through a read-only sync, a CSV export, or a supported PDF statement. Review the records before anything is saved." />
+      <PageHeader title="Connections" description="Connect a supported broker with read-only access, or import a statement from any broker. Review the records before anything is saved." />
       {!bundle.holdings.length && <section className="connection-onboarding" aria-label="Portfolio setup progress"><div><strong>Add your first holdings</strong><p>Choose one of the import paths below, then review the holdings Masterdeck finds. You can keep up to ten portfolios in one workspace, with Australian CGT records ready for tax time.</p></div><ol><li className="active"><span>1</span>Choose a source</li><li><span>2</span>Review and import</li></ol></section>}
       {demo && <div className="demo-banner"><ShieldCheck size={18} /><span>The demo shows connection states but never accepts or sends private broker credentials. Sign in to connect real accounts.</span></div>}
       <section className="csv-help" data-setup-provider="csv">
@@ -131,8 +157,8 @@ export function Connections() {
         {connectionCard(gmail, 'google_gmail', 'Optional separate Gmail read-only authorisation for narrow Superhero contract-note searches.', <>{gmail ? <Button icon={RefreshCw} busy={action === `sync-${gmail.id}`} disabled={demo} onClick={() => syncGmail(gmail.id)}>Scan Gmail now</Button> : <Button icon={Mail} disabled={demo} onClick={() => gmailLogin()}>Connect Gmail read-only</Button>}<span className="read-only-label"><ShieldCheck size={14} /> Requested scope: gmail.readonly</span></>)}
       </div>
 
-      <button type="button" className={`catalog-disclosure ${catalogOpen ? 'is-open' : ''}`} aria-expanded={catalogOpen} onClick={()=>setCatalogOpen(!catalogOpen)}><span><strong>Browse supported brokers</strong><small>Start with a named guide if you want one. A compatible CSV export works even when your broker is not listed.</small></span><ChevronDown size={18} aria-hidden="true"/></button><MotionExpand open={catalogOpen} className="catalog-reveal"><div className="catalog-heading"><div><h2>Find a broker or exchange</h2><p>Choose a named import guide, use the direct read-only sync where available, or upload a CSV from any broker and map its columns once.</p></div><label className="catalog-search"><Search size={15}/><input aria-label="Find a broker or exchange" value={catalogQuery} onChange={event=>setCatalogQuery(event.target.value)} placeholder="Find a broker or exchange…"/></label></div>
-      <div className="integration-catalog">{catalog.map((broker)=><Card className={`catalog-card method-${broker.method}`} key={broker.id}><span className="catalog-icon">{broker.method==='sync'?<KeyRound/>:broker.method==='parser'?<Building2/>:<FileSpreadsheet/>}</span><div><h3>{broker.name}</h3><p><span className="catalog-method">{methodLabel[broker.method]}</span> · {broker.region} · {broker.market}</p><small>{broker.note || methodDetail[broker.method]}</small></div>{broker.method==='sync'?<Button variant="ghost" icon={KeyRound} disabled={demo} onClick={()=>setIbkrOpen(true)}>Connect</Button>:broker.method==='parser'?<Button variant="ghost" icon={CloudUpload} onClick={()=>fileInput.current?.click()}>Upload</Button>:<Button variant="ghost" icon={CloudUpload} onClick={()=>{setImportSource(broker.id==='other'?'CSV':broker.name);setImportBroker(broker);genericFileInput.current?.click()}}>Choose CSV</Button>}</Card>)}</div>
+      <button type="button" className={`catalog-disclosure ${catalogOpen ? 'is-open' : ''}`} aria-expanded={catalogOpen} onClick={()=>setCatalogOpen(!catalogOpen)}><span><strong>Browse supported brokers</strong><small>Connect securely where a read-only provider is available, or use a compatible CSV export for any broker.</small></span><ChevronDown size={18} aria-hidden="true"/></button><MotionExpand open={catalogOpen} className="catalog-reveal"><div className="catalog-heading"><div><h2>Find a broker or exchange</h2><p>Use a direct feed, a secure provider-backed connection, or upload a CSV from any broker and map its columns once.</p></div><label className="catalog-search"><Search size={15}/><input aria-label="Find a broker or exchange" value={catalogQuery} onChange={event=>setCatalogQuery(event.target.value)} placeholder="Find a broker or exchange…"/></label></div>
+      <div className="integration-catalog">{catalog.map((broker)=>{ const connected = broker.method === 'aggregated-sync' ? snapTradeConnectionFor(broker) : undefined; return <Card className={`catalog-card method-${broker.method}`} key={broker.id}><span className="catalog-icon">{broker.method==='sync'?<KeyRound/>:broker.method==='aggregated-sync'?<ShieldCheck/>:broker.method==='parser'?<Building2/>:<FileSpreadsheet/>}</span><div><h3>{broker.name}</h3><p><span className="catalog-method">{methodLabel[broker.method]}</span> · {broker.region} · {broker.market}</p><small>{broker.note || methodDetail[broker.method]}</small>{connected && <small className="catalog-status">Connected · {relativeDate(connected.last_synced_at)}</small>}</div>{broker.method==='sync'?<Button variant="ghost" icon={KeyRound} disabled={demo} onClick={()=>setIbkrOpen(true)}>Connect</Button>:broker.method==='aggregated-sync'?connected?<Button variant="ghost" icon={RefreshCw} busy={action===`sync-${connected.id}`} disabled={demo} onClick={()=>syncSnapTrade(connected.id)}>Sync</Button>:<Button variant="ghost" icon={ShieldCheck} busy={action===`start-snaptrade-${broker.id}`} disabled={demo} onClick={()=>void openSnapTrade(broker)}>Connect</Button>:broker.method==='parser'?<Button variant="ghost" icon={CloudUpload} onClick={()=>fileInput.current?.click()}>Upload</Button>:<Button variant="ghost" icon={CloudUpload} onClick={()=>{setImportSource(broker.id==='other'?'CSV':broker.name);setImportBroker(broker);genericFileInput.current?.click()}}>Choose CSV</Button>}</Card>})}</div>
       {!catalog.length && <EmptyState icon={Search} title="Your broker does not need to be listed" description="Export a CSV from any broker, match its columns once, then review the records before they are saved."/>}</MotionExpand>
       <input ref={genericFileInput} className="visually-hidden" type="file" accept=".csv,text/csv" onChange={async event => { const file = event.target.files?.[0]; if (!file) return; try { if(file.size > 10_000_000) throw new Error('Choose a CSV smaller than 10 MB.'); setFileName(file.name);setReport(null);setCsvSheet(readCsvSheet(await file.text())) } catch(e){ setNotice({tone:'error',message:e instanceof Error ? e.message : 'Could not read CSV.'}) } finally { if(genericFileInput.current) genericFileInput.current.value='' } }}/>
       {csvSheet && <CsvImportMapper sheet={csvSheet} filename={fileName} source={importSource} defaultCurrency={importBroker?.currency || 'AUD'} defaultMarket={importBroker?.market || 'ASX'} onClose={()=>{setCsvSheet(null);setFileName('')}} onReview={parsed=>{setReport(parsed);setCsvSheet(null)}}/>}

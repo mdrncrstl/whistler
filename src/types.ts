@@ -1,6 +1,6 @@
 import type { Session } from '@supabase/supabase-js'
 
-export type Provider = 'ibkr' | 'superhero' | 'google_gmail'
+export type Provider = 'ibkr' | 'superhero' | 'google_gmail' | 'snaptrade'
 export type ConnectionStatus = 'pending' | 'connected' | 'error' | 'disabled'
 export type TransactionType =
   | 'BUY'

@@ -148,6 +148,8 @@ function formatAllocationName(name: string) {
 
   if (normalized === 'superhero') return 'Superhero'
 
+  if (normalized === 'snaptrade') return 'Connected broker'
+
   return name
 
 }

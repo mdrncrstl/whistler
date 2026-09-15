@@ -25,6 +25,8 @@ interface PortfolioContextValue {
   refresh: () => Promise<void>
   connectIbkr: (input: { label: string; token: string; queryId: string }) => Promise<void>
   syncIbkr: (connectionId: string) => Promise<void>
+  startSnapTrade: (brokerId: string, returnUrl?: string) => Promise<{ redirectUrl: string; connectionId: string }>
+  syncSnapTrade: (connectionId: string) => Promise<void>
   importSuperhero: (report: SuperheroReport) => Promise<void>
   connectGmail: (accessToken: string) => Promise<void>
   syncGmail: (connectionId: string) => Promise<void>
@@ -175,6 +177,23 @@ export function PortfolioProvider({ session, demo, children }: { session: Sessio
     return run('refresh-quotes', () => portfolioApi.refreshQuotes(requireSession()))
   }, [demo, requireSession, run])
 
+  const startSnapTrade = useCallback(async (brokerId: string, returnUrl?: string) => {
+    setAction(`start-snaptrade-${brokerId}`)
+    try {
+      const result = await portfolioApi.startSnapTrade(requireSession(), brokerId, returnUrl)
+      setNotice({ tone: 'info', message: 'Opening secure broker connection…' })
+      return { redirectUrl: result.redirectUrl, connectionId: result.connectionId }
+    } catch (error) {
+      setNotice({ tone: 'error', message: error instanceof Error ? error.message : 'The broker connection could not be started.' })
+      throw error
+    } finally {
+      setAction(null)
+    }
+  }, [requireSession])
+
+  const syncSnapTrade = useCallback((connectionId: string) =>
+    run(`sync-${connectionId}`, () => portfolioApi.syncSnapTrade(requireSession(), connectionId)), [requireSession, run])
+
   const value = useMemo<PortfolioContextValue>(() => ({
     bundle,
     session,
@@ -187,11 +206,18 @@ export function PortfolioProvider({ session, demo, children }: { session: Sessio
     refresh,
     connectIbkr: (input) => run('connect-ibkr', () => portfolioApi.connectIbkr(requireSession(), input)),
     syncIbkr: (connectionId) => run(`sync-${connectionId}`, () => portfolioApi.syncIbkr(requireSession(), connectionId)),
+    startSnapTrade,
+    syncSnapTrade,
     importSuperhero: (report) => run('import-superhero', () => portfolioApi.importSuperhero(requireSession(), report)),
     connectGmail: (accessToken) => run('connect-gmail', () => portfolioApi.storeGmailToken(requireSession(), accessToken)),
     syncGmail: (connectionId) => run(`sync-${connectionId}`, () => portfolioApi.syncGmail(requireSession(), connectionId)),
     refreshQuotes,
-    disconnect: (connectionId) => run(`disconnect-${connectionId}`, () => portfolioApi.disconnect(requireSession(), connectionId)),
+    disconnect: (connectionId) => {
+      const connection = bundle.connections.find((item) => item.id === connectionId)
+      return run(`disconnect-${connectionId}`, () => connection?.provider === 'snaptrade'
+        ? portfolioApi.disconnectSnapTrade(requireSession(), connectionId)
+        : portfolioApi.disconnect(requireSession(), connectionId))
+    },
     updateProfile: (profile) => demo
       ? run('save-profile', async () => {
           try { window.sessionStorage.setItem('masterdeck-demo-settings', JSON.stringify(profile.settings)) } catch { /* best effort */ }
@@ -199,7 +225,7 @@ export function PortfolioProvider({ session, demo, children }: { session: Sessio
           return { message: 'Demo preferences updated for this session.' }
         })
       : run('save-profile', () => portfolioApi.updateProfile(requireSession(), profile)),
-  }), [action, bundle, demo, loading, marketData, notice, refresh, refreshQuotes, requireSession, run, session])
+  }), [action, bundle, demo, loading, marketData, notice, refresh, refreshQuotes, requireSession, run, session, startSnapTrade, syncSnapTrade])
 
   return <PortfolioContext.Provider value={value}>{loading && !hasHydrated ? <LoadingScreen /> : children}</PortfolioContext.Provider>
 }

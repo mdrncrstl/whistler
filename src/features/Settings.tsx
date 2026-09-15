@@ -55,7 +55,7 @@ function SettingsForm({ profile, demo, action, updateProfile, onExitDemo }: {
         <Card className="settings-card security-card">
           <div className="settings-title"><ShieldCheck /><div><h2>Security model</h2><p>What MASTERDECK can and cannot do.</p></div></div>
           <ul className="security-list">
-            <li><ShieldCheck /><span><strong>Read-only broker access</strong>IBKR Activity Flex cannot place or modify trades.</span></li>
+            <li><ShieldCheck /><span><strong>Read-only broker access</strong>Connected broker feeds only read positions, balances and activity. They cannot place trades or move money.</span></li>
             <li><ShieldCheck /><span><strong>Separate Gmail permission</strong>Ordinary Google sign-in never grants mailbox access.</span></li>
             <li><ShieldCheck /><span><strong>User-isolated records</strong>Portfolio data is handled by authenticated Edge Functions and protected database policies.</span></li>
           </ul>

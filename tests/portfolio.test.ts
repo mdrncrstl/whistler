@@ -78,10 +78,13 @@ describe('broker directory', () => {
   it('only claims a live connection where one exists', async () => {
     const { brokers, methodLabel } = await import('../src/lib/brokers')
     const synced = brokers.filter(broker => broker.method === 'sync')
+    const providerSynced = brokers.filter(broker => broker.method === 'aggregated-sync')
     // Anything marked 'sync' is presented to users as an automatic read-only connection.
     // Adding a broker here without building the connection would be a false claim.
     expect(synced.map(broker => broker.id)).toEqual(['ibkr'])
+    expect(providerSynced.map(broker => broker.id)).toEqual(['commsec', 'stake-au', 'moomoo', 'webull', 'schwab', 'fidelity', 'robinhood', 'etrade', 'vanguard-us', 'degiro', 'wealthsimple'])
     expect(brokers.every(broker => methodLabel[broker.method])).toBe(true)
+    expect(providerSynced.every(broker => broker.snapTradeSlug)).toBe(true)
     expect(new Set(brokers.map(broker => broker.id)).size).toBe(brokers.length)
     expect(brokers.every(broker => broker.market && broker.currency)).toBe(true)
   })

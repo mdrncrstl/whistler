@@ -13,7 +13,7 @@ export function MarketingContent({ page, onStart, onDemo }: { page: MarketingPag
     <section className="cloud-container alpine-integration-hero">
       <span className="section-label">CONNECTIONS &amp; IMPORTS</span>
       <h1 aria-label={page.title}>Bring in your records.<br/><em>Keep your broker.</em></h1>
-      <p>Masterdeck has 28 named broker formats, optional read-only sync where available, and compatible CSV imports for the accounts that are not listed.</p>
+      <p>Connect supported brokers through a secure read-only provider, use the direct IBKR feed, or import a CSV or PDF when that is the broker’s available path.</p>
       <div className="cloud-actions"><button className="cloud-button" onClick={onStart}>Try Masterdeck free<ArrowRight/></button><button className="cloud-button md-demo-button" onClick={onDemo}>Explore the demo</button></div>
     </section>
     <BrokerDirectory />
@@ -21,7 +21,7 @@ export function MarketingContent({ page, onStart, onDemo }: { page: MarketingPag
       <span className="section-label">SET UP IN MINUTES</span>
       <h2 id="integration-steps-title">How imports work</h2>
       <div>
-        <article><span>01</span><h3>Choose the right path</h3><p>Pick a named guide, a direct read-only feed where available, or a CSV/PDF export.</p></article>
+        <article><span>01</span><h3>Choose the right path</h3><p>Use a secure read-only connection where supported, or bring a CSV/PDF export from any broker.</p></article>
         <article><span>02</span><h3>Import a statement</h3><p>Check the mapped columns, holdings and transactions against the source statement.</p></article>
         <article><span>03</span><h3>Check before you continue</h3><p>Once confirmed, the records power your portfolio, performance and tax reports.</p></article>
       </div>

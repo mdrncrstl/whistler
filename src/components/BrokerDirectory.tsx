@@ -1,13 +1,14 @@
 import { useMemo, useState } from 'react'
-import { KeyRound, Building2, FileSpreadsheet, Search } from 'lucide-react'
+import { KeyRound, Building2, FileSpreadsheet, Search, ShieldCheck } from 'lucide-react'
 import { brokers, methodDetail, methodLabel, type BrokerMethod } from '../lib/brokers'
 
-const icons: Record<BrokerMethod, typeof KeyRound> = { sync: KeyRound, parser: Building2, csv: FileSpreadsheet }
-const order: BrokerMethod[] = ['sync', 'parser', 'csv']
+const icons: Record<BrokerMethod, typeof KeyRound> = { sync: KeyRound, 'aggregated-sync': ShieldCheck, parser: Building2, csv: FileSpreadsheet }
+const order: BrokerMethod[] = ['sync', 'aggregated-sync', 'parser', 'csv']
 
 /**
  * The same broker list the Connections page uses, so the marketing claim and the product
- * cannot drift apart. The method is shown on every row: only 'sync' is a live connection.
+ * cannot drift apart. The method is shown on every row so file imports are not confused with
+ * direct or provider-backed connections.
  */
 export function BrokerDirectory() {
   const [query, setQuery] = useState('')
@@ -27,7 +28,8 @@ export function BrokerDirectory() {
         <span className="section-label">SUPPORTED BROKERS</span>
         <h2 id="broker-directory-title">Bring in records from any broker.</h2>
         <p>
-          Choose a named guide, use a supported direct feed, or import a CSV export you map once.
+          Choose a direct feed where the broker offers one, a secure read-only connection through our connectivity provider,
+          a named import guide, or a CSV export you map once.
           A broker missing from this list is still supported when it can provide a compatible export.
         </p>
       </div>

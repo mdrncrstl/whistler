@@ -31,7 +31,7 @@ describe('Masterdeck public conversion funnel', () => {
     expect(brokerQuestion).toHaveAttribute('aria-expanded', 'true')
     fireEvent.click(screen.getByRole('button', { name: 'Which accounts can I connect?' }))
     expect(brokerQuestion).toHaveAttribute('aria-expanded', 'false')
-    expect(screen.getByText(/named broker formats/)).toBeInTheDocument()
+    expect(screen.getByText(/secure read-only provider/)).toBeInTheDocument()
   })
 
   it('links each visual feature card to an existing product page', () => {

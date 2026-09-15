@@ -20,7 +20,7 @@ import { canonicalAppUrl } from '../lib/app-origin'
 import { Brand, MotionDialogSurface, SlidingTabs } from './ui-Wifi-G'
 
 const howItWorks = [
-  { title: 'Bring in your records', copy: 'Connect a supported source or upload your broker statement.', icon: Link2 },
+  { title: 'Bring in your records', copy: 'Connect a supported broker with read-only access, or upload a statement.', icon: Link2 },
   { title: 'Review the import', copy: 'Check your holdings and trades, then confirm the import.', icon: FileCheck2 },
   { title: 'Read the reports', copy: 'Explore your returns, income and Australian tax records.', icon: BarChart3 },
 ] as const
@@ -120,7 +120,7 @@ function BrokerWordmark({ broker }: { broker: Broker }) {
 
 const faqs = [
   ['Is Masterdeck a broker?', 'No. Masterdeck tracks and analyses portfolios. It cannot hold assets, move money or place trades.'],
-  ['Which accounts can I connect?', 'Bring records from named broker formats, any broker that exports CSV, and supported PDF statements. Where a direct read-only sync is available, it is optional; every import is reviewed before it is saved.'],
+  ['Which accounts can I connect?', 'Connect supported brokers through a secure read-only provider, use the direct IBKR feed, or import a CSV or PDF from any broker. Every import is reviewed before it is saved.'],
   ['Does it work for global portfolios?', 'Track performance, income, currency and allocation for supported global holdings, with dedicated Australian CGT records.'],
   ['Can I try it before paying?', 'Yes. Create a free account to open the demo, or start a 14-day trial when you are ready to add your own records. Neither requires a credit card or creates an automatic charge.'],
 ] as const
@@ -564,12 +564,12 @@ export function Landing({ onDemo, signedIn = false, onOpenApp, page }: LandingPr
           <div className="alpine-integrations-copy">
             <span className="section-label">CONNECTIONS &amp; IMPORTS</span>
             <h2 aria-label="Bring every portfolio into one history.">Bring every portfolio<br /><em>into one history.</em></h2>
-            <p>Use a named broker guide, a compatible CSV or a supported PDF statement. Start with the source you already have and keep your broker account separate.</p>
-            <div className="alpine-integrations-proof"><strong>{brokers.filter((broker) => broker.id !== 'other').length}</strong><span>named broker guides<br/>plus compatible CSV imports</span></div>
+            <p>Connect a supported broker with read-only access, or start with the CSV or PDF you already have. Your broker account stays separate.</p>
+            <div className="alpine-integrations-proof"><strong>{brokers.filter((broker) => broker.id !== 'other').length}</strong><span>named broker connections<br/>plus compatible CSV imports</span></div>
             <a className="alpine-text-link" href="/features/integrations">Browse connections &amp; imports <ArrowRight size={16}/></a>
           </div>
           <div className="alpine-integrations-panel">
-            <div className="alpine-integrations-head"><strong>Popular sources</strong><span>CSV · PDF · read-only sync</span></div>
+            <div className="alpine-integrations-head"><strong>Popular sources</strong><span>secure read-only · CSV · PDF</span></div>
             <div className="alpine-source-grid">
               {integrationBrokers.map((broker) => <div key={broker.id} className="alpine-source-item"><BrokerLogo broker={broker}/><strong>{broker.name}</strong><small>{broker.region}</small></div>)}
             </div>

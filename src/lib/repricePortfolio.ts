@@ -39,8 +39,23 @@ export function applyMarketSnapshot(bundle: PortfolioBundle, snapshot: MarketSna
     }
   })
 
-  if (!updated) return { bundle, updated: 0, failed: bundle.holdings.length }
-  const cashAud = bundle.cash.reduce((sum, cash) => sum + Number(cash.value_aud || 0), 0)
+  let cashUpdated = 0
+  const cash = bundle.cash.map((cashItem) => {
+    const currency = cashItem.currency.toUpperCase()
+    const fxQuote = snapshot.fx[currency]
+    const fxRate = currency === 'AUD' ? 1 : Number(fxQuote?.rate)
+    if (!Number.isFinite(fxRate) || fxRate <= 0) return cashItem
+    cashUpdated += 1
+    return {
+      ...cashItem,
+      fx_rate: round(fxRate, 6),
+      value_aud: round(cashItem.balance * fxRate, 2),
+      as_of: fxQuote?.asOf || cashItem.as_of,
+    }
+  })
+
+  if (!updated && !cashUpdated) return { bundle, updated: 0, failed: bundle.holdings.length }
+  const cashAud = cash.reduce((sum, cashItem) => sum + Number(cashItem.value_aud || 0), 0)
   const investedAud = holdings.reduce((sum, holding) => sum + Number(holding.value_aud || 0), 0)
   const snapshotDate = snapshot.generatedAt.slice(0, 10)
   const snapshots = [...bundle.snapshots]
@@ -58,5 +73,5 @@ export function applyMarketSnapshot(bundle: PortfolioBundle, snapshot: MarketSna
   else snapshots.push(current)
   snapshots.sort((a, b) => (a.snapshot_date || a.date).localeCompare(b.snapshot_date || b.date))
 
-  return { bundle: { ...bundle, holdings, snapshots }, updated, failed: bundle.holdings.length - updated }
+  return { bundle: { ...bundle, holdings, cash, snapshots }, updated, failed: bundle.holdings.length - updated }
 }

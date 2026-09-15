@@ -1,0 +1,5 @@
+{
+  "imports": {
+    "snaptrade-typescript-sdk": "npm:snaptrade-typescript-sdk@12.2.7"
+  }
+}

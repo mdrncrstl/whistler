@@ -42,6 +42,12 @@ export const portfolioApi = {
     edgeRequest<{ message: string }>(session, 'masterdeck-ibkr', { action: 'connect', ...input }),
   syncIbkr: (session: Session, connectionId: string) =>
     edgeRequest<{ message: string }>(session, 'masterdeck-ibkr', { action: 'sync', connectionId }),
+  startSnapTrade: (session: Session, brokerId: string, returnUrl?: string) =>
+    edgeRequest<{ message: string; redirectUrl: string; connectionId: string }>(session, 'masterdeck-snaptrade', { action: 'start', brokerId, returnUrl }),
+  syncSnapTrade: (session: Session, connectionId: string) =>
+    edgeRequest<{ message: string; imported: number; accounts: number }>(session, 'masterdeck-snaptrade', { action: 'sync', connectionId }),
+  disconnectSnapTrade: (session: Session, connectionId: string) =>
+    edgeRequest<{ message: string }>(session, 'masterdeck-snaptrade', { action: 'disconnect', connectionId }),
   refreshQuotes: (session: Session) =>
     edgeRequest<{ message: string; updated: number; failures: { symbol: string; error: string }[] }>(session, 'masterdeck-quotes'),
   storeGmailToken: (session: Session, providerToken: string) =>
