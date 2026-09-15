@@ -101,6 +101,7 @@ html:has(.alpine-site) { overflow-x:clip; }
 .alpine-site .cloud-pricing-copy { display:grid; justify-items:start; align-items:start; gap:16px; }
 .alpine-site .cloud-pricing-copy p { max-width:330px; margin:0; font-size:14px; line-height:1.5; }
 .alpine-site .cloud-pricing-copy .cloud-billing-toggle { margin:0; }
+.alpine-site .cloud-pricing-copy .cloud-billing-toggle.t-tabs .t-tabs-pill { border-radius:999px; }
 .alpine-site .cloud-pricing-grid { gap:18px; }
 .alpine-site .cloud-pricing-grid article,.alpine-site .md-public-plans article { padding:25px; border:1px solid #d2e4d9; border-radius:22px; background:white; box-shadow:0 10px 30px #263e4b08; }
 .alpine-site .cloud-pricing-grid article.featured,.alpine-site .md-public-plans article.is-featured { background:linear-gradient(150deg,#08795c,#16b98a); color:white; border-color:transparent; }
