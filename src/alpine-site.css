@@ -94,12 +94,13 @@ html:has(.alpine-site) { overflow-x:clip; }
 .alpine-site .cloud-connections p,.alpine-site .cloud-connections span,.alpine-site .cloud-connections strong { color:#486674; }
 .alpine-site .cloud-connection-row { border-color:#d8e9f0; padding:18px 0; }
 .alpine-site .cloud-connections-cta { background:#10a77c; }
-.alpine-site .cloud-pricing { padding:95px 0 70px; }
-.alpine-site .cloud-pricing-head { display:flex; flex-direction:column; align-items:center; text-align:center; gap:10px; margin-bottom:28px; }
-.alpine-site .cloud-pricing-head .cloud-section-intro { margin:0; }
-.alpine-site .cloud-pricing-head h2 { font-size:34px; }
-.alpine-site .cloud-pricing-copy { display:flex; flex-direction:column; align-items:center; gap:14px; }
-.alpine-site .cloud-pricing-copy p { font-size:13px; }
+.alpine-site .cloud-pricing { width:min(1280px,calc(100% - 80px)); padding:86px 0 70px; }
+.alpine-site .cloud-pricing-head { display:grid; grid-template-columns:minmax(0,1fr) minmax(280px,.65fr); align-items:end; gap:clamp(32px,8vw,96px); text-align:left; margin-bottom:28px; padding-bottom:36px; }
+.alpine-site .cloud-pricing-head .cloud-section-intro { max-width:620px; margin:0; }
+.alpine-site .cloud-pricing-head h2 { max-width:14ch; margin:0; font-size:clamp(38px,4.6vw,58px); line-height:.98; text-wrap:balance; }
+.alpine-site .cloud-pricing-copy { display:grid; justify-items:start; align-items:start; gap:16px; }
+.alpine-site .cloud-pricing-copy p { max-width:330px; margin:0; font-size:14px; line-height:1.5; }
+.alpine-site .cloud-pricing-copy .cloud-billing-toggle { margin:0; }
 .alpine-site .cloud-pricing-grid { gap:18px; }
 .alpine-site .cloud-pricing-grid article,.alpine-site .md-public-plans article { padding:25px; border:1px solid #d2e4d9; border-radius:22px; background:white; box-shadow:0 10px 30px #263e4b08; }
 .alpine-site .cloud-pricing-grid article.featured,.alpine-site .md-public-plans article.is-featured { background:linear-gradient(150deg,#08795c,#16b98a); color:white; border-color:transparent; }
@@ -161,6 +162,22 @@ html:has(.alpine-site) { overflow-x:clip; }
 @media(max-width:1000px) { .alpine-site .cloud-container { width:calc(100% - 48px); } .alpine-site .cloud-product-panels { grid-template-columns:1fr; } .alpine-site .cloud-product-stage { display:grid; grid-template-columns:1fr 1.4fr; gap:25px; } .alpine-site .cloud-hero.cloud-container { width:100%; } .alpine-feature-art { height:190px; } .alpine-site .cloud-footer-grid { grid-template-columns:repeat(3,1fr); } }
 @media(max-width:640px) { .alpine-site .cloud-container { width:calc(100% - 32px); } .alpine-site .cloud-nav { width:calc(100% - 24px); height:62px; } .alpine-site .cloud-hero.cloud-container { width:100%; padding:54px 18px 220px; min-height:550px; } .alpine-site .cloud-hero h1 { font-size:40px; } .alpine-assurance { gap:14px; font-size:10px; padding:24px 8px; } .alpine-showcase { padding:35px 0 55px; } .alpine-showcase figure { padding:25px 12px 0; } .alpine-feature-grid { grid-template-columns:1fr; gap:18px; padding-bottom:55px; } .alpine-feature-art { height:220px; } .alpine-site .cloud-product-rail a { padding:9px; font-size:11px; } .alpine-site .cloud-product-rail a>svg { display:none; } .alpine-site .cloud-product-stage { display:block; } .alpine-site .cloud-principles-layout { display:block; } .alpine-site .cloud-principles { padding:55px 0; } .alpine-site .cloud-pricing { padding:60px 0; } .alpine-site .cloud-final { width:calc(100% - 32px); margin-bottom:55px; } .alpine-site .cloud-footer { padding:32px 20px 15px; } .alpine-site .cloud-footer-grid { grid-template-columns:1fr 1fr; } .alpine-site .md-public-content { padding-top:22px; } .alpine-site .md-public-hero { padding:40px 18px; margin-bottom:40px; } .alpine-site .md-public-body { grid-template-columns:1fr; } .alpine-site .md-public-body>div { grid-template-columns:1fr; } }
 @media(prefers-reduced-motion:reduce) { .alpine-feature-card { transition:none; } .alpine-feature-card:hover,.alpine-site .cloud-button:hover { transform:none; } }
+
+/* Give the pricing promise room to read as a section header on desktop. The
+   plan cards remain the comparison surface; the supporting copy simply sits
+   beside the headline instead of creating a narrow stack above it. */
+@media(max-width:900px) {
+  .alpine-site .cloud-pricing { width:calc(100% - 48px); }
+  .alpine-site .cloud-pricing-head { grid-template-columns:1fr; gap:22px; }
+}
+@media(max-width:640px) {
+  .alpine-site .cloud-pricing { width:calc(100% - 32px); padding:60px 0; }
+  .alpine-site .cloud-pricing-head { padding-bottom:28px; text-align:center; }
+  .alpine-site .cloud-pricing-head .cloud-section-intro { margin-inline:auto; }
+  .alpine-site .cloud-pricing-head h2 { max-width:16ch; margin-inline:auto; font-size:clamp(38px,11vw,48px); }
+  .alpine-site .cloud-pricing-copy { justify-items:center; align-items:center; width:100%; }
+  .alpine-site .cloud-pricing-copy p { max-width:30ch; }
+}
 
 /* Brand-correct finishing: the reference informs composition, Masterdeck owns the identity. */
 .alpine-site .cloud-hero.cloud-container { padding:62px 24px 0; min-height:0; }
