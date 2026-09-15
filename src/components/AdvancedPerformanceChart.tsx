@@ -70,7 +70,7 @@ interface DisplayPoint {
   price: number
 }
 
-const presets: PerformanceRangePreset[] = [...FINANCE_PERIODS]
+const presets: Array<Exclude<PerformanceRangePreset, 'CUSTOM'>> = [...FINANCE_PERIODS]
 const DAY_MS = 86_400_000
 
 function isoDay(value: string) {
@@ -480,6 +480,10 @@ export function AdvancedPerformanceChart({
 
   if (points.length < 2) return <div className="advanced-chart-empty">More price history is required to build the interactive chart.</div>
 
+  const activePreset = presets.includes(period.preset as Exclude<PerformanceRangePreset, 'CUSTOM'>)
+    ? period.preset as Exclude<PerformanceRangePreset, 'CUSTOM'>
+    : presets[0]
+
   return <section className="advanced-performance-module" aria-label={`${symbol} interactive performance chart`}>
     <div className="advanced-chart-summary">
       <div>
@@ -494,9 +498,7 @@ export function AdvancedPerformanceChart({
     </div>
 
     <div className="advanced-chart-toolbar">
-      <div className="advanced-range-presets" role="group" aria-label="Performance time range">
-        {presets.map((preset) => <button key={preset} type="button" className={period.preset === preset ? 'active' : ''} aria-pressed={period.preset === preset} onClick={() => { onPeriodChange({ preset }); setMeasurement(null); setCustomOpen(false) }}>{preset}</button>)}
-      </div>
+      <div className="advanced-range-presets"><SlidingTabs className="advanced-range-tabs" options={presets.map((preset) => ({ value: preset, label: preset }))} value={activePreset} onChange={(preset) => { onPeriodChange({ preset }); setMeasurement(null); setCustomOpen(false) }} ariaLabel="Performance time range" /></div>
       <div className={`advanced-custom-range-anchor menu-anchor ${customOpen ? 'is-open' : ''}`}>
         <button type="button" className={`advanced-custom-trigger ${period.preset === 'CUSTOM' ? 'active' : ''}`} aria-expanded={customOpen} onClick={toggleCustomRange}><CalendarDays size={13}/>Custom</button>
         <MotionPopover open={customOpen} className="advanced-custom-range" role="group" ariaLabel="Custom chart date range" origin="top left"><label>From<input type="date" value={customStart} min={isoDay(sortedPoints[0].date)} max={customEnd || isoDay(sortedPoints.at(-1)!.date)} onChange={(event) => setCustomStart(event.target.value)}/></label><label>To<input type="date" value={customEnd} min={customStart || isoDay(sortedPoints[0].date)} max={isoDay(sortedPoints.at(-1)!.date)} onChange={(event) => setCustomEnd(event.target.value)}/></label><button type="button" onClick={applyCustomRange}>Apply range</button></MotionPopover>

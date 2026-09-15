@@ -112,7 +112,7 @@ export function Onboarding() {
         </motion.div>
       </AnimatePresence>
 
-      {error && <p className="onboarding-error" role="alert">{error}</p>}
+      <AnimatePresence initial={false}>{error && <motion.p key="onboarding-error" className="onboarding-error" role="alert" initial={reduceMotion ? false : { opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={reduceMotion ? undefined : { opacity: 0, y: -4 }} transition={{ duration: reduceMotion ? 0.01 : 0.16, ease: [0.23, 1, 0.32, 1] }}>{error}</motion.p>}</AnimatePresence>
 
       <div className={`onboarding-actions ${step === 1 ? 'onboarding-actions-first' : ''}`}>
         <button type="button" className="onboarding-back" disabled={step === 1 || busy} onClick={() => setStep((current) => Math.max(1, current - 1))}><ArrowLeft size={14} /><span>Back</span></button>
@@ -130,6 +130,6 @@ function Choice({ selected, title, copy, icon: Icon, multi, onClick }: { selecte
   return <button type="button" className={`onboarding-choice ${selected ? 'selected' : ''}`} aria-pressed={selected} onClick={onClick}>
     <motion.span className="onboarding-choice-icon" animate={{ scale: selected ? 1.05 : 1 }} transition={{ duration: reduceMotion ? 0.01 : 0.18 }}><Icon size={17} /></motion.span>
     <span className="onboarding-choice-copy"><strong>{title}</strong>{copy && <small>{copy}</small>}</span>
-    <span className={`onboarding-check ${multi ? 'multi' : ''}`}>{selected && <Check size={14} />}</span>
+    <span className={`onboarding-check ${multi ? 'multi' : ''}`}><AnimatePresence initial={false}>{selected && <motion.span key="check" className="onboarding-check-mark" initial={reduceMotion ? false : { opacity: 0, scale: 0.55 }} animate={{ opacity: 1, scale: 1 }} exit={reduceMotion ? undefined : { opacity: 0, scale: 0.55 }} transition={{ duration: reduceMotion ? 0.01 : 0.16, ease: [0.23, 1, 0.32, 1] }}><Check size={14} /></motion.span>}</AnimatePresence></span>
   </button>
 }

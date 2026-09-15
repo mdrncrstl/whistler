@@ -573,6 +573,144 @@ a.button:not([aria-disabled="true"]):active {
 .chart-mode-tabs.t-tabs .t-tab:hover { background: transparent; color: var(--accent-strong); }
 .chart-mode-tabs.t-tabs .t-tab[aria-pressed="true"] { color: var(--accent-strong); font-weight: 600; }
 
+/* Chart range presets use the same moving selection surface as the other
+   low-frequency chart controls while the outer wrapper keeps the mobile
+   horizontal scroll affordance. */
+.advanced-range-tabs.t-tabs {
+  width: max-content;
+  min-width: max-content;
+  gap: 2px;
+  padding: 2px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--surface-2);
+}
+.advanced-range-tabs.t-tabs .t-tabs-pill {
+  top: 2px;
+  height: 28px;
+  border-radius: 5px;
+  background: var(--surface);
+  box-shadow: 0 1px 3px rgb(17 24 39 / 8%);
+}
+.advanced-range-tabs.t-tabs .t-tab {
+  min-width: 38px;
+  height: 28px;
+  min-height: 28px;
+  padding: 0 9px;
+  border: 0;
+  border-radius: 5px;
+  color: var(--muted);
+  font: inherit;
+  font-size: 9.5px;
+  font-weight: 600;
+}
+.advanced-range-tabs.t-tabs .t-tab:hover { background: transparent; color: var(--green); }
+.advanced-range-tabs.t-tabs .t-tab[aria-pressed="true"] { color: var(--green); }
+
+/* Supply-chain relationship and list/map switches are occasional view
+   changes, so keep their state change spatially legible instead of swapping
+   an underline between unrelated buttons. */
+.intelligence-filter-tabs.t-tabs,
+.intelligence-view-tabs.t-tabs {
+  position: relative;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface-2);
+}
+.intelligence-filter-tabs.t-tabs { width: max-content; min-width: max-content; }
+.intelligence-view-tabs.t-tabs { width: max-content; min-width: 126px; }
+.intelligence-filter-tabs.t-tabs .t-tabs-pill,
+.intelligence-view-tabs.t-tabs .t-tabs-pill {
+  top: 3px;
+  height: 31px;
+  border-radius: 6px;
+  background: var(--surface);
+  box-shadow: 0 1px 3px rgb(17 24 39 / 8%);
+}
+.intelligence-filter-tabs.t-tabs .t-tab,
+.intelligence-view-tabs.t-tabs .t-tab {
+  min-height: 31px;
+  height: 31px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 6px;
+  color: var(--muted);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 600;
+}
+.intelligence-filter-tabs.t-tabs .t-tab:hover,
+.intelligence-view-tabs.t-tabs .t-tab:hover { background: transparent; color: var(--text); }
+.intelligence-filter-tabs.t-tabs .t-tab[aria-pressed="true"],
+.intelligence-view-tabs.t-tabs .t-tab[aria-pressed="true"] { color: var(--text); }
+.intelligence-filter-tabs .relationship-filter-label { margin: 0; color: inherit; }
+.intelligence-filter-tabs .relationship-filter-count { margin-left: 5px; color: var(--muted-2); font-size: 10px; font-weight: 500; }
+.intelligence-filter-tabs .t-tab[aria-pressed="true"] .relationship-filter-count { color: var(--green); }
+
+.holding-tab-switch.t-tabs {
+  width: max-content;
+  min-width: max-content;
+  gap: 3px;
+}
+.holding-tab-switch.t-tabs .t-tabs-pill {
+  top: 3px;
+  height: 33px;
+  border-radius: 6px;
+  background: var(--green-soft);
+}
+.holding-tab-switch.t-tabs .t-tab {
+  height: 39px;
+  min-height: 39px;
+  padding: 0 3px;
+  border: 0;
+  border-radius: 6px;
+  color: var(--muted);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 600;
+}
+.holding-tab-switch.t-tabs .t-tab:hover { background: transparent; color: var(--green); }
+.holding-tab-switch.t-tabs .t-tab[aria-pressed="true"] { color: var(--text); }
+
+.ai-question-tabs.t-tabs {
+  width: max-content;
+  max-width: 100%;
+  gap: 2px;
+  margin-top: 28px;
+  padding: 3px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--surface-2);
+}
+.ai-question-tabs.t-tabs .t-tabs-pill {
+  top: 3px;
+  height: 30px;
+  border-radius: 6px;
+  background: var(--surface);
+  box-shadow: 0 1px 3px rgb(17 24 39 / 8%);
+}
+.ai-question-tabs.t-tabs .t-tab {
+  height: 30px;
+  min-height: 30px;
+  padding: 0 11px;
+  border-radius: 6px;
+  color: var(--muted);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 600;
+}
+.ai-question-tabs.t-tabs .t-tab:hover { background: transparent; color: var(--green); }
+.ai-question-tabs.t-tabs .t-tab[aria-pressed="true"] { color: var(--text); }
+
+.onboarding-check-mark { display: grid; place-items: center; }
+
+/* App hydration should hand control back to the page instead of replacing it
+   on a hard visibility cut. */
+.app-loading-content { will-change: opacity; }
+.app-unified-loading { will-change: opacity; }
+
 .catalog-disclosure svg,
 .mytax-disclosure svg { transition: transform var(--acc-chevron) var(--acc-ease), color var(--duration-quick) var(--ease-smooth-out); }
 .catalog-disclosure.is-open svg,

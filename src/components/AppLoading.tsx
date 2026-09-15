@@ -1,3 +1,4 @@
+import { motion, useReducedMotion } from 'framer-motion'
 import { createContext, useCallback, useContext, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 
 const LoadingContext = createContext<null | (() => () => void)>(null)
@@ -11,6 +12,7 @@ export function AppLoadingProvider({ children }: { children: ReactNode }) {
   const [pending, setPending] = useState(0)
   const [visible, setVisible] = useState(false)
   const started = useRef(0)
+  const reduceMotion = useReducedMotion()
   const register = useCallback(() => {
     if (!started.current) started.current = Date.now()
     setVisible(true)
@@ -27,8 +29,8 @@ export function AppLoadingProvider({ children }: { children: ReactNode }) {
     return () => window.clearTimeout(timer)
   }, [pending, visible])
   return <LoadingContext.Provider value={register}>
-    <div className="app-loading-content" inert={visible} style={visible ? { visibility: 'hidden' } : undefined}>{children}</div>
-    {visible && <div className="app-unified-loading"><LogoScreen /></div>}
+    <motion.div className="app-loading-content" inert={visible} style={visible ? { pointerEvents: 'none', visibility: 'hidden' } : undefined} initial={false} animate={{ opacity: visible ? 0 : 1 }} transition={{ duration: reduceMotion ? 0 : 0.18, ease: [0.23, 1, 0.32, 1] }}>{children}</motion.div>
+    {visible && <motion.div className="app-unified-loading" initial={reduceMotion ? false : { opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: reduceMotion ? 0 : 0.16, ease: [0.23, 1, 0.32, 1] }}><LogoScreen /></motion.div>}
   </LoadingContext.Provider>
 }
 

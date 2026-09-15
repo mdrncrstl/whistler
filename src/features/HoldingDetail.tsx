@@ -9,7 +9,7 @@ import { PriceSummary } from '../components/PriceSummary'
 import { HoldingChart } from '../components/HoldingChart'
 import { isFund } from '../lib/assetType'
 import { HoldingLogo } from '../components/HoldingLogo'
-import { EmptyState, PrivateMoney } from '../components/ui'
+import { EmptyState, PrivateMoney, SlidingTabs } from '../components/ui'
 import { usePortfolio } from '../context/PortfolioContext'
 import { date, money } from '../lib/format'
 import { holdingCurrencyGain } from '../lib/portfolio'
@@ -152,7 +152,7 @@ export function HoldingDetail() {
   return <div className="holding-page">
     <div className="holding-breadcrumb"><Link to="/deck">Portfolio</Link><ChevronRight size={13}/><span>{holding.symbol}</span></div>
     <header className="holding-page-header"><HoldingLogo symbol={holding.symbol} market={holding.market} assetClass={holding.asset_class} href={companyUrlForSymbol(holding.symbol, holding.market)} size={46}/><div className="holding-heading-copy"><h1>{holding.name || holding.symbol}</h1><div className="holding-meta"><strong>{holding.symbol}:{holding.market || 'GLOBAL'}</strong><span className="holding-account-badge">{holding.account_name}</span><span>{holding.sector || holding.asset_class || 'Investment'}</span><span className="holding-current-price">{money(holding.current_price, holding.currency, 2)}</span><span className={`holding-day-move ${holding.day_change_aud >= 0 ? 'positive' : 'negative'}`}>{holding.day_change_aud >= 0 ? '+' : ''}{money(holding.day_change_aud, 'AUD', 2)} ({dayPct.toFixed(2)}%)</span><span className={`holding-market-state state-${marketData.status}`} title={marketData.message || undefined}><i/>{marketFreshnessLabel(marketData)}</span></div></div>{!isFund(holding) && <Link className="holding-supply-chain-link" to={`/deck/tools/supply-chain/${encodeURIComponent(holding.symbol.toUpperCase())}`} aria-label="View supply chain relationship map"><Network size={15}/><span>View supply chain</span><ChevronRight size={14}/></Link>}</header>
-    <nav className="holding-tabs" aria-label="Holding details">{(['Overview', 'Trades', 'Income', 'Notes'] as Tab[]).map((item) => <button key={item} aria-current={tab === item ? 'page' : undefined} onClick={() => setTab(item)}>{item}</button>)}</nav>
+    <nav className="holding-tabs" aria-label="Holding details"><SlidingTabs className="holding-tab-switch" options={(['Overview', 'Trades', 'Income', 'Notes'] as Tab[]).map((item) => ({ value: item, label: item }))} value={tab} onChange={setTab} ariaLabel="Holding detail view" /></nav>
 
     {tab === 'Overview' && <>
       <div className="holding-controls holding-position-controls"><label><select aria-label="Holding positions" value={positionMode} onChange={(event) => setPositionMode(event.target.value)}><option>All Positions</option><option>Open Positions Only</option></select><ChevronDown size={13}/></label></div>

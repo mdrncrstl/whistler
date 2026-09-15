@@ -1,4 +1,5 @@
 import { Check, CreditCard, ExternalLink, ShieldCheck } from 'lucide-react'
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 import { Badge, Button, Card, PageHeader, SlidingTabs } from '../components/ui'
 import { usePortfolio } from '../context/PortfolioContext'
@@ -16,6 +17,7 @@ export function Billing() {
   const { subscription, loading, refresh } = useBillingStatus(session, demo)
   const [annual, setAnnual] = useState(true)
   const [busy, setBusy] = useState('')
+  const reduceMotion = useReducedMotion()
   const currentPlan = planForSubscription(subscription?.plan)
   const hasBillingProfile = Boolean(subscription?.stripe_customer_id)
   const hasPaidPlan = Boolean(subscription && paidStatuses.has(subscription.status))
@@ -97,7 +99,7 @@ export function Billing() {
       <Badge tone={hasPaidPlan || trialActive ? 'success' : trialExpired ? 'warning' : undefined}>{accountPlanStatus}</Badge>
     </Card>
     <div className="billing-plans-heading"><h2>Choose a plan</h2><SlidingTabs className="billing-toggle" options={[{ value: 'monthly', label: 'Monthly' }, { value: 'annual', label: <><span>Annual</span> <em className="billing-save">save 26%</em></> }]} value={annual ? 'annual' : 'monthly'} onChange={(value) => setAnnual(value === 'annual')} ariaLabel="Billing interval" /></div>
-    <div className="pricing-grid">{plans.map((plan) => <Card key={plan.id} className={`pricing-card ${plan.featured ? 'featured' : ''}`}>{plan.featured && <Badge tone="success">Recommended</Badge>}<h2>{plan.name}</h2><p>Up to <strong>{plan.portfolios}</strong> {plan.portfolios === 1 ? 'portfolio' : 'portfolios'}</p><div className="plan-price"><strong>${formatAud(annual ? plan.annual : plan.monthly)}</strong><span>AUD / month</span></div><small>{annual ? `$${formatAud(plan.annualTotal)} billed annually · save ${annualSavingsPercent(plan)}%` : 'Billed monthly. Cancel anytime.'}</small><Button variant={plan.featured ? 'primary' : 'secondary'} icon={hasPaidPlan ? ExternalLink : CreditCard} busy={busy === plan.id || busy === 'stripe-portal'} onClick={() => hasPaidPlan ? openBilling() : checkout(plan.id)}>{hasPaidPlan ? 'Manage current plan' : `Choose ${plan.name}`}</Button><ul>{plan.features.map((feature) => <li key={feature}><Check />{feature}</li>)}</ul></Card>)}</div>
+    <div className="pricing-grid">{plans.map((plan) => <Card key={plan.id} className={`pricing-card ${plan.featured ? 'featured' : ''}`}>{plan.featured && <Badge tone="success">Recommended</Badge>}<h2>{plan.name}</h2><p>Up to <strong>{plan.portfolios}</strong> {plan.portfolios === 1 ? 'portfolio' : 'portfolios'}</p><div className="plan-price"><AnimatePresence initial={false} mode="wait"><motion.strong key={`${plan.id}-${annual ? 'annual' : 'monthly'}`} initial={reduceMotion ? false : { opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} exit={reduceMotion ? undefined : { opacity: 0, y: -4 }} transition={{ duration: reduceMotion ? 0.01 : 0.16, ease: [0.23, 1, 0.32, 1] }}>${formatAud(annual ? plan.annual : plan.monthly)}</motion.strong></AnimatePresence><span>AUD / month</span></div><AnimatePresence initial={false} mode="wait"><motion.small key={`${plan.id}-${annual ? 'annual-note' : 'monthly-note'}`} initial={reduceMotion ? false : { opacity: 0, y: 3 }} animate={{ opacity: 1, y: 0 }} exit={reduceMotion ? undefined : { opacity: 0, y: -3 }} transition={{ duration: reduceMotion ? 0.01 : 0.14, ease: [0.23, 1, 0.32, 1] }}>{annual ? `$${formatAud(plan.annualTotal)} billed annually · save ${annualSavingsPercent(plan)}%` : 'Billed monthly. Cancel anytime.'}</motion.small></AnimatePresence><Button variant={plan.featured ? 'primary' : 'secondary'} icon={hasPaidPlan ? ExternalLink : CreditCard} busy={busy === plan.id || busy === 'stripe-portal'} onClick={() => hasPaidPlan ? openBilling() : checkout(plan.id)}>{hasPaidPlan ? 'Manage current plan' : `Choose ${plan.name}`}</Button><ul>{plan.features.map((feature) => <li key={feature}><Check />{feature}</li>)}</ul></Card>)}</div>
     <p className="billing-trust"><ShieldCheck aria-hidden="true" /><span>14-day trial with no card · Payments handled by Stripe</span></p>
   </>
 }

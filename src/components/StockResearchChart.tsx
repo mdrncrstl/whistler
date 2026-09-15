@@ -6,7 +6,7 @@ import type { FinanceChartStyle, FinanceIndicatorId } from './financeChartUtils'
 import { FinancePeriodSelector } from './FinancePeriodSelector'
 import { filterFinancePoints, type FinancePeriod } from '../lib/financePeriods'
 import { fetchMarketHistory, type MarketHistoryPoint } from '../lib/marketDataApi'
-import { MotionExpand } from './ui'
+import { MotionExpand, SlidingTabs } from './ui'
 
 type StockPoint = MarketHistoryPoint
 
@@ -43,7 +43,7 @@ export function StockResearchChart({ points, symbol, currency, market = '', comp
       <FinanceProToolbar chartStyle={proStyle} onChartStyleChange={setProStyle} comparison={comparison} onComparisonChange={value => { setComparison(value); setComparisonPoints([]) }} comparisonOptions={availableComparisons} indicators={indicators} onIndicatorsChange={setIndicators} candleAvailable={hasCandleData} barAvailable allowSymbolSearch/>
     </MotionExpand>
     <MotionExpand open={!proGraphMode} className="finance-compact-reveal">
-      <div className="finance-chart-controls" role="group" aria-label="Stock chart type">{styles.map(value => <button key={value} type="button" aria-pressed={value === activeStyle} onClick={() => setStyle(value)}>{value}</button>)}</div>
+      <div className="finance-chart-controls"><SlidingTabs className="chart-mode-tabs" options={styles.map(value => ({ value, label: value }))} value={activeStyle} onChange={setStyle} ariaLabel="Stock chart type" /></div>
     </MotionExpand>
     <FinanceChart points={plottedData} comparisonLabel={selectedComparison?.label || comparison} resolution="daily" chartStyle={proGraphMode ? proStyle : activeStyle === 'Candles' ? 'candle' : activeStyle === 'Area' ? 'area' : 'line'} formatValue={v => Intl.NumberFormat('en', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(v)} formatAxis={v => Intl.NumberFormat('en', { maximumFractionDigits: 2 }).format(v)} indicators={proGraphMode ? indicators : []}/>
     <FinancePeriodSelector value={period} onChange={setPeriod} ariaLabel="Price history period"/>

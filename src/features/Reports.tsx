@@ -6,6 +6,7 @@ import type { FinanceChartStyle, FinanceIndicatorId } from '../components/financ
 import { CalendarDays, ChevronLeft, ChevronRight, Download, Scale, Search, TrendingUp } from 'lucide-react'
 
 import { useMemo, useState, type ReactNode } from 'react'
+import { useReducedMotion } from 'framer-motion'
 
 import { useParams } from 'react-router-dom'
 
@@ -259,6 +260,7 @@ function RankedCard({ title, rows }: { title: string; rows: Position[] }) { retu
 function Diversification({ bundle }: { bundle: PortfolioBundle }) {
 
   const [view, setView] = useState<'provider'|'sector'|'asset_class'>('provider')
+  const reduceMotion = useReducedMotion()
 
   const allocation = allocationBy(bundle.holdings, view)
 
@@ -275,7 +277,7 @@ function Diversification({ bundle }: { bundle: PortfolioBundle }) {
 
     <MetricStrip><Metric label="Categories" value={allocation.length} /><Metric label="Largest allocation" value={displayAllocation[0]?.name || '—'} sub={allocation[0] ? share(allocation[0].percentage) : 'No data'} /><Metric label={concentrationCount === 1 ? 'Largest share' : `Top ${concentrationCount} concentration`} value={share(concentration)} /><Metric label="Total value" value={money(total)} /></MetricStrip>
 
-    <div className="report-two-col report-diversification-layout"><Card className="report-chart-card"><div className="card-title-row"><h2>Portfolio allocation</h2></div>{allocation.length ? <div className="donut-layout"><div className="donut-chart"><ResponsiveContainer><PieChart><Pie data={displayAllocation} dataKey="value" nameKey="name" innerRadius="62%" outerRadius="86%" stroke="var(--surface)" strokeWidth={2} isAnimationActive={false}>{displayAllocation.map((_, index) => <Cell key={index} fill={colours[index % colours.length]}/>)}</Pie><Tooltip separator=": " formatter={(value) => money(Number(value))}/></PieChart></ResponsiveContainer><span><strong>{money(total)}</strong><small>Invested</small></span></div><div className="allocation-list">{displayAllocation.map((item, index) => <div key={item.name}><span><i style={{ background: colours[index % colours.length] }}/>{item.name}</span><strong>{share(item.percentage)}</strong><small>{money(item.value)}</small></div>)}</div></div> : <EmptyState icon={TrendingUp} title="No allocation data" description="Import holdings to calculate portfolio concentration."/>}</Card><HoldingsWeightTable holdings={[...bundle.holdings]} total={total}/></div>
+    <div className="report-two-col report-diversification-layout"><Card className="report-chart-card"><div className="card-title-row"><h2>Portfolio allocation</h2></div>{allocation.length ? <div className="donut-layout"><div className="donut-chart"><ResponsiveContainer><PieChart><Pie data={displayAllocation} dataKey="value" nameKey="name" innerRadius="62%" outerRadius="86%" stroke="var(--surface)" strokeWidth={2} isAnimationActive={!reduceMotion} animationDuration={reduceMotion ? 0 : 260} animationEasing="ease-out">{displayAllocation.map((_, index) => <Cell key={index} fill={colours[index % colours.length]}/>)}</Pie><Tooltip separator=": " formatter={(value) => money(Number(value))}/></PieChart></ResponsiveContainer><span><strong>{money(total)}</strong><small>Invested</small></span></div><div className="allocation-list">{displayAllocation.map((item, index) => <div key={item.name}><span><i style={{ background: colours[index % colours.length] }}/>{item.name}</span><strong>{share(item.percentage)}</strong><small>{money(item.value)}</small></div>)}</div></div> : <EmptyState icon={TrendingUp} title="No allocation data" description="Import holdings to calculate portfolio concentration."/>}</Card><HoldingsWeightTable holdings={[...bundle.holdings]} total={total}/></div>
 
   </>
 
