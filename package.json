@@ -11,7 +11,7 @@
     "lint": "eslint .",
     "test": "vitest run",
     "test:watch": "vitest",
-    "qa:visual": "node scripts/visual-qa.mjs",
+    "qa:visual": "node scripts/visual-qa-Wifi-G.mjs",
     "qa:transitions": "node scripts/transition-qa.mjs",
     "deploy": "vercel --prod --yes"
   },

@@ -60,6 +60,7 @@ export function matchTaxLots(transactions: Transaction[], financialYear: string,
         output.push({
           sellId: transaction.provider_external_id,
           symbol,
+          market: transaction.market,
           soldAt: transaction.date,
           boughtAt: lot.date,
           quantity: matchedQuantity,

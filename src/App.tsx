@@ -94,6 +94,9 @@ function AppContent() {
   const location = useLocation()
   const [session, setSession] = useState<Session | null | undefined>(undefined)
   const [demo, setDemo] = useState(false)
+  const previewingOnboarding = import.meta.env.DEV
+    && location.pathname === '/welcome'
+    && new URLSearchParams(location.search).get('preview') === '1'
   const publicMarketingPath = location.pathname === '/'
     || location.pathname === '/pricing'
     || marketingPages.some(page => page.path === location.pathname)
@@ -102,20 +105,24 @@ function AppContent() {
     let mounted = true
     authClient.auth.getSession().then(({ data }) => {
       if (!mounted) return
-      if (!data.session) window.sessionStorage.removeItem('masterdeck-demo')
+      const storedDemo = window.sessionStorage.getItem('masterdeck-demo') === 'true'
+      const localDemo = import.meta.env.DEV && storedDemo
+      if (!data.session && !localDemo) window.sessionStorage.removeItem('masterdeck-demo')
       setSession(data.session)
-      setDemo(Boolean(data.session && window.sessionStorage.getItem('masterdeck-demo') === 'true'))
+      setDemo(Boolean(storedDemo && (data.session || localDemo)))
     }).catch(() => {
       if (!mounted) return
-      window.sessionStorage.removeItem('masterdeck-demo')
+      const localDemo = import.meta.env.DEV && window.sessionStorage.getItem('masterdeck-demo') === 'true'
+      if (!localDemo) window.sessionStorage.removeItem('masterdeck-demo')
       setSession(null)
-      setDemo(false)
+      setDemo(localDemo)
     })
     const { data: subscription } = authClient.auth.onAuthStateChange((_event, nextSession) => {
       setSession(nextSession)
       if (!nextSession) {
-        window.sessionStorage.removeItem('masterdeck-demo')
-        setDemo(false)
+        const localDemo = import.meta.env.DEV && window.sessionStorage.getItem('masterdeck-demo') === 'true'
+        if (!localDemo) window.sessionStorage.removeItem('masterdeck-demo')
+        setDemo(localDemo)
       }
     })
     return () => { mounted = false; subscription.subscription.unsubscribe() }
@@ -133,9 +140,10 @@ function AppContent() {
   if (session === undefined && location.pathname === '/auth/callback') return <AuthCallback />
   // Same reasoning as the account-access gate below: the onboarding route keeps its own
   // surface while the session resolves rather than borrowing the workspace loader.
-  if (session === undefined && !publicMarketingPath) return location.pathname === '/welcome'
+  if (session === undefined && !publicMarketingPath && !previewingOnboarding) return location.pathname === '/welcome'
     ? <main className="onboarding-page onboarding-page-waiting" aria-busy="true" />
     : <LoadingScreen />
+  if (previewingOnboarding) return <><PointerChartEnhancer /><AccountAccessProvider session={null} demo><Onboarding /></AccountAccessProvider></>
   const authenticated = Boolean(session || demo)
   return (
     <>

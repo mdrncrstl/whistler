@@ -160,9 +160,11 @@ export function FinanceChart({ points, label = 'Price', formatValue, formatAxis 
   const tooltipPoint = tooltipIndex === null ? null : data[tooltipIndex]
   const tooltipStyle = pointer ? { left: `${Math.max(left + 10, Math.min(right - 10, pointer.x))}px`, top: `${Math.max(top + 42, Math.min(plotBottom - 10, pointer.y - 12))}px` } : undefined
   const dataDescription = candleMode ? 'Daily OHLC market points' : resolution === 'daily' ? 'Daily market points' : 'Recorded portfolio points'
+  const displayLabel = label.replace(/\b\w/g, (character) => character.toUpperCase())
+  const displayComparisonLabel = comparisonLabel.replace(/\b\w/g, (character) => character.toUpperCase())
 
   return <div className="finance-plot" ref={host} data-chart-type={candleMode ? 'candles' : barMode ? 'bars' : 'line'} data-chart-style={effectiveStyle} data-indicators={activeIndicators.join(',')} data-range={Boolean(selected)} data-points={data.length} data-resolution={resolution} data-first-date={data[0].date} data-last-date={data.at(-1)!.date} data-range-start={selectedStart?.date} data-range-end={selectedEnd?.date}>
-    <svg ref={svgRef} width="100%" height={height} viewBox={`0 0 ${width} ${height}`} role="img" aria-label={`${label} ${candleMode ? 'candlestick' : barMode ? 'bar' : effectiveStyle === 'area' ? 'area' : 'line'} history. ${dataDescription} can be inspected with the pointer. Hold and drag between dates to compare; release to clear. Use arrow keys to inspect, Shift and arrows to compare, Escape to clear.`}
+    <svg ref={svgRef} width="100%" height={height} viewBox={`0 0 ${width} ${height}`} role="img" aria-label={`${displayLabel} ${candleMode ? 'candlestick' : barMode ? 'bar' : effectiveStyle === 'area' ? 'area' : 'line'} history. ${dataDescription} can be inspected with the pointer. Hold and drag between dates to compare; release to clear. Use arrow keys to inspect, Shift and arrows to compare, Escape to clear.`}
       tabIndex={0} onPointerMove={move}
       onPointerDown={event => {
         if (event.button !== 0) return
@@ -218,14 +220,14 @@ export function FinanceChart({ points, label = 'Price', formatValue, formatAxis 
       {(selected || (hover !== null ? [hover] : [])).map(index => <g key={index} className="finance-marker"><line x1={x(index)} x2={x(index)} y1={top - 10} y2={plotBottom} stroke="#aeb4c0" strokeWidth="2" strokeDasharray="2 6" strokeLinecap="round"/><circle cx={x(index)} cy={y(data[index].value)} r="5" fill="#3268ee"/></g>)}
       {!selected && hover === null && !barMode && !candleMode && <circle cx={right} cy={y(data.at(-1)!.value)} r="5" fill={color}/>}
     </svg>
-    {tooltipPoint && pointer && !barMode && !selected && <div className="finance-pointer-tooltip" style={tooltipStyle} role="tooltip"><span>{date(tooltipPoint.date, fullDate)}</span>{candleMode ? <><strong>Open {formatValue(tooltipPoint.open!)}</strong><strong>High {formatValue(tooltipPoint.high!)}</strong><strong>Low {formatValue(tooltipPoint.low!)}</strong><strong>Close {formatValue(tooltipPoint.close!)}</strong></> : <strong>{formatValue(tooltipPoint.value)}</strong>}{tooltipPoint.volume !== undefined && <small>Volume {volume(tooltipPoint.volume)}</small>}</div>}
+      {tooltipPoint && pointer && !barMode && !selected && <div className="finance-pointer-tooltip" style={tooltipStyle} role="tooltip"><span>{date(tooltipPoint.date, fullDate)}</span>{candleMode ? <><strong>Open {formatValue(tooltipPoint.open!)}</strong><strong>High {formatValue(tooltipPoint.high!)}</strong><strong>Low {formatValue(tooltipPoint.low!)}</strong><strong>Close {formatValue(tooltipPoint.close!)}</strong></> : <strong>{displayLabel}: {formatValue(tooltipPoint.value)}</strong>}{tooltipPoint.volume !== undefined && <small>Volume {volume(tooltipPoint.volume)}</small>}</div>}
     {a && b && <div className="finance-readout" role="status">
-      <span>{label}: <span className={positive ? 'gain' : 'loss'}>{selected ? formatValue(displayDelta) : formatValue(a.value)} {percent !== null && `(${percentText})`}</span></span>
+      <span>{displayLabel}: <span className={positive ? 'gain' : 'loss'}>{selected ? formatValue(displayDelta) : formatValue(a.value)} {percent !== null && `(${percentText})`}</span></span>
       {selected && <span>{date(a.date, fullDate)} – {date(b.date, fullDate)}</span>}
       {!selected && <span>{date(a.date, fullDate)}</span>}
       {a.volume !== undefined && b.volume !== undefined && <span>Volume: {volume(a.volume)}{selected ? ` – ${volume(b.volume)}` : ''}</span>}
-      {a.comparison !== undefined && b.comparison !== undefined && <span>{comparisonLabel}: {formatValue(selected ? b.comparison - a.comparison : a.comparison)}</span>}
+      {a.comparison !== undefined && b.comparison !== undefined && <span>{displayComparisonLabel}: {formatValue(selected ? b.comparison - a.comparison : a.comparison)}</span>}
     </div>}
-    {(data.some(point => point.comparison !== undefined) || mainIndicatorSeries.length > 0) && <div className="finance-legend"><span>{label}</span>{data.some(point => point.comparison !== undefined) && <span>{comparisonLabel}</span>}{[...new Set(mainIndicatorSeries.map(series => series.indicator))].map(indicator => <span key={indicator}>{indicator === 'sma' ? 'Moving average' : indicator === 'envelope' ? 'Envelope' : 'MACD'}</span>)}</div>}
+    {(data.some(point => point.comparison !== undefined) || mainIndicatorSeries.length > 0) && <div className="finance-legend"><span>{displayLabel}</span>{data.some(point => point.comparison !== undefined) && <span>{displayComparisonLabel}</span>}{[...new Set(mainIndicatorSeries.map(series => series.indicator))].map(indicator => <span key={indicator}>{indicator === 'sma' ? 'Moving Average' : indicator === 'envelope' ? 'Envelope' : 'MACD'}</span>)}</div>}
   </div>
 }

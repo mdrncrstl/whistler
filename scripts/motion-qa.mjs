@@ -31,12 +31,12 @@ try {
   watchConsole(page, 'desktop')
   await enterDemo(page)
 
-  await page.getByRole('button', { name: /All portfolios/ }).click()
+  await page.getByRole('button', { name: /All Portfolios/i }).click()
   const portfolioMenu = page.getByRole('menu').filter({ hasText: 'Manage portfolios' })
   await portfolioMenu.waitFor()
   check('portfolio popover opens', await portfolioMenu.isVisible())
   check('portfolio popover uses top-edge origin', (await portfolioMenu.evaluate((element) => getComputedStyle(element).transformOrigin)).split(' ')[1] === '0px')
-  await page.getByRole('button', { name: /All portfolios/ }).click()
+  await page.getByRole('button', { name: /All Portfolios/i }).click()
   await portfolioMenu.waitFor({ state: 'detached' })
   check('portfolio popover exits cleanly', true)
 
@@ -87,7 +87,7 @@ try {
   const reducedPage = await reduced.newPage()
   watchConsole(reducedPage, 'reduced-motion')
   await enterDemo(reducedPage)
-  await reducedPage.getByRole('button', { name: /All portfolios/ }).click()
+  await reducedPage.getByRole('button', { name: /All Portfolios/i }).click()
   const reducedMenu = reducedPage.getByRole('menu').filter({ hasText: 'Manage portfolios' })
   await reducedMenu.waitFor()
   check('reduced motion removes spatial popover movement', await reducedMenu.evaluate((element) => ['none', 'matrix(1, 0, 0, 1, 0, 0)'].includes(getComputedStyle(element).transform)))

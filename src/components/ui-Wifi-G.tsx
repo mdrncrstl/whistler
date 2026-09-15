@@ -98,7 +98,7 @@ export function SlidingTabs<T extends string>({ options, value, onChange, ariaLa
       key={option.value}
       ref={option.value === value ? activeRef : undefined}
       type="button"
-      className="t-tab"
+      className={['t-tab', option.value === value ? 'active' : ''].filter(Boolean).join(' ')}
       aria-label={option.ariaLabel}
       aria-pressed={option.value === value}
       onClick={() => onChange(option.value)}

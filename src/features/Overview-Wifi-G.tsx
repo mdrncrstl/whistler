@@ -6,7 +6,7 @@ import { usePortfolio } from '../context/PortfolioContext'
 import { holdingCapitalGain, holdingCurrencyGain, incomeTransactions, summarisePortfolio } from '../lib/portfolio'
 import { fetchMarketHistory, marketFreshnessLabel, type MarketHistoryPoint } from '../lib/marketDataApi'
 import { date, downloadCsv, money } from '../lib/format'
-import { EmptyState, MotionDialogSurface, MotionExpand, MotionPopover, PrivateMoney } from '../components/ui'
+import { EmptyState, MotionDialogSurface, MotionExpand, MotionPopover, PrivateMoney, SlidingTabs } from '../components/ui'
 import { PortfolioSetupGuide } from '../components/PortfolioSetupGuide'
 import { HoldingLogo } from '../components/HoldingLogo'
 import { HoldingNavigationRow } from '../components/HoldingNavigation'
@@ -73,7 +73,7 @@ const cellValue = (item: Position, key: ColumnKey, income = 0) => ({
 function HoldingRow({ item, income, visibleColumns, menuOpen, onMenu }: { item: Position; income: number; visibleColumns: ColumnKey[]; menuOpen: boolean; onMenu: () => void }) {
   const navigate = useNavigate()
   return <HoldingNavigationRow symbol={item.symbol}>
-    <td className="portfolio-symbol"><button className="holding-link" onClick={() => navigate(`/deck/holdings/${encodeURIComponent(item.symbol)}`)}><HoldingLogo symbol={item.symbol}/><span><strong>{item.symbol}</strong><small>{item.name || item.account_name}</small></span></button></td>
+    <td className="portfolio-symbol"><button className="holding-link" onClick={() => navigate(`/deck/holdings/${encodeURIComponent(item.symbol)}`)}><HoldingLogo symbol={item.symbol} market={item.market}/><span><strong>{item.symbol}</strong><small>{item.name || item.account_name}</small></span></button></td>
     {visibleColumns.map((key) => <td key={key} className={`numeric ${['value','capital_gain','income_return','currency_gain','total_return'].includes(key) ? 'private-value' : ''} ${positiveColumn(key) ? (item.unrealised_gain_aud >= 0 ? 'positive' : 'negative') : ''}`}><span className={key === 'price' ? 'holding-price' : ''}>{cellValue(item, key, income)}</span></td>)}
     <td className={`row-menu menu-anchor ${menuOpen ? 'is-open' : ''}`}><button aria-label={`Actions for ${item.symbol}`} aria-haspopup="menu" aria-expanded={menuOpen} onClick={onMenu}><MoreHorizontal size={15}/></button><MotionPopover open={menuOpen} className="row-menu-popover" role="menu" ariaLabel={`${item.symbol} actions`} origin="top right"><button onClick={() => navigate(`/deck/holdings/${encodeURIComponent(item.symbol)}`)}>View holding</button><button onClick={() => navigate(`/deck/transactions?symbol=${encodeURIComponent(item.symbol)}`)}>View transactions</button></MotionPopover></td>
   </HoldingNavigationRow>
@@ -224,7 +224,7 @@ export function Overview() {
     <section className="portfolio-chart-section">
       <div className="finance-chart-heading"><p className="finance-history-status" role="status">{history.loading ? 'Loading daily history - ' : history.error ? history.error : history.daily ? 'Daily closing valuations  -  recorded trades and FX  -  value changes include cash flows' : 'Recorded valuations'}</p><FinanceProToggle enabled={proGraphMode} onChange={setProGraphMode}/></div>
       <MotionExpand open={!proGraphMode} className="finance-compact-reveal">
-        <div className="chart-mode-row"><div><button className={valueMode === 'Amount' ? 'active' : ''} onClick={() => setValueMode('Amount')}>Amount</button><button className={valueMode === 'Percent' ? 'active' : ''} onClick={() => { setValueMode('Percent'); setChartType('Line') }}>Percent</button></div>{valueMode === 'Amount' && <div><button className={chartType === 'Line' ? 'active' : ''} onClick={() => setChartType('Line')}>Line</button><button className={chartType === 'Bar' ? 'active' : ''} onClick={() => setChartType('Bar')}>Bar</button></div>}</div>
+        <div className="chart-mode-row"><SlidingTabs className="chart-mode-tabs" options={[{ value: 'Amount', label: 'Amount' }, { value: 'Percent', label: 'Percent' }]} value={valueMode} onChange={(value) => { setValueMode(value as 'Amount' | 'Percent'); if (value === 'Percent') setChartType('Line') }} ariaLabel="Chart value mode" />{valueMode === 'Amount' && <SlidingTabs className="chart-mode-tabs" options={[{ value: 'Line', label: 'Line' }, { value: 'Bar', label: 'Bar' }]} value={chartType} onChange={(value) => setChartType(value as 'Line' | 'Bar')} ariaLabel="Chart style" />}</div>
       </MotionExpand>
       <MotionExpand open={proGraphMode} className="finance-pro-reveal">
         <FinanceProToolbar chartStyle={proStyle} onChartStyleChange={setProStyle} comparison={comparison} onComparisonChange={setComparison} comparisonOptions={comparisonOptions} comparisonHeading="Portfolio series and holdings" indicators={indicators} onIndicatorsChange={setIndicators} candleAvailable={false} barAvailable allowSymbolSearch/>

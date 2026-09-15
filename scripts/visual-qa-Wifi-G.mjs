@@ -27,7 +27,10 @@ async function screenshot(page, name, fullPage = false) {
 
 async function watchConsole(page, label) {
   page.on('console', (message) => {
-    if (['error', 'warning'].includes(message.type())) consoleIssues.push({ page: label, type: message.type(), text: message.text() })
+    const text = message.text()
+    const location = message.location().url
+    const knownExternalAssetNoise = /ERR_BLOCKED_BY_RESPONSE|gstatic\.com\/faviconV2|pearler\.com|schwab\.com|hatchinvest\.nz|status of 404/i.test(`${text} ${location}`)
+    if (['error', 'warning'].includes(message.type()) && !knownExternalAssetNoise) consoleIssues.push({ page: label, type: message.type(), text })
   })
   page.on('pageerror', (error) => consoleIssues.push({ page: label, type: 'pageerror', text: error.message }))
 }
@@ -37,16 +40,20 @@ try {
   const page = await desktop.newPage()
   await watchConsole(page, 'desktop')
   await page.goto(baseUrl, { waitUntil: 'networkidle' })
-  check('landing title', (await page.title()).includes('MASTERDECK'))
-  check('landing identity', await page.getByRole('heading', { name: 'Know what your portfolio is really doing.' }).isVisible())
+  check('landing title', (await page.title()) === 'Masterdeck | Portfolio tracking with Australian CGT depth')
+  check('landing identity', await page.getByRole('heading', { name: 'Every investment. One clear view.' }).isVisible())
   check('landing signup control', await page.getByRole('banner').getByRole('button', { name: 'Try Masterdeck free' }).isVisible())
   check('landing pricing control', await page.getByRole('link', { name: 'See pricing' }).first().isVisible())
 
   const authPage = await desktop.newPage()
   await authPage.goto(baseUrl, { waitUntil: 'domcontentloaded' })
   await authPage.getByRole('banner').getByRole('button', { name: 'Try Masterdeck free' }).click()
-  check('email sign-in control', await authPage.getByRole('textbox', { name: 'Email' }).isVisible())
-  check('password sign-in control', await authPage.getByRole('textbox', { name: 'Password' }).isVisible())
+  const authDialog = authPage.getByRole('dialog', { name: 'Continue to Masterdeck' })
+  check('authentication dialog opens', await authDialog.isVisible())
+  check('email sign-in option', await authDialog.getByRole('button', { name: 'Continue with email' }).isVisible())
+  await authDialog.getByRole('button', { name: 'Continue with email' }).click()
+  check('email sign-in control', await authDialog.getByRole('textbox', { name: 'Email' }).isVisible())
+  check('password sign-in control', await authDialog.getByRole('textbox', { name: 'Password' }).isVisible())
   await authPage.close()
   await screenshot(page, 'desktop-landing')
 
@@ -81,7 +88,7 @@ try {
 
   await page.goto(`${baseUrl}/deck/connections`)
   await page.getByRole('heading', { name: 'Connections', exact: true }).waitFor()
-  await page.setInputFiles('input[type="file"]', fixturePath)
+  await page.setInputFiles('input[accept=".csv,text/csv,.pdf,application/pdf"]', fixturePath)
   await page.getByText('superhero-sample.csv', { exact: true }).waitFor()
   await page.locator('.import-counts').waitFor()
   const importCounts = await page.locator('.import-counts').innerText()
@@ -107,10 +114,12 @@ try {
   await mobilePage.goto(`${baseUrl}/deck`, { waitUntil: 'domcontentloaded' })
   await mobilePage.locator('h1').filter({ hasText: 'Portfolio overview' }).waitFor({ state: 'attached' })
   check('mobile overflow', await mobilePage.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth))
-  check('mobile navigation', await mobilePage.getByRole('navigation', { name: 'Mobile portfolio navigation' }).isVisible())
+  const mobileNav = mobilePage.locator('nav.mobile-nav')
+  await mobileNav.waitFor({ state: 'visible' })
+  check('mobile navigation', await mobileNav.isVisible())
   check('desktop sidebar hidden on mobile', await mobilePage.locator('.sidebar').evaluate((element) => getComputedStyle(element).display === 'none'))
   await screenshot(mobilePage, 'mobile-overview', true)
-  await mobilePage.getByRole('navigation', { name: 'Mobile portfolio navigation' }).getByRole('link', { name: 'Activity' }).click()
+  await mobileNav.getByRole('link', { name: 'Activity' }).click()
   await mobilePage.getByRole('heading', { name: 'Transactions', exact: true }).waitFor()
   check('mobile activity route', mobilePage.url().endsWith('/deck/transactions'))
   check('mobile holdings overflow', await mobilePage.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth))

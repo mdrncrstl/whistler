@@ -64,6 +64,7 @@ export interface Transaction {
   date: string
   type: TransactionType | string
   symbol?: string | null
+  market?: string | null
   description?: string | null
   quantity: number
   price: number
@@ -154,6 +155,7 @@ export interface SuperheroTransactionInput {
   date: string
   type: string
   symbol?: string
+  market?: string
   description?: string
   quantity?: number
   price?: number
@@ -184,6 +186,7 @@ export type TaxMethod = 'fifo' | 'lifo' | 'hifo'
 export interface TaxMatch {
   sellId: string
   symbol: string
+  market?: string | null
   soldAt: string
   boughtAt: string
   quantity: number

@@ -1,6 +1,6 @@
 import { BarChart3, BriefcaseBusiness, CircleDollarSign, Landmark, Layers3, type LucideIcon } from 'lucide-react'
 import { useState } from 'react'
-import { companyDomainForSymbol, normaliseCompanySymbol } from '../lib/companyIdentity'
+import { companyDomainForSymbol, marketSymbolForLogo, normaliseCompanySymbol } from '../lib/companyIdentity'
 
 function fallbackIconFor(symbol: string, assetClass?: string | null): LucideIcon {
   const normalizedClass = assetClass?.toLowerCase() || ''
@@ -16,20 +16,22 @@ function FallbackMark({ icon: Icon, size }: { icon: LucideIcon; size: number }) 
   return <Icon size={Math.max(13, Math.round(size * .52))} strokeWidth={1.8} />
 }
 
-function faviconSources(domain: string) {
+function logoSources(marketSymbol: string, domain: string) {
   const logoDevKey = import.meta.env.VITE_LOGO_DEV_PUBLIC_KEY?.trim()
   return [
-    ...(logoDevKey ? [`https://img.logo.dev/${encodeURIComponent(domain)}?token=${encodeURIComponent(logoDevKey)}&size=128&format=png&retina=true&fallback=404`] : []),
-    `https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}&sz=128`,
+    ...(marketSymbol ? [`https://assets.parqet.com/logos/symbol/${encodeURIComponent(marketSymbol)}`] : []),
+    ...(logoDevKey && domain ? [`https://img.logo.dev/${encodeURIComponent(domain)}?token=${encodeURIComponent(logoDevKey)}&size=128&format=png&retina=true&fallback=404`] : []),
+    ...(domain ? [`https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}&sz=128`] : []),
   ]
 }
 
 export function HoldingLogo({ symbol, assetClass, market, size = 26, href }: { symbol: string; assetClass?: string | null; market?: string | null; size?: number; href?: string }) {
   const [sourceState, setSourceState] = useState({ key: '', index: 0 })
   const normalized = normaliseCompanySymbol(symbol)
+  const marketSymbol = marketSymbolForLogo(symbol, market)
   const domain = companyDomainForSymbol(normalized, market)
-  const sources = domain ? faviconSources(domain) : []
-  const sourceKey = `${normalized}:${domain}`
+  const sources = logoSources(marketSymbol, domain)
+  const sourceKey = `${normalized}:${market}:${marketSymbol}:${domain}`
   const sourceIndex = sourceState.key === sourceKey ? sourceState.index : 0
   const source = sources[sourceIndex] || ''
   const FallbackIcon = fallbackIconFor(normalized, assetClass)

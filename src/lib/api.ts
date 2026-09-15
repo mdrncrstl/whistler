@@ -10,26 +10,38 @@ export class ApiError extends Error {
   }
 }
 
-export async function edgeRequest<T>(session: Session, functionName: string, body: Record<string, unknown> = {}): Promise<T> {
-  const response = await fetch(edgeUrl(functionName), {
-    method: 'POST',
-    headers: {
-      'content-type': 'application/json',
-      authorization: `Bearer ${session.access_token}`,
-      apikey: config.dataKey,
-    },
-    body: JSON.stringify(body),
-  })
-  const payload = await response.json().catch(() => ({}))
-  if (!response.ok || payload.ok === false) {
-    throw new ApiError(payload.error || payload.message || `Request failed (${response.status}).`, response.status)
+export async function edgeRequest<T>(session: Session, functionName: string, body: Record<string, unknown> = {}, options: { timeoutMs?: number } = {}): Promise<T> {
+  const controller = new AbortController()
+  const timeout = setTimeout(() => controller.abort(), options.timeoutMs ?? 30000)
+  try {
+    const response = await fetch(edgeUrl(functionName), {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        authorization: `Bearer ${session.access_token}`,
+        apikey: config.dataKey,
+      },
+      body: JSON.stringify(body),
+      signal: controller.signal,
+    })
+    const payload = await response.json().catch(() => ({}))
+    if (!response.ok || payload.ok === false) {
+      throw new ApiError(payload.error || payload.message || `Request failed (${response.status}).`, response.status)
+    }
+    return payload as T
+  } catch (error) {
+    if (error instanceof DOMException && error.name === 'AbortError') {
+      throw new ApiError(`${functionName} timed out. Please retry.`, 408)
+    }
+    throw error
+  } finally {
+    clearTimeout(timeout)
   }
-  return payload as T
 }
 
 export const portfolioApi = {
   bundle: async (session: Session) => {
-    const result = await edgeRequest<{ bundle: PortfolioBundle }>(session, 'masterdeck-data', { route: 'bundle' })
+    const result = await edgeRequest<{ bundle: PortfolioBundle }>(session, 'masterdeck-data', { route: 'bundle' }, { timeoutMs: 15000 })
     return result.bundle
   },
   updateProfile: (session: Session, profile: Pick<Profile, 'full_name' | 'avatar_url' | 'settings'>) =>

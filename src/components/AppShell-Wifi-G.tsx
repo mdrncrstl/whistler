@@ -359,7 +359,7 @@ export function AppShell({ children, onExitDemo }: { children: ReactNode; onExit
               const ItemIcon = item.icon
               const holdingLabel = item.holding ? `${item.holding.symbol} · ${item.holding.name || item.holding.account_name}` : item.label
               return <button key={item.id} id={`command-result-${index}`} type="button" className={`command-result ${item.holding ? 'command-result-holding' : ''} ${index === activeCommandIndex ? 'active' : ''}`} aria-label={holdingLabel} aria-selected={index === activeCommandIndex} onMouseEnter={() => setActiveCommandIndex(index)} onClick={() => openCommand(item.to)}>
-                {item.holding ? <HoldingLogo symbol={item.holding.symbol} assetClass={item.holding.asset_class} size={32}/> : ItemIcon ? <ItemIcon size={16}/> : null}
+                {item.holding ? <HoldingLogo symbol={item.holding.symbol} market={item.holding.market} assetClass={item.holding.asset_class} size={32}/> : ItemIcon ? <ItemIcon size={16}/> : null}
                 {item.holding ? <span className="command-result-copy"><strong>{item.holding.symbol}</strong><span>{item.holding.name || 'Unnamed holding'}</span><small>{[item.holding.market, item.holding.account_name].filter(Boolean).join(' · ')}</small></span> : <strong>{item.label}</strong>}
                 <small className="command-result-hint">↵</small>
               </button>

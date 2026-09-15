@@ -6993,3 +6993,78 @@ html { scrollbar-gutter: stable; }
   .mytax-review-item { grid-template-columns: 24px minmax(0, 1fr); }
   .mytax-review-item .badge { grid-column: 2; justify-self: start; }
 }
+
+/* Shared control geometry: every content-level search field and button sits on
+   the same 40px track, with one square-ish radius. */
+:root { --radius: 8px; }
+.button,
+.select-wrap select,
+.sort-direction,
+.portfolio-filter,
+.report-search,
+.catalog-search,
+.search-input,
+.portfolio-toolbar > button,
+.holdings-head button,
+.report-toolbar .button,
+.report-toolbar .select-wrap select {
+  border-radius: 8px;
+}
+.portfolio-filter,
+.report-search,
+.catalog-search,
+.search-input,
+.report-toolbar .button,
+.report-toolbar .select-wrap,
+.report-toolbar .select-wrap select {
+  min-height: 40px;
+  height: 40px;
+}
+.report-toolbar .button,
+.report-toolbar .select-wrap select { font-size: 11px; }
+.report-toolbar .select-wrap { min-width: 126px; }
+.tax-page--overview .tax-report-toolbar {
+  min-height: 40px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.report-diversification-layout { min-width: 0; grid-template-columns: minmax(0, 1.45fr) minmax(320px, .75fr); }
+.report-diversification-layout > * { min-width: 0; }
+.report-diversification-layout .report-chart-card { min-width: 0; }
+.report-diversification-layout .donut-layout { min-width: 0; grid-template-columns: minmax(250px, .95fr) minmax(0, 1fr); gap: 16px; }
+.report-diversification-layout .donut-chart { height: 310px; min-width: 0; }
+.report-diversification-layout .report-detail-card { min-width: 0; overflow: hidden; }
+.report-diversification-layout .report-detail-card .table-scroll { overflow-x: hidden; }
+.report-diversification-layout .report-detail-card table { width: 100%; min-width: 0; table-layout: fixed; }
+.report-diversification-layout .report-detail-card th,
+.report-diversification-layout .report-detail-card td { overflow: hidden; text-overflow: ellipsis; }
+.report-diversification-layout .report-detail-card th:first-child,
+.report-diversification-layout .report-detail-card td:first-child { width: 48%; }
+.report-diversification-layout .report-detail-card th:nth-child(2),
+.report-diversification-layout .report-detail-card td:nth-child(2) { width: 24%; }
+.report-diversification-layout .report-detail-card th:last-child,
+.report-diversification-layout .report-detail-card td:last-child { width: 28%; }
+.app-page-transition:has(.ai-engine) { min-height: 0; }
+.app-content:has(.ai-engine) { padding: 0; }
+.ai-engine { width: 100%; min-height: calc(100dvh - 60px); margin: 0; }
+.ai-engine .ai-titlebar { width: 100%; box-sizing: border-box; }
+.app-page-transition:has(.tax-page--valuation),
+.app-page-transition:has(.tax-page--historical-cost) { min-height: 0; }
+.tax-page--valuation .tax-field-card,
+.tax-page--historical-cost .tax-field-card { margin-bottom: 0; }
+
+/* Keep hover states in the product palette instead of falling back to a dark
+   text/background pairing that reads like a broken button. */
+.button-primary:hover:not(:disabled) { color: #fff; background: var(--green-strong); }
+.button-secondary:hover:not(:disabled),
+.button-ghost:hover:not(:disabled),
+.portfolio-toolbar button:hover:not(:disabled),
+.holdings-head button:hover:not(:disabled) { color: var(--text); background: var(--surface-2); }
+
+@media (max-width: 900px) {
+  .report-diversification-layout { grid-template-columns: 1fr; }
+  .report-diversification-layout .donut-layout { grid-template-columns: minmax(0, 1fr); }
+  .report-diversification-layout .donut-chart { height: 280px; }
+}
